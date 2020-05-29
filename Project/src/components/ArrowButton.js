@@ -5,9 +5,16 @@ export default function ArrowButton({
     vertical=false,
     source,
     onPress,
+    disabled=false,
 }) {
     return (
-        <TouchableOpacity onPress={onPress} >
+        <TouchableOpacity 
+            onPress={onPress} 
+            disabled={disabled} 
+            style={{
+                opacity: disabled && 0.5,
+            }} 
+        >
             <Image
                 style={
                     vertical

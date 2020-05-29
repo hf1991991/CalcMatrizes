@@ -44,6 +44,7 @@ export default function MatrixArea({
                                 columns: editableDimensions.columns - 1,
                             })
                         }
+                        disabled={editableDimensions.columns <= 1}
                     />
                     <ArrowButton 
                         source={require('../../assets/icons/RightArrow.png')}
@@ -66,13 +67,14 @@ export default function MatrixArea({
             >
                 <ArrowButton 
                     vertical
-                    source={require('../../assets/icons/UpArrow.png')}
                     onPress={
                         () => changeEditableDimensions({
                             ...editableDimensions,
-                            rows: editableDimensions.rows + 1,
+                            rows: editableDimensions.rows - 1,
                         })
                     }
+                    disabled={editableDimensions.rows <= 1}
+                    source={require('../../assets/icons/UpArrow.png')}
                 />
                 <ArrowButton 
                     vertical
@@ -80,7 +82,7 @@ export default function MatrixArea({
                     onPress={
                         () => changeEditableDimensions({
                             ...editableDimensions,
-                            rows: editableDimensions.rows - 1,
+                            rows: editableDimensions.rows + 1,
                         })
                     }
                 />
