@@ -40,7 +40,8 @@ export default function InfoArea({
                         changeEditableMatrix(
                             MatrixOperations.resizeMatrix({
                                 originalMatrix: currentMatrix,
-                                ...editableDimensions,
+                                rows,
+                                columns,
                             })
                         );
                     }}
