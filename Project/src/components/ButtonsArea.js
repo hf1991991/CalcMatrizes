@@ -2,22 +2,25 @@ import React, { useState } from 'react';
 import { View, StyleSheet, Dimensions } from 'react-native';
 import Button from './Button';
 import MatrixOperations from '../utilities/MatrixOperations';
-import { KeyboardState } from '../utilities/constants';
+import { MatrixState } from '../utilities/constants';
 import MatrixData from '../utilities/MatrixData';
 
 const windowWidth = Dimensions.get('window').width;
 
 export default function ButtonsArea({ 
-    keyboardState, 
+    matrixState, 
     numberWritten,
     onPressAC,
     onPressCE,
     numberButtonPressed,
     onEnter,
+    onCheck,
+    checkActive,
     secondSetOfKeysActive, 
     changeSecondSetOfKeysActive, 
     columnDirectionActive,
     changeColumnDirectionActive,
+    selectedMatrixElement,
     currentMatrix,
     changeCurrentMatrix,
 }) {
@@ -40,7 +43,7 @@ export default function ButtonsArea({
                 />
                 <Button
                     source={
-                        keyboardState == KeyboardState.matrixReady
+                        matrixState == MatrixState.ready
                             ? require('../../assets/buttons/Save.png')
                             : require('../../assets/buttons/SavedList.png')
                     }
@@ -52,7 +55,7 @@ export default function ButtonsArea({
                             : require('../../assets/buttons/InactiveSecond.png')
                     }
                     source={
-                        keyboardState == KeyboardState.matrixReady
+                        matrixState == MatrixState.ready
                             ? secondSetOfKeysActive
                                 ? require('../../assets/buttons/ActiveSecond.png')
                                 : require('../../assets/buttons/InactiveSecond.png')
@@ -61,14 +64,14 @@ export default function ButtonsArea({
                                 : require('../../assets/buttons/InactiveColumnDirection.png')
                     }
                     onPress={
-                        keyboardState == KeyboardState.matrixReady
+                        matrixState == MatrixState.ready
                             ? changeSecondSetOfKeysActive
                             : changeColumnDirectionActive
                     }
                 />
                 <Button
                     source={
-                        keyboardState == KeyboardState.matrixReady
+                        matrixState == MatrixState.ready
                             ? secondSetOfKeysActive
                                 ? require('../../assets/buttons/LambdaxA.png')
                                 : require('../../assets/buttons/R.png')
@@ -93,7 +96,7 @@ export default function ButtonsArea({
                 />
                 <Button
                     source={
-                        keyboardState == KeyboardState.matrixReady
+                        matrixState == MatrixState.ready
                             ? secondSetOfKeysActive
                                 ? require('../../assets/buttons/BxA.png')
                                 : require('../../assets/buttons/AxB.png')
@@ -155,14 +158,19 @@ export default function ButtonsArea({
                 />
                 <Button
                     source={
-                        keyboardState == KeyboardState.matrixReady
+                        matrixState == MatrixState.ready
                             ? secondSetOfKeysActive
                                 ? require('../../assets/buttons/Transposed.png')
                                 : require('../../assets/buttons/Inverse.png')
-                            : require('../../assets/buttons/Enter.png')
+                            : selectedMatrixElement
+                                ? require('../../assets/buttons/Enter.png')
+                                : require('../../assets/buttons/Check.png')
+                    }
+                    disabled={
+                        matrixState != MatrixState.ready && !selectedMatrixElement && !checkActive
                     }
                     onPress={
-                        keyboardState == KeyboardState.matrixReady
+                        matrixState == MatrixState.ready
                             ? secondSetOfKeysActive
                                 ? () => {
                                     changeCurrentMatrix(
@@ -172,7 +180,9 @@ export default function ButtonsArea({
                                     );
                                 }
                                 : () => {}
-                            : onEnter
+                            : selectedMatrixElement
+                                ? onEnter
+                                : onCheck
                     }
                 />
             </View>

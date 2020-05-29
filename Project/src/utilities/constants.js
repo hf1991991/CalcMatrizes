@@ -1,6 +1,6 @@
-export const KeyboardState = {
-    matrixReady: 'matrixReady',
-    changingMatrix: 'changingMatrix',
+export const MatrixState = {
+    ready: 'ready',
+    editing: 'editing',
 }
 
 export function count(string, substring, caseSensitive) {

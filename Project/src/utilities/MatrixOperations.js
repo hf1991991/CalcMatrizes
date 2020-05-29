@@ -77,4 +77,15 @@ export default class MatrixOperations {
         return matrix;
     }
 
+    static isMatrixFull(matrix) {
+        if (!matrix) return false;
+        
+        for (let row = 0; row < matrix.dimensions().rows; row++) {
+            for (let column = 0; column < matrix.dimensions().columns; column++) {
+                if (matrix.data[row][column] === null) return false;
+            }
+        }
+        return true;
+    }
+
 }

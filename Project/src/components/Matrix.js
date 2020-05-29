@@ -91,7 +91,7 @@ export default function Matrix({
                                                 minHeight: 40,
                                                 minWidth: Math.max(
                                                     flatListWidth/matrixNumbers?.dimensions().columns-10,
-                                                    100
+                                                    50
                                                 ),
                                                 marginHorizontal: 5,
                                             }}

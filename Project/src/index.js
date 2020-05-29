@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { SafeAreaView, StatusBar, View } from 'react-native';
 import ButtonsArea from './components/ButtonsArea';
 import InfoArea from './components/InfoArea';
-import { KeyboardState, count } from './utilities/constants';
+import { MatrixState, count } from './utilities/constants';
 import MatrixOperations from './utilities/MatrixOperations';
 import MatrixData from './utilities/MatrixData';
 
@@ -10,9 +10,9 @@ export default function App() {
     let [currentMatrix, changeCurrentMatrix] = useState(
         new MatrixData({
             data: [
-                [1,2,5],
-                [4,702,3],
-                [9,9,9000],
+                [null, null, null],
+                [null, null, null],
+                [null, null, null],
             ]
         })
     );
@@ -20,14 +20,14 @@ export default function App() {
     let [numberWritten, changeNumberWritten] = useState(null);
     let [selectedMatrixElement, changeSelectedMatrixElement] = useState(null);
     let [editableDimensions, changeEditableDimensions] = useState(null);
-    let [keyboardState, changeKeyboardState] = useState(KeyboardState.matrixReady);
+    let [matrixState, changeMatrixState] = useState(MatrixState.ready);
     let [secondSetOfKeysActive, changeSecondSetOfKeysActive] = useState(false);
     let [columnDirectionActive, changeColumnDirectionActive] = useState(false);
 
-    function getNewNumberConfigs() {
+    function getNewNumberConfigs(matrix) {
         if (
-            selectedMatrixElement.row == currentMatrix.dimensions().rows - 1
-            && selectedMatrixElement.column == currentMatrix.dimensions().columns - 1
+            selectedMatrixElement.row == matrix.dimensions().rows - 1
+            && selectedMatrixElement.column == matrix.dimensions().columns - 1
         ) {
             return {
                 number: null,
@@ -35,9 +35,9 @@ export default function App() {
             };
         } else {
             if (columnDirectionActive) {
-                if (selectedMatrixElement.row < currentMatrix.dimensions().rows - 1) {
+                if (selectedMatrixElement.row < matrix.dimensions().rows - 1) {
                     return {
-                        number: currentMatrix.data
+                        number: matrix.data
                             [selectedMatrixElement.row + 1]
                             [selectedMatrixElement.column],
                         selectedElement: {
@@ -47,7 +47,7 @@ export default function App() {
                     };
                 } else {
                     return {
-                        number: currentMatrix.data
+                        number: matrix.data
                             [0]
                             [selectedMatrixElement.column + 1],
                         selectedElement: {
@@ -57,9 +57,9 @@ export default function App() {
                     };
                 }
             } else {
-                if (selectedMatrixElement.column < currentMatrix.dimensions().columns - 1) {
+                if (selectedMatrixElement.column < matrix.dimensions().columns - 1) {
                     return {
-                        number: currentMatrix.data
+                        number: matrix.data
                             [selectedMatrixElement.row]
                             [selectedMatrixElement.column + 1],
                         selectedElement: {
@@ -69,7 +69,7 @@ export default function App() {
                     };
                 } else {
                     return {
-                        number: currentMatrix.data
+                        number: matrix.data
                             [selectedMatrixElement.row + 1]
                             [0],
                         selectedElement: {
@@ -92,6 +92,7 @@ export default function App() {
         >
             <StatusBar barStyle='light-content' />
             <InfoArea 
+                matrixState={matrixState}
                 currentMatrix={currentMatrix}
                 changeCurrentMatrix={changeCurrentMatrix}
                 editableMatrix={editableMatrix}
@@ -100,8 +101,12 @@ export default function App() {
                 changeSelectedMatrixElement={
                     ({ row, column }) => {
                         changeSelectedMatrixElement({ row, column });
-                        changeEditableMatrix(currentMatrix);
-                        changeEditableDimensions(currentMatrix.dimensions());
+
+                        if (matrixState == MatrixState.ready) {
+                            changeMatrixState(MatrixState.editing);
+                            changeEditableMatrix(currentMatrix);
+                            changeEditableDimensions(currentMatrix.dimensions());
+                        }
                     }
                 }
                 editableDimensions={editableDimensions}
@@ -114,17 +119,13 @@ export default function App() {
                 }
             />
             <ButtonsArea
-                keyboardState={
-                    selectedMatrixElement 
-                        ? KeyboardState.changingMatrix 
-                        : keyboardState
-                }
+                matrixState={matrixState}
                 numberWritten={numberWritten}
                 onPressCE={
                     () => changeNumberWritten(null)
                 }
                 onPressAC={
-                    () => changeSelectedMatrixElement(null)
+                    () => changeMatrixState(MatrixState.ready)
                 }
                 numberButtonPressed={
                     (element) => {
@@ -144,20 +145,27 @@ export default function App() {
                 }
                 currentMatrix={currentMatrix}
                 changeCurrentMatrix={changeCurrentMatrix}
+                selectedMatrixElement={selectedMatrixElement}
                 onEnter={() => {
-                    changeCurrentMatrix(
+
+                    changeEditableMatrix(
                         MatrixOperations.changeElement({
-                            currentMatrix,
+                            currentMatrix: editableMatrix,
                             ...selectedMatrixElement,
                             numberWritten,
                         })
                     );
 
-                    const { number, selectedElement } = getNewNumberConfigs();
+                    const { number, selectedElement } = getNewNumberConfigs(editableMatrix);
 
                     changeNumberWritten(number);
                     changeSelectedMatrixElement(selectedElement);
 
+                }}
+                checkActive={MatrixOperations.isMatrixFull(editableMatrix)}
+                onCheck={() => {
+                    changeCurrentMatrix(editableMatrix);
+                    changeMatrixState(MatrixState.ready);
                 }}
             />
         </SafeAreaView>

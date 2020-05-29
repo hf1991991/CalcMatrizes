@@ -2,8 +2,10 @@ import React from 'react';
 import { View } from 'react-native';
 import Matrix from './Matrix';
 import ArrowButton from './ArrowButton';
+import { MatrixState } from '../utilities/constants';
 
 export default function MatrixArea({ 
+    matrixState,
     currentMatrix,
     selectedMatrixElement,
     changeSelectedMatrixElement,
@@ -31,7 +33,7 @@ export default function MatrixArea({
                         justifyContent: 'center',
                         alignItems: 'center',
                         marginLeft: 15,
-                        display: selectedMatrixElement ? 'flex' : 'none',
+                        display: matrixState != MatrixState.editing && 'none',
                     }}
                 >
                     <ArrowButton 
@@ -59,7 +61,7 @@ export default function MatrixArea({
                     flexDirection: 'row',
                     justifyContent: 'center',
                     marginTop: 15,
-                    display: selectedMatrixElement ? 'flex' : 'none',
+                    display: matrixState != MatrixState.editing && 'none',
                 }}
             >
                 <ArrowButton 
@@ -68,7 +70,7 @@ export default function MatrixArea({
                     onPress={
                         () => changeEditableDimensions({
                             ...editableDimensions,
-                            rows: editableDimensions.rows - 1,
+                            rows: editableDimensions.rows + 1,
                         })
                     }
                 />
@@ -78,7 +80,7 @@ export default function MatrixArea({
                     onPress={
                         () => changeEditableDimensions({
                             ...editableDimensions,
-                            rows: editableDimensions.rows + 1,
+                            rows: editableDimensions.rows - 1,
                         })
                     }
                 />

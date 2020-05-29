@@ -2,8 +2,10 @@ import React from 'react';
 import { Text, View, ScrollView } from 'react-native';
 import MatrixArea from './MatrixArea';
 import MatrixOperations from '../utilities/MatrixOperations';
+import { MatrixState } from '../utilities/constants';
 
 export default function InfoArea({ 
+    matrixState,
     currentMatrix,
     changeCurrentMatrix,
     editableMatrix,
@@ -26,45 +28,55 @@ export default function InfoArea({
         >
             <ScrollView
                 showsVerticalScrollIndicator={false}
+                style={{
+                    transform:[{rotateX:'180deg'}],
+                }}
             >
-                <MatrixArea 
-                    currentMatrix={
-                        selectedMatrixElement
-                            ? editableMatrix
-                            : currentMatrix
-                    }
-                    changeCurrentMatrix={changeCurrentMatrix}
-                    editableDimensions={editableDimensions}
-                    changeEditableDimensions={({ rows, columns }) => {
-                        changeEditableDimensions({ rows, columns });
-                        changeEditableMatrix(
-                            MatrixOperations.resizeMatrix({
-                                originalMatrix: currentMatrix,
-                                rows,
-                                columns,
-                            })
-                        );
-                    }}
-                    selectedMatrixElement={selectedMatrixElement}
-                    changeSelectedMatrixElement={changeSelectedMatrixElement}
-                    changeNumberWritten={changeNumberWritten}
-                />
                 <View
                     style={{
-                        justifyContent: 'center',
-                        minHeight: 100,
+                        transform:[{rotateX:'180deg'}],
                     }}
                 >
-                    <Text
+                    <MatrixArea 
+                        matrixState={matrixState}
+                        currentMatrix={
+                            matrixState == MatrixState.editing
+                                ? editableMatrix
+                                : currentMatrix
+                        }
+                        changeCurrentMatrix={changeCurrentMatrix}
+                        editableDimensions={editableDimensions}
+                        changeEditableDimensions={({ rows, columns }) => {
+                            changeEditableDimensions({ rows, columns });
+                            changeEditableMatrix(
+                                MatrixOperations.resizeMatrix({
+                                    originalMatrix: currentMatrix,
+                                    rows,
+                                    columns,
+                                })
+                            );
+                        }}
+                        selectedMatrixElement={selectedMatrixElement}
+                        changeSelectedMatrixElement={changeSelectedMatrixElement}
+                        changeNumberWritten={changeNumberWritten}
+                    />
+                    <View
                         style={{
-                            textAlign: 'right',
-                            color: '#fff',
-                            fontSize: 60,
-                            marginVertical: 10,
+                            justifyContent: 'center',
+                            minHeight: 100,
                         }}
                     >
-                        {numberWritten}
-                    </Text>
+                        <Text
+                            style={{
+                                textAlign: 'right',
+                                color: '#fff',
+                                fontSize: 60,
+                                marginVertical: 10,
+                            }}
+                        >
+                            {numberWritten}
+                        </Text>
+                    </View>
                 </View>
             </ScrollView>
         </View>
