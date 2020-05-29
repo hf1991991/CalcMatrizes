@@ -1,5 +1,11 @@
 export default class MatrixOperations {
 
+    static changeElement({ currentMatrix, column, row, numberWritten }) {
+        let matrixCopy = [...currentMatrix.data];
+        matrixCopy[row][column] = numberWritten;
+        return matrixCopy;
+    }
+
     static transpose(matrix) {
         let transposed = [];
 
