@@ -1,7 +1,8 @@
 export default class MatrixData {
 
-    constructor(data) {
+    constructor({ data, dataBeforeEdit }) {
         this.data = data;
+        this.dataBeforeEdit = dataBeforeEdit;
     }
 
     length() {
