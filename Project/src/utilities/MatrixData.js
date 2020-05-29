@@ -1,11 +1,10 @@
 export default class MatrixData {
 
-    constructor({ data, dataBeforeEdit }) {
+    constructor({ data }) {
         this.data = data;
-        this.dataBeforeEdit = dataBeforeEdit;
     }
 
-    length() {
+    dimensions() {
         return {
             rows: this.data.length,
             columns: this.data[0].length,

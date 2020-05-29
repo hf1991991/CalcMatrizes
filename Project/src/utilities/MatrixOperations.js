@@ -12,39 +12,24 @@ export default class MatrixOperations {
 
     static copyMatrixData(matrix) {
         let copyData = [];
-        let copyDataBeforeEdit = [];
 
-        for (let row = 0; row < matrix.length().rows; row++) {
+        for (let row = 0; row < matrix.dimensions().rows; row++) {
             let copyDataRow = [];
-            for (let column = 0; column < matrix.length().columns; column++) {
+            for (let column = 0; column < matrix.dimensions().columns; column++) {
                 copyDataRow.push(matrix.data[row][column]);
             }
             copyData.push(copyDataRow);
         }
 
-        if (!matrix.dataBeforeEdit) copyDataBeforeEdit = null
-        else {
-            for (let row = 0; row < matrix.dataBeforeEdit.length; row++) {
-                let copyDataBeforeEditRow = [];
-                for (let column = 0; column < matrix.dataBeforeEdit[0].length; column++) {
-                    copyDataBeforeEditRow.push(matrix.dataBeforeEdit[row][column]);
-                }
-                copyDataBeforeEdit.push(copyDataBeforeEditRow);
-            }
-        }
-
-        return {
-            data: copyData,
-            dataBeforeEdit: copyDataBeforeEdit,
-        }
+        return copyData;
     }
 
     static transpose(matrix) {
         let transposed = [];
 
-        for (let column = 0; column < matrix.length().columns; column++) {
+        for (let column = 0; column < matrix.dimensions().columns; column++) {
             let transposedRow = [];
-            for (let row = 0; row < matrix.length().rows; row++) {
+            for (let row = 0; row < matrix.dimensions().rows; row++) {
                 transposedRow.push(matrix.data[row][column]);
             }
             transposed.push(transposedRow);
@@ -53,28 +38,43 @@ export default class MatrixOperations {
         return transposed;
     }
 
-    static addColumn(currentMatrix) {
-        const originalMatrixData = MatrixOperations.copyMatrixData(currentMatrix);
-        console.log(originalMatrixData);
-        const matrixDataCopy = [...currentMatrix.data.slice()];
-        for (let row of matrixDataCopy) row.push(null);
-        console.log(originalMatrixData);
+    static resizeMatrix({ originalMatrix, rows, columns }) {
+        let resizedMatrix = MatrixOperations.copyMatrixData(originalMatrix);
+
+        while (resizedMatrix.length != rows) {
+            if (resizedMatrix.length > rows) MatrixOperations.removeRow(resizedMatrix);
+            else MatrixOperations.addRow(resizedMatrix);
+        }
+
+        while ((resizedMatrix[0] || []).length != columns) {
+            if ((resizedMatrix[0] || []).length > columns) MatrixOperations.removeColumn(resizedMatrix);
+            else MatrixOperations.addColumn(resizedMatrix);
+        }
+
         return new MatrixData({
-            data: matrixDataCopy,
-            dataBeforeEdit: originalMatrixData.dataBeforeEdit || originalMatrixData.data,
+            data: resizedMatrix,
         });
     }
 
-    static removeColumn(currentMatrix) {
-        const originalMatrixData = MatrixOperations.copyMatrixData(currentMatrix);
-        console.log(originalMatrixData);
-        const matrixDataCopy = [...currentMatrix.data.slice()];
-        for (let row of matrixDataCopy) row.pop();
-        console.log(originalMatrixData);
-        return new MatrixData({
-            data: matrixDataCopy,
-            dataBeforeEdit: originalMatrixData.dataBeforeEdit || originalMatrixData.data,
-        });
+    static addColumn(matrix) {
+        for (let row of matrix) row.push(null);
+        return matrix;
+    }
+
+    static removeColumn(matrix) {
+        for (let row of matrix) row.pop();
+        return matrix;
+    }
+
+    static addRow(matrix) {
+        matrix.push([]);
+        for (let column of matrix[0]) matrix[matrix.length - 1].push(null);
+        return matrix;
+    }
+
+    static removeRow(matrix) {
+        matrix.pop();
+        return matrix;
     }
 
 }
