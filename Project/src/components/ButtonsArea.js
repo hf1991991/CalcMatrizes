@@ -2,80 +2,81 @@ import React, { useState } from 'react';
 import { View, StyleSheet, Dimensions } from 'react-native';
 import CalculatorButton from './CalculatorButton';
 import MatrixOperations from '../utilities/MatrixOperations';
-import { MatrixState } from '../utilities/constants';
+import { MatrixState, ButtonType } from '../utilities/constants';
 import MatrixData from '../utilities/MatrixData';
 
 const windowWidth = Dimensions.get('window').width;
 
-export default function ButtonsArea({ 
-    matrixState, 
-    numberWritten,
-    onPressAC,
-    onPressCE,
-    numberButtonPressed,
-    onEnter,
-    onCheck,
-    isMatrixFull,
-    secondSetOfKeysActive, 
-    changeSecondSetOfKeysActive, 
-    columnDirectionActive,
-    changeColumnDirectionActive,
-    selectedMatrixElement,
-    currentMatrix,
-    changeCurrentMatrix,
-}) {
+export default function ButtonsArea(props) {
+    const { 
+        matrixState, 
+        numberWritten,
+        secondSetOfKeysActive, 
+        selectedMatrixElement,
+    } = props;
     return (
         <>
             <View 
                 style={styles.button}
             >
                 <CalculatorButton
-                    source={
+                    {...props}
+                    buttonType={
                         numberWritten 
-                            ? require('../../assets/buttons/CE.png')
-                            : require('../../assets/buttons/AC.png')
-                    }
-                    onPress={
-                        numberWritten
-                            ? onPressCE
-                            : onPressAC
+                            ? ButtonType.CE
+                            : ButtonType.AC
                     }
                 />
                 <CalculatorButton
-                    source={
-                        matrixState == MatrixState.ready
-                            ? require('../../assets/buttons/Save.png')
-                            : require('../../assets/buttons/SavedList.png')
+                    {...props}
+                    buttonType={
+                        matrixState == MatrixState.ready 
+                            ? ButtonType.Save
+                            : ButtonType.SavedList
                     }
                 />
                 <CalculatorButton
-                    source={
-                        secondSetOfKeysActive
-                            ? require('../../assets/buttons/ActiveSecond.png')
-                            : require('../../assets/buttons/InactiveSecond.png')
+                    {...props}
+                    buttonType={
+                        matrixState == MatrixState.ready 
+                            ? ButtonType.Second
+                            : ButtonType.ColumnDirection
                     }
-                    source={
-                        matrixState == MatrixState.ready
+                />
+                <CalculatorButton
+                    {...props}
+                    buttonType={
+                        matrixState == MatrixState.ready 
                             ? secondSetOfKeysActive
-                                ? require('../../assets/buttons/ActiveSecond.png')
-                                : require('../../assets/buttons/InactiveSecond.png')
-                            : columnDirectionActive
-                                ? require('../../assets/buttons/ActiveColumnDirection.png')
-                                : require('../../assets/buttons/InactiveColumnDirection.png')
-                    }
-                    onPress={
-                        matrixState == MatrixState.ready
-                            ? changeSecondSetOfKeysActive
-                            : changeColumnDirectionActive
+                                ? ButtonType.LambdaxA
+                                : ButtonType.R
+                            : ButtonType.Divide
                     }
                 />
+            </View>
+            <View 
+                style={styles.button}
+            >
                 <CalculatorButton
-                    source={
-                        matrixState == MatrixState.ready
+                    {...props}
+                    buttonType={ButtonType[7]}
+                />
+                <CalculatorButton
+                    {...props}
+                    buttonType={ButtonType[8]}
+                />
+                <CalculatorButton
+                    {...props}
+                    buttonType={ButtonType[9]}
+                />
+                <CalculatorButton
+                    {...props}
+                    buttonType={
+                        matrixState == MatrixState.ready 
                             ? secondSetOfKeysActive
-                                ? require('../../assets/buttons/LambdaxA.png')
-                                : require('../../assets/buttons/R.png')
-                            : require('../../assets/buttons/Divide.png')
+                                ? ButtonType.BxA
+                                : ButtonType.AxB
+                            : ButtonType.Multiply
                     }
                 />
             </View>
@@ -83,106 +84,66 @@ export default function ButtonsArea({
                 style={styles.button}
             >
                 <CalculatorButton
-                    source={require('../../assets/buttons/7.png')}
-                    onPress={() => numberButtonPressed(7)}
+                    {...props}
+                    buttonType={ButtonType[4]}
                 />
                 <CalculatorButton
-                    source={require('../../assets/buttons/8.png')}
-                    onPress={() => numberButtonPressed(8)}
+                    {...props}
+                    buttonType={ButtonType[5]}
                 />
                 <CalculatorButton
-                    source={require('../../assets/buttons/9.png')}
-                    onPress={() => numberButtonPressed(9)}
+                    {...props}
+                    buttonType={ButtonType[6]}
                 />
                 <CalculatorButton
-                    source={
-                        matrixState == MatrixState.ready
-                            ? secondSetOfKeysActive
-                                ? require('../../assets/buttons/BxA.png')
-                                : require('../../assets/buttons/AxB.png')
-                            : require('../../assets/buttons/Multiply.png')
-                    }
+                    {...props}
+                    buttonType={ButtonType.Subtract}
                 />
             </View>
             <View 
                 style={styles.button}
             >
                 <CalculatorButton
-                    source={require('../../assets/buttons/4.png')}
-                    onPress={() => numberButtonPressed(4)}
+                    {...props}
+                    buttonType={ButtonType[1]}
                 />
                 <CalculatorButton
-                    source={require('../../assets/buttons/5.png')}
-                    onPress={() => numberButtonPressed(5)}
+                    {...props}
+                    buttonType={ButtonType[2]}
                 />
                 <CalculatorButton
-                    source={require('../../assets/buttons/6.png')}
-                    onPress={() => numberButtonPressed(6)}
+                    {...props}
+                    buttonType={ButtonType[3]}
                 />
                 <CalculatorButton
-                    source={require('../../assets/buttons/Subtract.png')}
-                />
-            </View>
-            <View 
-                style={styles.button}
-            >
-                <CalculatorButton
-                    source={require('../../assets/buttons/1.png')}
-                    onPress={() => numberButtonPressed(1)}
-                />
-                <CalculatorButton
-                    source={require('../../assets/buttons/2.png')}
-                    onPress={() => numberButtonPressed(2)}
-                />
-                <CalculatorButton
-                    source={require('../../assets/buttons/3.png')}
-                    onPress={() => numberButtonPressed(3)}
-                />
-                <CalculatorButton
-                    source={require('../../assets/buttons/Add.png')}
+                    {...props}
+                    buttonType={ButtonType.Add}
                 />
             </View>
             <View 
                 style={styles.button}
             >
                 <CalculatorButton
+                    {...props}
                     style={{
                         flex: 2,
                     }}
-                    source={require('../../assets/buttons/0.png')}
-                    onPress={() => numberButtonPressed(0)}
+                    buttonType={ButtonType[0]}
                 />
                 <CalculatorButton
-                    source={require('../../assets/buttons/Comma.png')}
-                    onPress={() => numberButtonPressed(',')}
+                    {...props}
+                    buttonType={ButtonType.Comma}
                 />
                 <CalculatorButton
-                    source={
-                        matrixState == MatrixState.ready
+                    {...props}
+                    buttonType={
+                        matrixState == MatrixState.ready 
                             ? secondSetOfKeysActive
-                                ? require('../../assets/buttons/Transposed.png')
-                                : require('../../assets/buttons/Inverse.png')
+                                ? ButtonType.Transposed
+                                : ButtonType.Inverse
                             : selectedMatrixElement
-                                ? require('../../assets/buttons/Enter.png')
-                                : require('../../assets/buttons/Check.png')
-                    }
-                    disabled={
-                        matrixState != MatrixState.ready && !selectedMatrixElement && !isMatrixFull
-                    }
-                    onPress={
-                        matrixState == MatrixState.ready
-                            ? secondSetOfKeysActive
-                                ? () => {
-                                    changeCurrentMatrix(
-                                        new MatrixData({
-                                            data: MatrixOperations.transpose(currentMatrix)
-                                        })
-                                    );
-                                }
-                                : () => {}
-                            : selectedMatrixElement
-                                ? onEnter
-                                : onCheck
+                                ? ButtonType.Enter
+                                : ButtonType.Check
                     }
                 />
             </View>

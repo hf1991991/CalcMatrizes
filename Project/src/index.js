@@ -151,6 +151,13 @@ export default function App() {
                 currentMatrix={currentMatrix}
                 changeCurrentMatrix={changeCurrentMatrix}
                 selectedMatrixElement={selectedMatrixElement}
+                onTranspose={() => {
+                    changeCurrentMatrix(
+                        new MatrixData({
+                            data: MatrixOperations.transpose(currentMatrix)
+                        })
+                    );
+                }}
                 onEnter={() => {
 
                     changeEditableMatrix(
