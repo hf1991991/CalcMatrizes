@@ -7,7 +7,7 @@ export default class MatrixData {
     dimensions() {
         return {
             rows: this.data.length,
-            columns: this.data[0].length,
+            columns: this.data[0] && this.data[0].length,
         };
     }
 }
