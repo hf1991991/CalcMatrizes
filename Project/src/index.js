@@ -6,16 +6,16 @@ import { MatrixState, count } from './utilities/constants';
 import MatrixOperations from './utilities/MatrixOperations';
 import MatrixData from './utilities/MatrixData';
 
+const NULL_MATRIX = () => new MatrixData({
+    data: [
+        [null, null, null],
+        [null, null, null],
+        [null, null, null],
+    ],
+});
+
 export default function App() {
-    let [currentMatrix, changeCurrentMatrix] = useState(
-        new MatrixData({
-            data: [
-                [null, null, null],
-                [null, null, null],
-                [null, null, null],
-            ]
-        })
-    );
+    let [currentMatrix, changeCurrentMatrix] = useState(NULL_MATRIX());
     let [editableMatrix, changeEditableMatrix] = useState(null);
     let [numberWritten, changeNumberWritten] = useState(null);
     let [selectedMatrixElement, changeSelectedMatrixElement] = useState(null);
@@ -125,7 +125,12 @@ export default function App() {
                     () => changeNumberWritten(null)
                 }
                 onPressAC={
-                    () => changeMatrixState(MatrixState.ready)
+                    matrixState == MatrixState.ready
+                        ? () => changeCurrentMatrix(NULL_MATRIX())
+                        : () => {
+                            changeMatrixState(MatrixState.ready);
+                            changeSelectedMatrixElement(null);
+                        }
                 }
                 numberButtonPressed={
                     (element) => {
