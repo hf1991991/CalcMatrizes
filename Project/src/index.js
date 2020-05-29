@@ -167,7 +167,7 @@ export default function App() {
                     changeSelectedMatrixElement(selectedElement);
 
                 }}
-                checkActive={MatrixOperations.isMatrixFull(editableMatrix)}
+                isMatrixFull={MatrixOperations.isMatrixFull(editableMatrix)}
                 onCheck={() => {
                     changeCurrentMatrix(editableMatrix);
                     changeMatrixState(MatrixState.ready);

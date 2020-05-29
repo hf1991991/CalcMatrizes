@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, Dimensions } from 'react-native';
-import Button from './Button';
+import CalculatorButton from './CalculatorButton';
 import MatrixOperations from '../utilities/MatrixOperations';
 import { MatrixState } from '../utilities/constants';
 import MatrixData from '../utilities/MatrixData';
@@ -15,7 +15,7 @@ export default function ButtonsArea({
     numberButtonPressed,
     onEnter,
     onCheck,
-    checkActive,
+    isMatrixFull,
     secondSetOfKeysActive, 
     changeSecondSetOfKeysActive, 
     columnDirectionActive,
@@ -29,7 +29,7 @@ export default function ButtonsArea({
             <View 
                 style={styles.button}
             >
-                <Button
+                <CalculatorButton
                     source={
                         numberWritten 
                             ? require('../../assets/buttons/CE.png')
@@ -41,14 +41,14 @@ export default function ButtonsArea({
                             : onPressAC
                     }
                 />
-                <Button
+                <CalculatorButton
                     source={
                         matrixState == MatrixState.ready
                             ? require('../../assets/buttons/Save.png')
                             : require('../../assets/buttons/SavedList.png')
                     }
                 />
-                <Button
+                <CalculatorButton
                     source={
                         secondSetOfKeysActive
                             ? require('../../assets/buttons/ActiveSecond.png')
@@ -69,7 +69,7 @@ export default function ButtonsArea({
                             : changeColumnDirectionActive
                     }
                 />
-                <Button
+                <CalculatorButton
                     source={
                         matrixState == MatrixState.ready
                             ? secondSetOfKeysActive
@@ -82,19 +82,19 @@ export default function ButtonsArea({
             <View 
                 style={styles.button}
             >
-                <Button
+                <CalculatorButton
                     source={require('../../assets/buttons/7.png')}
                     onPress={() => numberButtonPressed(7)}
                 />
-                <Button
+                <CalculatorButton
                     source={require('../../assets/buttons/8.png')}
                     onPress={() => numberButtonPressed(8)}
                 />
-                <Button
+                <CalculatorButton
                     source={require('../../assets/buttons/9.png')}
                     onPress={() => numberButtonPressed(9)}
                 />
-                <Button
+                <CalculatorButton
                     source={
                         matrixState == MatrixState.ready
                             ? secondSetOfKeysActive
@@ -107,56 +107,56 @@ export default function ButtonsArea({
             <View 
                 style={styles.button}
             >
-                <Button
+                <CalculatorButton
                     source={require('../../assets/buttons/4.png')}
                     onPress={() => numberButtonPressed(4)}
                 />
-                <Button
+                <CalculatorButton
                     source={require('../../assets/buttons/5.png')}
                     onPress={() => numberButtonPressed(5)}
                 />
-                <Button
+                <CalculatorButton
                     source={require('../../assets/buttons/6.png')}
                     onPress={() => numberButtonPressed(6)}
                 />
-                <Button
+                <CalculatorButton
                     source={require('../../assets/buttons/Subtract.png')}
                 />
             </View>
             <View 
                 style={styles.button}
             >
-                <Button
+                <CalculatorButton
                     source={require('../../assets/buttons/1.png')}
                     onPress={() => numberButtonPressed(1)}
                 />
-                <Button
+                <CalculatorButton
                     source={require('../../assets/buttons/2.png')}
                     onPress={() => numberButtonPressed(2)}
                 />
-                <Button
+                <CalculatorButton
                     source={require('../../assets/buttons/3.png')}
                     onPress={() => numberButtonPressed(3)}
                 />
-                <Button
+                <CalculatorButton
                     source={require('../../assets/buttons/Add.png')}
                 />
             </View>
             <View 
                 style={styles.button}
             >
-                <Button
+                <CalculatorButton
                     style={{
                         flex: 2,
                     }}
                     source={require('../../assets/buttons/0.png')}
                     onPress={() => numberButtonPressed(0)}
                 />
-                <Button
+                <CalculatorButton
                     source={require('../../assets/buttons/Comma.png')}
                     onPress={() => numberButtonPressed(',')}
                 />
-                <Button
+                <CalculatorButton
                     source={
                         matrixState == MatrixState.ready
                             ? secondSetOfKeysActive
@@ -167,7 +167,7 @@ export default function ButtonsArea({
                                 : require('../../assets/buttons/Check.png')
                     }
                     disabled={
-                        matrixState != MatrixState.ready && !selectedMatrixElement && !checkActive
+                        matrixState != MatrixState.ready && !selectedMatrixElement && !isMatrixFull
                     }
                     onPress={
                         matrixState == MatrixState.ready

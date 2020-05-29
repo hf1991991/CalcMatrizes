@@ -1,7 +1,7 @@
 import React from 'react';
 import { Image, TouchableOpacity } from 'react-native';
 
-export default function Button({ source, style, resizeMode='contain', onPress, disabled=false }) {
+export default function CalculatorButton({ source, style, resizeMode='contain', onPress, disabled=false }) {
     return (
         <TouchableOpacity
             style={{

@@ -41,17 +41,17 @@ export default function MatrixArea({
                         onPress={
                             () => changeEditableDimensions({
                                 ...editableDimensions,
-                                columns: editableDimensions.columns - 1,
+                                columns: editableDimensions?.columns - 1,
                             })
                         }
-                        disabled={editableDimensions.columns <= 1}
+                        disabled={editableDimensions?.columns <= 1}
                     />
                     <ArrowButton 
                         source={require('../../assets/icons/RightArrow.png')}
                         onPress={
                             () => changeEditableDimensions({
                                 ...editableDimensions,
-                                columns: editableDimensions.columns + 1,
+                                columns: editableDimensions?.columns + 1,
                             })
                         }
                     />
@@ -70,10 +70,10 @@ export default function MatrixArea({
                     onPress={
                         () => changeEditableDimensions({
                             ...editableDimensions,
-                            rows: editableDimensions.rows - 1,
+                            rows: editableDimensions?.rows - 1,
                         })
                     }
-                    disabled={editableDimensions.rows <= 1}
+                    disabled={editableDimensions?.rows <= 1}
                     source={require('../../assets/icons/UpArrow.png')}
                 />
                 <ArrowButton 
@@ -82,7 +82,7 @@ export default function MatrixArea({
                     onPress={
                         () => changeEditableDimensions({
                             ...editableDimensions,
-                            rows: editableDimensions.rows + 1,
+                            rows: editableDimensions?.rows + 1,
                         })
                     }
                 />
