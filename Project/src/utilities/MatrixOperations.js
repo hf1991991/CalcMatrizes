@@ -105,6 +105,10 @@ export default class MatrixOperations {
         return matrix;
     }
 
+    static getTransposedDimensions(matrix) {
+        return MatrixOperations.transpose(matrix).dimensions();
+    }
+
     static isMatrixFull(matrix) {
         if (!matrix) return false;
 
@@ -236,6 +240,26 @@ export default class MatrixOperations {
                     Number.parseFloat(matrixA.data[row][column])
                     - Number.parseFloat(matrixB.data[row][column])
                 );
+            }
+            matrix.push(matrixRow);
+        }
+
+        return new MatrixData({
+            data: matrix,
+        });    
+    }
+
+    static multiplyMatrix(matrixA, matrixB) {
+        let matrix = [];
+
+        for (let row = 0; row < matrixA.dimensions().rows; row++) {
+            let matrixRow = [];
+            for (let column = 0; column < matrixB.dimensions().columns; column++) {
+                let newElement = 0;
+                for (let index = 0; index < matrixA.dimensions().columns; index++) {
+                    newElement += matrixA.data[row][index] * matrixB.data[index][column];
+                }
+                matrixRow.push(newElement);
             }
             matrix.push(matrixRow);
         }

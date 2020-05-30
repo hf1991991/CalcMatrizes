@@ -5,17 +5,20 @@ import InfoArea from './components/InfoArea';
 import { MatrixState, count } from './utilities/constants';
 import MatrixOperations from './utilities/MatrixOperations';
 
+const INITIAL_MATRIX = MatrixOperations.emptyMatrix({
+    rows: 3,
+    columns: 1,
+});
+
 export default function App() {
-    let [readyMatrix, changeReadyMatrix] = useState(
-        MatrixOperations.emptyMatrix({
-            rows: 3,
-            columns: 1,
-        })
-    );
-    let [editableMatrix, changeEditableMatrix] = useState(null);
-    let [selectedMatrixElement, changeSelectedMatrixElement] = useState(null);
+    let [readyMatrix, changeReadyMatrix] = useState(INITIAL_MATRIX);
+    let [editableMatrix, changeEditableMatrix] = useState(INITIAL_MATRIX);
+    let [selectedMatrixElement, changeSelectedMatrixElement] = useState({
+        row: 0,
+        column: 0,
+    });
     let [editableDimensions, changeEditableDimensions] = useState(null);
-    let [matrixState, changeMatrixState] = useState(MatrixState.ready);
+    let [matrixState, changeMatrixState] = useState(MatrixState.editing);
     let [secondSetOfKeysActive, changeSecondSetOfKeysActive] = useState(false);
     let [columnDirectionActive, changeColumnDirectionActive] = useState(true);
 
@@ -181,10 +184,30 @@ export default function App() {
                     }
                 }
                 onPressAxB={() => {
-                    changeMatrixState(MatrixState.ready);
+                    matrixState !== MatrixState.ready && safeChangeReadyMatrix(editableMatrix);
+                    enterEditingMode({
+                        matrixState: MatrixState.AxB,
+                        editableMatrix: MatrixOperations.emptyMatrix(
+                            MatrixOperations.getTransposedDimensions(matrixOnScreen)
+                        ),
+                        selectedElement: {
+                            row: 0,
+                            column: 0,
+                        },
+                    });
                 }}
                 onPressBxA={() => {
-                    
+                    matrixState !== MatrixState.ready && safeChangeReadyMatrix(editableMatrix);
+                    enterEditingMode({
+                        matrixState: MatrixState.BxA,
+                        editableMatrix: MatrixOperations.emptyMatrix(
+                            MatrixOperations.getTransposedDimensions(matrixOnScreen)
+                        ),
+                        selectedElement: {
+                            row: 0,
+                            column: 0,
+                        },
+                    });
                 }}
                 onPressAddMatrix={() => {
                     matrixState !== MatrixState.ready && safeChangeReadyMatrix(editableMatrix);
@@ -261,6 +284,16 @@ export default function App() {
                         case MatrixState.subtractMatrix:
                             safeChangeReadyMatrix(
                                 MatrixOperations.subtract(readyMatrix, editableMatrix)
+                            );
+                            break;
+                        case MatrixState.AxB:
+                            safeChangeReadyMatrix(
+                                MatrixOperations.multiplyMatrix(readyMatrix, editableMatrix)
+                            );
+                            break;
+                        case MatrixState.BxA:
+                            safeChangeReadyMatrix(
+                                MatrixOperations.multiplyMatrix(editableMatrix, readyMatrix)
                             );
                             break;
                         default:
