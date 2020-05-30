@@ -9,13 +9,18 @@ const windowWidth = Dimensions.get('window').width;
 
 export default function ButtonsArea(props) {
     const { 
+        hidden,
         matrixState, 
         numberWritten,
         secondSetOfKeysActive, 
         selectedMatrixElement,
     } = props;
     return (
-        <>
+        <View
+            style={{
+                display: hidden && 'none',
+            }}
+        >
             <View 
                 style={styles.button}
             >
@@ -141,7 +146,7 @@ export default function ButtonsArea(props) {
                     }
                 />
             </View>
-        </>
+        </View>
     );
 }
 
