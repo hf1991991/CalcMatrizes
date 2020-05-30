@@ -14,8 +14,6 @@ export default function InfoArea({
     changeSelectedMatrixElement,
     editableDimensions,
     changeEditableDimensions,
-    numberWritten,
-    changeNumberWritten,
 }) {
 
     return (
@@ -46,7 +44,6 @@ export default function InfoArea({
                 }}
                 selectedMatrixElement={selectedMatrixElement}
                 changeSelectedMatrixElement={changeSelectedMatrixElement}
-                changeNumberWritten={changeNumberWritten}
             />
         </View>
     );

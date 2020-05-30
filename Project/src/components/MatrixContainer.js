@@ -27,7 +27,7 @@ const HorizontalLines = () => (
     </View>
 );
 
-export default function MatrixColumns({ matrixColumns }) {
+export default function MatrixColumns({ matrixContent }) {
     return (
         <View
             style={{
@@ -48,7 +48,7 @@ export default function MatrixColumns({ matrixColumns }) {
                         paddingHorizontal: 4,
                     }}
                 >
-                    {matrixColumns}
+                    {matrixContent}
                 </View>
             <HorizontalLines />
         </View>

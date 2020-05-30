@@ -108,8 +108,6 @@ export default function App() {
                 }
                 editableDimensions={editableDimensions}
                 changeEditableDimensions={changeEditableDimensions}
-                numberWritten={getNumberWritten()}
-                changeNumberWritten={changeNumberWritten}
             />
             <ButtonsArea
                 matrixState={matrixState}
@@ -146,9 +144,7 @@ export default function App() {
                 selectedMatrixElement={selectedMatrixElement}
                 onTranspose={() => {
                     changeCurrentMatrix(
-                        new MatrixData({
-                            data: MatrixOperations.transpose(currentMatrix)
-                        })
+                        MatrixOperations.transpose(currentMatrix)
                     );
                 }}
                 onEnter={nextElement}

@@ -10,6 +10,27 @@ export default class MatrixOperations {
         });
     }
 
+    static insertElementsPosition(matrix) {
+        let positionMatrix = [];
+
+        for (let column = matrix.dimensions().columns - 1; column >= 0 ; column--) {
+            let positionMatrixColumn = [];
+            for (let row = matrix.dimensions().rows - 1; row >= 0 ; row--) {
+                positionMatrixColumn.push({
+                    number: matrix.data[row][column],
+                    row,
+                    column,
+                });
+            }
+            positionMatrix.push({
+                data: positionMatrixColumn,
+                column,
+            });
+        }
+
+        return positionMatrix;
+    }
+
     static copyMatrixData(matrix) {
         let copyData = [];
 
@@ -25,17 +46,19 @@ export default class MatrixOperations {
     }
 
     static transpose(matrix) {
-        let transposed = [];
+        let transposedData = [];
 
         for (let column = 0; column < matrix.dimensions().columns; column++) {
             let transposedRow = [];
             for (let row = 0; row < matrix.dimensions().rows; row++) {
                 transposedRow.push(matrix.data[row][column]);
             }
-            transposed.push(transposedRow);
+            transposedData.push(transposedRow);
         }
 
-        return transposed;
+        return new MatrixData({
+            data: transposedData,
+        });
     }
 
     static minDimensions = (matrix1, matrix2) => ({

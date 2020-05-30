@@ -12,7 +12,6 @@ export default function MatrixArea({
     changeSelectedMatrixElement,
     editableDimensions,
     changeEditableDimensions,
-    changeNumberWritten,
 }) {
     return (
         <SafeAreaView
@@ -38,7 +37,6 @@ export default function MatrixArea({
                     matrixNumbers={currentMatrix}
                     selectedMatrixElement={selectedMatrixElement}
                     changeSelectedMatrixElement={changeSelectedMatrixElement}
-                    changeNumberWritten={changeNumberWritten}
                 />
                 <ArrowButtonsArea 
                     vertical
