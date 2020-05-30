@@ -11,6 +11,7 @@ export default function Matrix({
     let [flatListDimensions, changeFlatListDimensions] = useState({
         height: 0,
         width: 0,
+        loaded: false,
     });
 
     function getElementStyle(row, column) {
@@ -51,25 +52,35 @@ export default function Matrix({
                         changeFlatListDimensions({
                             height: event.nativeEvent.layout.height,
                             width: event.nativeEvent.layout.width,
+                            loaded: true,
                         });
                     }}
                 >
                     <ScrollView
                         horizontal
                         showsHorizontalScrollIndicator
+                        directionalLockEnabled={false}
                         style={{
                             transform:[{rotateY:'180deg'}],
+                        }}
+                        showsVerticalScrollIndicator={false}
+                        showsHorizontalScrollIndicator={false}
+                        contentInset={{
+                            top: 1,
+                            bottom: 1,
+                            right: 1,
+                            left: 1,
                         }}
                     >
                         <FlatList
                             style={{
                                 transform:[{rotateX:'180deg'}],
                             }}
+                            scrollEnabled={false}
                             contentContainerStyle={{
                                 justifyContent: 'center',
                             }}
                             key={matrixNumbers.dimensions().columns}
-                            scrollEnabled
                             numColumns={matrixNumbers.dimensions().columns}
                             keyExtractor={element => `${element.row}:${element.column}`}
                             data={matrixElements}
