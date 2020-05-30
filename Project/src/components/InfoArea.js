@@ -45,7 +45,7 @@ export default function InfoArea({
                                 columns,
                             })
                         );
-                        console.log(selectedMatrixElement);
+                        
                         if (selectedMatrixElement?.row >= rows 
                             || selectedMatrixElement?.column >= columns
                         ) changeSelectedMatrixElement(null);

@@ -187,6 +187,7 @@ export default function App() {
                     
                 }}
                 onPressAddMatrix={() => {
+                    matrixState !== MatrixState.ready && safeChangeReadyMatrix(editableMatrix);
                     enterEditingMode({
                         matrixState: MatrixState.addMatrix,
                         editableMatrix: MatrixOperations.emptyMatrix(matrixOnScreen.dimensions()),
@@ -197,6 +198,7 @@ export default function App() {
                     });
                 }}
                 onPressSubtractMatrix={() => {
+                    matrixState !== MatrixState.ready && safeChangeReadyMatrix(editableMatrix);
                     enterEditingMode({
                         matrixState: MatrixState.subtractMatrix,
                         editableMatrix: MatrixOperations.emptyMatrix(matrixOnScreen.dimensions()),
