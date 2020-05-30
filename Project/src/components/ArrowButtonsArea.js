@@ -1,5 +1,5 @@
 import React from 'react';
-import { View } from 'react-native';
+import { View, Text } from 'react-native';
 import ArrowButton from './ArrowButton';
 
 export default function ArrowButtonsArea({ 
@@ -8,67 +8,104 @@ export default function ArrowButtonsArea({
     disabled=false,
     editableDimensions,
     changeEditableDimensions,
+    determinant=null,
 }) {
+    console.log(determinant);
     return (
         <View
             style={{
                 justifyContent: 'center',
                 alignItems: 'center',
-                opacity: hidden ? 0.0 : 1.0,
                 ...(vertical
                     ? {
                         width: 70,
                     }
                     : { 
+                        marginHorizontal: 20,
                         flexDirection: 'row',
                         height: 70,
                     }
                 ),
             }}
         >
-            <ArrowButton 
-                vertical={vertical}
-                source={vertical
-                    ? require('../../assets/icons/LeftArrow.png')
-                    : require('../../assets/icons/UpArrow.png')
-                }
-                onPress={vertical
-                    ? () => changeEditableDimensions({
-                        ...editableDimensions,
-                        columns: editableDimensions?.columns - 1,
-                    })
-                    : () => changeEditableDimensions({
-                        ...editableDimensions,
-                        rows: editableDimensions?.rows - 1,
-                    })
-                }
-                disabled={
-                    (vertical 
-                        ? editableDimensions?.columns 
-                        : editableDimensions?.rows
-                    ) <= 1 
-                    || hidden 
-                    || disabled
-                }
-            />
-            <ArrowButton 
-                vertical={vertical}
-                source={vertical
-                    ? require('../../assets/icons/RightArrow.png')
-                    : require('../../assets/icons/DownArrow.png')
-                }
-                onPress={vertical
-                    ? () => changeEditableDimensions({
-                        ...editableDimensions,
-                        columns: editableDimensions?.columns + 1,
-                    })
-                    : () => changeEditableDimensions({
-                        ...editableDimensions,
-                        rows: editableDimensions?.rows + 1,
-                    })
-                }
-                disabled={hidden || disabled}
-            />
+            {
+                !vertical && (
+                    <Text
+                        style={{
+                            color: '#fff',
+                            fontSize: 25,
+                            position: 'absolute',
+                            left: 0,
+                        }}
+                    >
+                        {editableDimensions.rows}x{editableDimensions.columns}
+                    </Text>
+                )
+            }
+            <View
+                style={{
+                    ...(!vertical && {flexDirection: 'row'}),
+                    opacity: hidden ? 0.0 : 1.0,
+                }}
+            >
+                <ArrowButton 
+                    vertical={vertical}
+                    source={vertical
+                        ? require('../../assets/icons/LeftArrow.png')
+                        : require('../../assets/icons/UpArrow.png')
+                    }
+                    onPress={vertical
+                        ? () => changeEditableDimensions({
+                            ...editableDimensions,
+                            columns: editableDimensions?.columns - 1,
+                        })
+                        : () => changeEditableDimensions({
+                            ...editableDimensions,
+                            rows: editableDimensions?.rows - 1,
+                        })
+                    }
+                    disabled={
+                        (vertical 
+                            ? editableDimensions?.columns 
+                            : editableDimensions?.rows
+                        ) <= 1 
+                        || hidden 
+                        || disabled
+                    }
+                />
+                <ArrowButton 
+                    vertical={vertical}
+                    source={vertical
+                        ? require('../../assets/icons/RightArrow.png')
+                        : require('../../assets/icons/DownArrow.png')
+                    }
+                    onPress={vertical
+                        ? () => changeEditableDimensions({
+                            ...editableDimensions,
+                            columns: editableDimensions?.columns + 1,
+                        })
+                        : () => changeEditableDimensions({
+                            ...editableDimensions,
+                            rows: editableDimensions?.rows + 1,
+                        })
+                    }
+                    disabled={hidden || disabled}
+                />
+            </View>
+            {
+                !vertical && determinant !== null && (
+                    <Text
+                        style={{
+                            color: '#fff',
+                            fontSize: 25,
+                            position: 'absolute',
+                            right: 0,
+                        }}
+                    >
+                        det: {determinant}
+                    </Text>
+                )
+            }
         </View>
     );
 }

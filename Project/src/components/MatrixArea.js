@@ -3,6 +3,7 @@ import { View, SafeAreaView } from 'react-native';
 import Matrix from './Matrix';
 import { MatrixState } from '../utilities/constants';
 import ArrowButtonsArea from './ArrowButtonsArea';
+import MatrixOperations from '../utilities/MatrixOperations';
 
 export default function MatrixArea({ 
     matrixState,
@@ -64,6 +65,9 @@ export default function MatrixArea({
                 }
                 editableDimensions={editableDimensions}
                 changeEditableDimensions={changeEditableDimensions}
+                determinant={
+                    MatrixOperations.determinant(readyMatrix)
+                }
             />
         </SafeAreaView>
     );

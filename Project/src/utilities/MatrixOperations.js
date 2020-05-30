@@ -307,6 +307,18 @@ export default class MatrixOperations {
         return MatrixOperations.smartToFixedOnMatrix(secondElimination.matrixB);
     }
 
+    static determinant(matrix) {
+        return (
+            MatrixOperations.isMatrixFull(matrix)
+            && MatrixOperations.isMatrixSquare(matrix)
+        ) 
+            ? MatrixOperations.partialGaussianElimination({
+                matrixA: matrix,
+                matrixB: MatrixOperations.identity(matrix.dimensions().rows)
+            }).determinant
+            : null;
+    }
+
     /* 
         Escalona a porcao, seja abaixo ou acima, da diagonal principal 
         de matrixA, assim como retorna o determinante da matriz.
