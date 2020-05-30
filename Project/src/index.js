@@ -98,6 +98,12 @@ export default function App() {
                 matrixState={matrixState}
                 currentMatrix={currentMatrix}
                 safeChangeCurrentMatrix={changeCurrentMatrix}
+                onPressBackground={
+                    () => {
+                        changeMatrixState(MatrixState.ready);
+                        changeSelectedMatrixElement(null);
+                    }
+                }
                 editableMatrix={editableMatrix}
                 changeEditableMatrix={changeEditableMatrix}
                 selectedMatrixElement={selectedMatrixElement}

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, View, ScrollView } from 'react-native';
+import { View, TouchableWithoutFeedback } from 'react-native';
 import MatrixArea from './MatrixArea';
 import MatrixOperations from '../utilities/MatrixOperations';
 import { MatrixState } from '../utilities/constants';
@@ -8,6 +8,7 @@ export default function InfoArea({
     matrixState,
     currentMatrix,
     changeCurrentMatrix,
+    onPressBackground,
     editableMatrix,
     changeEditableMatrix,
     selectedMatrixElement,
@@ -17,34 +18,38 @@ export default function InfoArea({
 }) {
 
     return (
-        <View
-            style={{
-                flex: 1,
-            }}
+        <TouchableWithoutFeedback
+            onPress={onPressBackground}
         >
-            <MatrixArea 
-                matrixState={matrixState}
-                currentMatrix={
-                    matrixState == MatrixState.editing
-                        ? editableMatrix
-                        : currentMatrix
-                }
-                changeCurrentMatrix={changeCurrentMatrix}
-                editableDimensions={editableDimensions}
-                changeEditableDimensions={({ rows, columns }) => {
-                    changeEditableDimensions({ rows, columns });
-                    changeEditableMatrix(
-                        MatrixOperations.resizeMatrix({
-                            originalMatrix: currentMatrix,
-                            editableMatrix: editableMatrix,
-                            rows,
-                            columns,
-                        })
-                    );
+            <View
+                style={{
+                    flex: 1,
                 }}
-                selectedMatrixElement={selectedMatrixElement}
-                changeSelectedMatrixElement={changeSelectedMatrixElement}
-            />
-        </View>
+            >
+                <MatrixArea 
+                    matrixState={matrixState}
+                    currentMatrix={
+                        matrixState == MatrixState.editing
+                            ? editableMatrix
+                            : currentMatrix
+                    }
+                    changeCurrentMatrix={changeCurrentMatrix}
+                    editableDimensions={editableDimensions}
+                    changeEditableDimensions={({ rows, columns }) => {
+                        changeEditableDimensions({ rows, columns });
+                        changeEditableMatrix(
+                            MatrixOperations.resizeMatrix({
+                                originalMatrix: currentMatrix,
+                                editableMatrix: editableMatrix,
+                                rows,
+                                columns,
+                            })
+                        );
+                    }}
+                    selectedMatrixElement={selectedMatrixElement}
+                    changeSelectedMatrixElement={changeSelectedMatrixElement}
+                />
+            </View>
+        </TouchableWithoutFeedback>
     );
 }
