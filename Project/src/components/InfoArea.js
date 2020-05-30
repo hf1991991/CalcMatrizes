@@ -39,7 +39,9 @@ export default function InfoArea({
                         changeEditableDimensions({ rows, columns });
                         changeEditableMatrix(
                             MatrixOperations.resizeMatrix({
-                                originalMatrix: readyMatrix,
+                                originalMatrix: matrixState === MatrixState.editing
+                                    ? readyMatrix
+                                    : editableMatrix,
                                 editableMatrix: editableMatrix,
                                 rows,
                                 columns,

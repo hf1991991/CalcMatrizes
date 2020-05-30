@@ -10,4 +10,8 @@ export default class MatrixData {
             columns: this.data[0] && this.data[0].length,
         };
     }
+
+    hasPosition({ row, column }) {
+        return row < this.dimensions().rows && column < this.dimensions().columns;
+    } 
 }

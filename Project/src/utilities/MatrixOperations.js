@@ -59,7 +59,14 @@ export default class MatrixOperations {
     })
 
     static joinElements = (matrix1, matrix2, row, column) => {
-        const joinedElement = (matrix1.data[row] && matrix1.data[row][column]) || (matrix2.data[row] && matrix2.data[row][column]);
+        const joinedElement = 
+            (matrix1.data[row] && matrix1.data[row][column]) 
+            || (
+                !matrix1.hasPosition({ row, column }) 
+                && matrix2.data[row] 
+                && matrix2.data[row][column]
+            )
+            || null;
         return joinedElement === undefined ? null : joinedElement;
     }
 

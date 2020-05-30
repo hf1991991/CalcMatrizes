@@ -17,7 +17,7 @@ export default function App() {
         row: 0,
         column: 0,
     });
-    let [editableDimensions, changeEditableDimensions] = useState(null);
+    let [editableDimensions, changeEditableDimensions] = useState(INITIAL_MATRIX.dimensions());
     let [matrixState, changeMatrixState] = useState(MatrixState.editing);
     let [secondSetOfKeysActive, changeSecondSetOfKeysActive] = useState(false);
     let [columnDirectionActive, changeColumnDirectionActive] = useState(true);
@@ -28,19 +28,25 @@ export default function App() {
         );
     }
 
+    function safeChangeEditableMatrix(matrix) {
+        changeEditableMatrix(
+            MatrixOperations.convertStringToNumbers(matrix)
+        );
+    }
+
     const matrixOnScreen = matrixState === MatrixState.ready 
         ? readyMatrix
         : editableMatrix;
 
     function enterEditingMode({ editableMatrix, matrixState, selectedElement }) {
         changeMatrixState(matrixState);
-        changeEditableMatrix(editableMatrix);
+        safeChangeEditableMatrix(editableMatrix);
         changeEditableDimensions(editableMatrix.dimensions());
         selectedElement && changeSelectedMatrixElement(selectedElement);
     }
 
     function changeNumberWritten(newNumber) {
-        selectedMatrixElement && changeEditableMatrix(
+        selectedMatrixElement && safeChangeEditableMatrix(
             MatrixOperations.changeElement({
                 matrix: editableMatrix || readyMatrix,
                 ...selectedMatrixElement,
@@ -117,7 +123,7 @@ export default function App() {
                     }
                 }
                 editableMatrix={editableMatrix}
-                changeEditableMatrix={changeEditableMatrix}
+                changeEditableMatrix={safeChangeEditableMatrix}
                 selectedMatrixElement={selectedMatrixElement}
                 changeSelectedMatrixElement={
                     (selection) => {
@@ -160,7 +166,7 @@ export default function App() {
                     () => {
                         const changeMatrixOnScreen = matrixState === MatrixState.ready 
                             ? safeChangeReadyMatrix
-                            : changeEditableMatrix;
+                            : safeChangeEditableMatrix;
 
                         changeMatrixOnScreen(
                             MatrixOperations.emptyMatrix(matrixOnScreen.dimensions())
@@ -249,7 +255,7 @@ export default function App() {
                     }
 
                     else {
-                        changeEditableMatrix(
+                        safeChangeEditableMatrix(
                             MatrixOperations.transpose(editableMatrix)
                         );
                         changeSelectedMatrixElement({
@@ -264,9 +270,19 @@ export default function App() {
                     
                 }}
                 onInvert={() => {
-                    safeChangeReadyMatrix(
-                        MatrixOperations.invert(matrixOnScreen)
-                    );
+                    
+                    if (matrixState === MatrixState.ready) {
+                        safeChangeReadyMatrix(
+                            MatrixOperations.invert(readyMatrix)
+                        );
+                    }
+
+                    else {
+                        safeChangeEditableMatrix(
+                            MatrixOperations.invert(editableMatrix)
+                        );
+                    }
+                    
                 }}
                 onEnter={nextElement}
                 isMatrixFull={MatrixOperations.isMatrixFull(matrixOnScreen)}
