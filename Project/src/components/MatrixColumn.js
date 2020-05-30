@@ -13,11 +13,11 @@ export default function MatrixColumn({
         return {
             backgroundColor: selectedMatrixElement?.row == row && selectedMatrixElement?.column == column
                 ? '#3c3c3c'
-                : (matrixNumbers?.data[row][column] || '').length == 0
+                : (matrixNumbers?.data[row][column] === null)
                     ? '#1c1c1c'
                     : 'transparent',
             ...(
-                (matrixNumbers?.data[row][column] || '').length == 0
+                (matrixNumbers?.data[row][column] === null)
                 && {
                     borderColor: '#fff',
                     borderWidth: 1.5,
@@ -25,6 +25,13 @@ export default function MatrixColumn({
                 }
             )
         };
+    }
+
+    function formatElement(element) {
+        const decimal = element === null || element === undefined
+            ? ''
+            : (element.toString().split('.')[1] && element.toString().split('.')[1].length) > 4 ? element.toFixed(4) : element;
+        return (decimal === null ? '' : decimal).toString().replace('.', ',');
     }
 
     return (
@@ -40,7 +47,6 @@ export default function MatrixColumn({
             keyExtractor={element => `${element.row}:${element.column}`}
             data={matrixColumnElements}
             renderItem={({ item }) => {
-                console.log(item);
                 const { number, row, column } = item;
                 return (
                     <TouchableOpacity
@@ -77,7 +83,7 @@ export default function MatrixColumn({
                                     textAlign: 'center',
                                 }}
                             >
-                                {(number || '').toString().replace('.', ',')}
+                                {formatElement(number)}
                             </Text>
                         </View>
                     </TouchableOpacity>

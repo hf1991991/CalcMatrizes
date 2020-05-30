@@ -8,9 +8,9 @@ import MatrixData from './utilities/MatrixData';
 
 const NULL_MATRIX = () => new MatrixData({
     data: [
-        [null, null, null],
-        [null, null, null],
-        [null, null, null],
+        [1, 2, 3],
+        [4, 4, 8],
+        [4, 1, 2],
     ],
 });
 
@@ -22,6 +22,12 @@ export default function App() {
     let [matrixState, changeMatrixState] = useState(MatrixState.ready);
     let [secondSetOfKeysActive, changeSecondSetOfKeysActive] = useState(false);
     let [columnDirectionActive, changeColumnDirectionActive] = useState(false);
+
+    function safeChangeCurrentMatrix(matrix) {
+        changeCurrentMatrix(
+            MatrixOperations.convertStringToNumbers(matrix)
+        );
+    }
 
     function changeNumberWritten(newNumber) {
         selectedMatrixElement && changeEditableMatrix(
@@ -91,7 +97,7 @@ export default function App() {
             <InfoArea 
                 matrixState={matrixState}
                 currentMatrix={currentMatrix}
-                changeCurrentMatrix={changeCurrentMatrix}
+                safeChangeCurrentMatrix={changeCurrentMatrix}
                 editableMatrix={editableMatrix}
                 changeEditableMatrix={changeEditableMatrix}
                 selectedMatrixElement={selectedMatrixElement}
@@ -111,17 +117,28 @@ export default function App() {
             />
             <ButtonsArea
                 matrixState={matrixState}
+                currentMatrix={currentMatrix}
+                changeCurrentMatrix={safeChangeCurrentMatrix}
                 numberWritten={getNumberWritten()}
-                onPressCE={
-                    () => changeNumberWritten(null)
+                secondSetOfKeysActive={secondSetOfKeysActive}
+                changeSecondSetOfKeysActive={
+                    () => changeSecondSetOfKeysActive(!secondSetOfKeysActive)
                 }
+                columnDirectionActive={columnDirectionActive}
+                changeColumnDirectionActive={
+                    () => changeColumnDirectionActive(!columnDirectionActive)
+                }
+                selectedMatrixElement={selectedMatrixElement}
                 onPressAC={
                     matrixState == MatrixState.ready
-                        ? () => changeCurrentMatrix(NULL_MATRIX())
+                        ? () => safeChangeCurrentMatrix(NULL_MATRIX())
                         : () => {
                             changeMatrixState(MatrixState.ready);
                             changeSelectedMatrixElement(null);
                         }
+                }
+                onPressCE={
+                    () => changeNumberWritten(null)
                 }
                 numberButtonPressed={
                     (element) => {
@@ -131,26 +148,20 @@ export default function App() {
                             changeNumberWritten(getNumberWritten() + element);
                     }
                 }
-                secondSetOfKeysActive={secondSetOfKeysActive}
-                changeSecondSetOfKeysActive={
-                    () => changeSecondSetOfKeysActive(!secondSetOfKeysActive)
-                }
-                columnDirectionActive={columnDirectionActive}
-                changeColumnDirectionActive={
-                    () => changeColumnDirectionActive(!columnDirectionActive)
-                }
-                currentMatrix={currentMatrix}
-                changeCurrentMatrix={changeCurrentMatrix}
-                selectedMatrixElement={selectedMatrixElement}
                 onTranspose={() => {
-                    changeCurrentMatrix(
+                    safeChangeCurrentMatrix(
                         MatrixOperations.transpose(currentMatrix)
+                    );
+                }}
+                onInvert={() => {
+                    safeChangeCurrentMatrix(
+                        MatrixOperations.invert(currentMatrix)
                     );
                 }}
                 onEnter={nextElement}
                 isMatrixFull={MatrixOperations.isMatrixFull(editableMatrix)}
                 onCheck={() => {
-                    changeCurrentMatrix(editableMatrix);
+                    safeChangeCurrentMatrix(editableMatrix);
                     changeMatrixState(MatrixState.ready);
                 }}
             />

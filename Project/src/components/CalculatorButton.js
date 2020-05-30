@@ -2,6 +2,7 @@ import React from 'react';
 import { Image, TouchableOpacity } from 'react-native';
 import { ButtonType } from '../utilities/constants';
 import ButtonData from '../utilities/ButtonData';
+import MatrixOperations from '../utilities/MatrixOperations';
 
 export default function CalculatorButton(props) {
 
@@ -12,56 +13,67 @@ export default function CalculatorButton(props) {
                     source: require('../../assets/buttons/0.png'), 
                     style: {flex: 2},
                     onPress: () => props.numberButtonPressed(0),
+                    disabled: !props.selectedMatrixElement,
                 });
             case ButtonType[1]:
                 return new ButtonData({
                     source: require('../../assets/buttons/1.png'), 
                     onPress: () => props.numberButtonPressed(1),
+                    disabled: !props.selectedMatrixElement,
                 });
             case ButtonType[2]:
                 return new ButtonData({
                     source: require('../../assets/buttons/2.png'), 
                     onPress: () => props.numberButtonPressed(2),
+                    disabled: !props.selectedMatrixElement,
                 });
             case ButtonType[3]:
                 return new ButtonData({
                     source: require('../../assets/buttons/3.png'), 
                     onPress: () => props.numberButtonPressed(3),
+                    disabled: !props.selectedMatrixElement,
                 });
             case ButtonType[4]:
                 return new ButtonData({
                     source: require('../../assets/buttons/4.png'), 
                     onPress: () => props.numberButtonPressed(4),
+                    disabled: !props.selectedMatrixElement,
                 });
             case ButtonType[5]:
                 return new ButtonData({
                     source: require('../../assets/buttons/5.png'), 
                     onPress: () => props.numberButtonPressed(5),
+                    disabled: !props.selectedMatrixElement,
                 });
             case ButtonType[6]:
                 return new ButtonData({
                     source: require('../../assets/buttons/6.png'), 
                     onPress: () => props.numberButtonPressed(6),
+                    disabled: !props.selectedMatrixElement,
                 });
             case ButtonType[7]:
                 return new ButtonData({
                     source: require('../../assets/buttons/7.png'), 
                     onPress: () => props.numberButtonPressed(7),
+                    disabled: !props.selectedMatrixElement,
                 });
             case ButtonType[8]:
                 return new ButtonData({
                     source: require('../../assets/buttons/8.png'), 
                     onPress: () => props.numberButtonPressed(8),
+                    disabled: !props.selectedMatrixElement,
                 });
             case ButtonType[9]:
                 return new ButtonData({
                     source: require('../../assets/buttons/9.png'), 
                     onPress: () => props.numberButtonPressed(9),
+                    disabled: !props.selectedMatrixElement,
                 });
             case ButtonType.Comma:
                 return new ButtonData({
                     source: require('../../assets/buttons/Comma.png'), 
                     onPress: () => props.numberButtonPressed(','),
+                    disabled: !props.selectedMatrixElement,
                 });
             case ButtonType.AC:
                 return new ButtonData({
@@ -98,27 +110,44 @@ export default function CalculatorButton(props) {
             case ButtonType.R:
                 return new ButtonData({
                     source: require('../../assets/buttons/R.png'),
+                    disabled: !MatrixOperations.isMatrixFull(props.currentMatrix),
                 });
             case ButtonType.LambdaxA:
                 return new ButtonData({
                     source: require('../../assets/buttons/LambdaxA.png'), 
+                    disabled: !MatrixOperations.isMatrixFull(props.currentMatrix),
                 });
             case ButtonType.AxB:
                 return new ButtonData({
                     source: require('../../assets/buttons/AxB.png'), 
+                    disabled: !MatrixOperations.isMatrixFull(props.currentMatrix),
                 });
             case ButtonType.BxA:
                 return new ButtonData({
                     source: require('../../assets/buttons/BxA.png'), 
+                    disabled: !MatrixOperations.isMatrixFull(props.currentMatrix),
                 });
             case ButtonType.Inverse:
                 return new ButtonData({
                     source: require('../../assets/buttons/Inverse.png'), 
+                    onPress: props.onInvert,
+                    disabled: !MatrixOperations.isMatrixFull(props.currentMatrix)
+                        || !MatrixOperations.isMatrixSquare(props.currentMatrix),
                 });
             case ButtonType.Transposed:
                 return new ButtonData({
                     source: require('../../assets/buttons/Transposed.png'), 
                     onPress: props.onTranspose,
+                });
+            case ButtonType.SubtractMatrix:
+                return new ButtonData({
+                    source: require('../../assets/buttons/Subtract.png'), 
+                    disabled: !MatrixOperations.isMatrixFull(props.currentMatrix),
+                });
+            case ButtonType.AddMatrix:
+                return new ButtonData({
+                    source: require('../../assets/buttons/Add.png'), 
+                    disabled: !MatrixOperations.isMatrixFull(props.currentMatrix),
                 });
             case ButtonType.Subtract:
                 return new ButtonData({

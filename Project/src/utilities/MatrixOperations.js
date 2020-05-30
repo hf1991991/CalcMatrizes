@@ -1,4 +1,5 @@
 import MatrixData from "./MatrixData";
+import { forceRound, smartToFixed } from "./constants";
 
 export default class MatrixOperations {
 
@@ -42,22 +43,8 @@ export default class MatrixOperations {
             copyData.push(copyDataRow);
         }
 
-        return copyData;
-    }
-
-    static transpose(matrix) {
-        let transposedData = [];
-
-        for (let column = 0; column < matrix.dimensions().columns; column++) {
-            let transposedRow = [];
-            for (let row = 0; row < matrix.dimensions().rows; row++) {
-                transposedRow.push(matrix.data[row][column]);
-            }
-            transposedData.push(transposedRow);
-        }
-
         return new MatrixData({
-            data: transposedData,
+            data: copyData,
         });
     }
 
@@ -80,12 +67,12 @@ export default class MatrixOperations {
         let joined = [];
 
         for (let row = 0; row < rows; row++) {
-            let joinedRow = [];
+            let fixedRow = [];
             for (let column = 0; column < columns; column++) {
                 const joinedElement = MatrixOperations.joinElements(editableMatrix, originalMatrix, row, column);
-                joinedRow.push(joinedElement);
+                fixedRow.push(joinedElement);
             }
-            joined.push(joinedRow);
+            joined.push(fixedRow);
         }
 
         return joined;
@@ -128,4 +115,221 @@ export default class MatrixOperations {
         }
         return true;
     }
+
+    static isMatrixSquare(matrix) {
+        return matrix.dimensions().rows === matrix.dimensions().columns;
+    }
+
+    static printMatrix(matrix) {
+        for (row of matrix.data) {
+            let rowString = '';
+            for (elem of row) {
+                rowString += ` ${elem} `;
+            }
+            console.log(rowString);
+        }
+        console.log('\n');
+    }
+
+    static smartToFixedOnMatrix(matrix) {
+        let fixed = [];
+
+        for (let row = 0; row < matrix.dimensions().rows; row++) {
+            let fixedRow = [];
+            for (let column = 0; column < matrix.dimensions().columns; column++) {
+                fixedRow.push(smartToFixed(matrix.data[row][column]));
+            }
+            fixed.push(fixedRow);
+        }
+
+        return new MatrixData({
+            data: fixed,
+        });
+    }
+
+    static convertStringToNumbers(matrix) {
+        let converted = [];
+
+        for (let row = 0; row < matrix.dimensions().rows; row++) {
+            let convertedRow = [];
+            for (let column = 0; column < matrix.dimensions().columns; column++) {
+                const parsed = Number.parseFloat(matrix.data[row][column]);
+                convertedRow.push(matrix.data[row][column] === null ? null : parsed);
+            }
+            converted.push(convertedRow);
+        }
+
+        return new MatrixData({
+            data: converted,
+        });
+    }
+
+    static identity(dimension) {
+        return new MatrixData({
+            data: [
+                [1,0,0],
+                [0,1,0],
+                [0,0,1],
+            ],
+        });
+    }
+
+    static transpose(matrix) {
+        let transposedData = [];
+
+        for (let column = 0; column < matrix.dimensions().columns; column++) {
+            let transposedRow = [];
+            for (let row = 0; row < matrix.dimensions().rows; row++) {
+                transposedRow.push(matrix.data[row][column]);
+            }
+            transposedData.push(transposedRow);
+        }
+
+        return new MatrixData({
+            data: transposedData,
+        });
+    }
+
+    static invert(matrix) {
+        let firstElimination = MatrixOperations.partialGaussianElimination({
+            matrixA: matrix,
+            matrixB: MatrixOperations.identity(3),
+            eliminateBelowMainDiagonal: true,
+        });
+
+        let secondElimination = MatrixOperations.partialGaussianElimination({
+            ...firstElimination,
+            eliminateBelowMainDiagonal: false,
+        });
+
+        return MatrixOperations.smartToFixedOnMatrix(secondElimination.matrixB);
+    }
+
+    /* 
+        Escalona a porcao, seja abaixo ou acima, da diagonal principal 
+        de matrixA, assim como retorna o determinante da matriz.
+        OBS: verticalElimination deve ser verdadeiro se a ordem da equação a ser escalonada é X*A=B.
+    */
+    static partialGaussianElimination({ matrixA, matrixB, eliminateBelowMainDiagonal, showSteps=false, verticalElimination=false }) {
+        let _matrixA = MatrixOperations.copyMatrixData(matrixA);
+        let _matrixB = MatrixOperations.copyMatrixData(matrixB);
+
+        const dimensionsA = _matrixA.dimensions();
+        const dimensionsB = _matrixB.dimensions();
+
+        const minDimensionsA = Math.min(
+            dimensionsA.rows,
+            dimensionsA.columns,
+        );
+
+        let determinant = 1;
+        let noPivotOnColumn = false;
+
+        for (
+            let pivotColumn = (eliminateBelowMainDiagonal ? 0 : minDimensionsA - 1);
+            pivotColumn != (eliminateBelowMainDiagonal ? minDimensionsA : -1);
+            pivotColumn += (eliminateBelowMainDiagonal? 1 : -1)
+        ) {
+            let pivot = _matrixA.data[pivotColumn][pivotColumn]
+
+            if (pivot === 0.0) {
+
+                let testRow = pivotColumn + 1;
+                while (true) {
+                    // Se houver uma coluna sem pivot em uma matriz escalonada reduzida, o determinante dela é nulo:
+                    if (testRow === dimensionsA.rows) {
+                        noPivotOnColumn = true;
+                        break
+                    }
+
+                    let possibleNewPivot = _matrixA.data[testRow][pivotColumn];
+
+                    if (possibleNewPivot !== 0.0) break;
+
+                    testRow++;
+                }
+
+                if (!noPivotOnColumn) {
+
+                    let _matrixACopy = MatrixOperations.copyMatrixData(_matrixA);
+                    let _matrixBCopy = MatrixOperations.copyMatrixData(_matrixB);
+
+                    _matrixA.data[pivotColumn] = _matrixACopy.data[testRow];
+                    _matrixA.data[testRow] = _matrixACopy.data[pivotColumn];
+
+                    _matrixB.data[pivotColumn] = _matrixBCopy.data[testRow];
+                    _matrixB.data[testRow] = _matrixBCopy.data[pivotColumn];
+
+                    pivot = _matrixA.data[pivotColumn][pivotColumn];
+
+                    determinant *= -1;
+                }
+            }
+
+            if (!noPivotOnColumn) {
+                if (pivot !== 1.0) {
+                    for (let index = 0; index < dimensionsA.columns; index++)
+                        _matrixA.data[pivotColumn][index] /= pivot;
+                    for (let index = 0; index < dimensionsB.columns; index++)
+                        _matrixB.data[pivotColumn][index] /= pivot;
+
+                    determinant *= pivot;
+
+                    //if (showSteps)
+                    //    exibicao_passos_resolver_equacao_matricial(_matrixA, _matrixB, pivot, pivotColumn+1, pivotColumn+1, verticalElimination, None)
+
+                    pivot = _matrixA.data[pivotColumn][pivotColumn];
+                }
+
+                for (
+                    let index = (eliminateBelowMainDiagonal 
+                        ? 0 
+                        : pivotColumn - 1
+                    );
+                    index != (eliminateBelowMainDiagonal
+                        ? dimensionsA.rows - pivotColumn - 1
+                        : -1
+                    );
+                    index += (eliminateBelowMainDiagonal
+                        ? 1
+                        : -1    
+                    )
+                ) {
+                    let verticalIndex = null;
+                    if (eliminateBelowMainDiagonal)
+                        verticalIndex = index + pivotColumn + 1;
+                    else
+                        verticalIndex = index;
+
+                    const element = _matrixA.data[verticalIndex][pivotColumn];
+                    const eliminationFactor = -element / pivot;
+
+                    for (let horizontalIndex = 0; horizontalIndex < dimensionsA.columns; horizontalIndex++)
+                        _matrixA.data[verticalIndex][horizontalIndex] = 
+                            _matrixA.data[verticalIndex][horizontalIndex] + 
+                            eliminationFactor * _matrixA.data[pivotColumn][horizontalIndex];
+
+                    for (let horizontalIndex = 0; horizontalIndex < dimensionsB.columns; horizontalIndex++)
+                        _matrixB.data[verticalIndex][horizontalIndex] = 
+                            _matrixB.data[verticalIndex][horizontalIndex] + 
+                            eliminationFactor * _matrixB.data[pivotColumn][horizontalIndex];
+
+                    //if (showSteps)
+                    //    exibicao_passos_resolver_equacao_matricial(_matrixA, _matrixB, eliminationFactor, pivotColumn+1, verticalIndex+1, verticalElimination, None)
+                }
+            } 
+
+            // MatrixOperations.printMatrix(_matrixA);
+        }
+
+        if (noPivotOnColumn) determinant = 0.0;
+
+        return {
+            matrixA: _matrixA,
+            matrixB: _matrixB,
+            determinant: smartToFixed(determinant), 
+        };
+        // return arredondamento_na_raca(determinant, 6);
+    }
+
 }

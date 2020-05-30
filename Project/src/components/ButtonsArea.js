@@ -97,7 +97,11 @@ export default function ButtonsArea(props) {
                 />
                 <CalculatorButton
                     {...props}
-                    buttonType={ButtonType.Subtract}
+                    buttonType={
+                        matrixState == MatrixState.ready
+                            ? ButtonType.SubtractMatrix
+                            : ButtonType.Subtract
+                    }
                 />
             </View>
             <View 
@@ -117,7 +121,11 @@ export default function ButtonsArea(props) {
                 />
                 <CalculatorButton
                     {...props}
-                    buttonType={ButtonType.Add}
+                    buttonType={
+                        matrixState == MatrixState.ready
+                            ? ButtonType.AddMatrix
+                            : ButtonType.Add
+                    }
                 />
             </View>
             <View 
