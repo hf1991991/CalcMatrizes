@@ -5,6 +5,7 @@ import ArrowButton from './ArrowButton';
 export default function ArrowButtonsArea({ 
     vertical,
     hidden,
+    disabled=false,
     editableDimensions,
     changeEditableDimensions,
 }) {
@@ -46,7 +47,8 @@ export default function ArrowButtonsArea({
                         ? editableDimensions?.columns 
                         : editableDimensions?.rows
                     ) <= 1 
-                    || hidden
+                    || hidden 
+                    || disabled
                 }
             />
             <ArrowButton 
@@ -65,7 +67,7 @@ export default function ArrowButtonsArea({
                         rows: editableDimensions?.rows + 1,
                     })
                 }
-                disabled={hidden}
+                disabled={hidden || disabled}
             />
         </View>
     );

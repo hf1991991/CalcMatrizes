@@ -1,6 +1,11 @@
 export const MatrixState = {
     ready: 'ready',
     editing: 'editing',
+    addMatrix: 'addMatrix',
+    subtractMatrix: 'subtractMatrix',
+    AxB: 'AxB',
+    BxA: 'BxA',
+    LambdaxA: 'LambdaxA',
 }
 
 export const ButtonType = {

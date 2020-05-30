@@ -1,13 +1,12 @@
 import React from 'react';
 import { View, SafeAreaView } from 'react-native';
 import Matrix from './Matrix';
-import ArrowButton from './ArrowButton';
 import { MatrixState } from '../utilities/constants';
 import ArrowButtonsArea from './ArrowButtonsArea';
 
 export default function MatrixArea({ 
     matrixState,
-    currentMatrix,
+    readyMatrix,
     selectedMatrixElement,
     changeSelectedMatrixElement,
     editableDimensions,
@@ -34,19 +33,35 @@ export default function MatrixArea({
                     changeEditableDimensions={changeEditableDimensions}
                 />
                 <Matrix 
-                    matrixNumbers={currentMatrix}
+                    matrixNumbers={readyMatrix}
                     selectedMatrixElement={selectedMatrixElement}
                     changeSelectedMatrixElement={changeSelectedMatrixElement}
                 />
                 <ArrowButtonsArea 
                     vertical
-                    hidden={matrixState != MatrixState.editing}
+                    hidden={matrixState === MatrixState.ready}
+                    disabled={
+                        [
+                            MatrixState.addMatrix,
+                            MatrixState.subtractMatrix,
+                            MatrixState.BxA,
+                        ]
+                        .includes(matrixState)
+                    }
                     editableDimensions={editableDimensions}
                     changeEditableDimensions={changeEditableDimensions}
                 />
             </View>
             <ArrowButtonsArea 
-                hidden={matrixState != MatrixState.editing}
+                hidden={matrixState === MatrixState.ready}
+                disabled={
+                    [
+                        MatrixState.addMatrix,
+                        MatrixState.subtractMatrix,
+                        MatrixState.AxB,
+                    ]
+                    .includes(matrixState)
+                }
                 editableDimensions={editableDimensions}
                 changeEditableDimensions={changeEditableDimensions}
             />

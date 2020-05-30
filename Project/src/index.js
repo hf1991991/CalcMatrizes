@@ -4,35 +4,42 @@ import ButtonsArea from './components/ButtonsArea';
 import InfoArea from './components/InfoArea';
 import { MatrixState, count } from './utilities/constants';
 import MatrixOperations from './utilities/MatrixOperations';
-import MatrixData from './utilities/MatrixData';
-
-const NULL_MATRIX = () => new MatrixData({
-    data: [
-        [1, 2, 3],
-        [4, 4, 8],
-        [4, 1, 2],
-    ],
-});
 
 export default function App() {
-    let [currentMatrix, changeCurrentMatrix] = useState(NULL_MATRIX());
+    let [readyMatrix, changeReadyMatrix] = useState(
+        MatrixOperations.emptyMatrix({
+            rows: 3,
+            columns: 1,
+        })
+    );
     let [editableMatrix, changeEditableMatrix] = useState(null);
     let [selectedMatrixElement, changeSelectedMatrixElement] = useState(null);
     let [editableDimensions, changeEditableDimensions] = useState(null);
     let [matrixState, changeMatrixState] = useState(MatrixState.ready);
     let [secondSetOfKeysActive, changeSecondSetOfKeysActive] = useState(false);
-    let [columnDirectionActive, changeColumnDirectionActive] = useState(false);
+    let [columnDirectionActive, changeColumnDirectionActive] = useState(true);
 
-    function safeChangeCurrentMatrix(matrix) {
-        changeCurrentMatrix(
+    function safeChangeReadyMatrix(matrix) {
+        changeReadyMatrix(
             MatrixOperations.convertStringToNumbers(matrix)
         );
+    }
+
+    const matrixOnScreen = matrixState === MatrixState.ready 
+        ? readyMatrix
+        : editableMatrix;
+
+    function enterEditingMode({ editableMatrix, matrixState, selectedElement }) {
+        changeMatrixState(matrixState);
+        changeEditableMatrix(editableMatrix);
+        changeEditableDimensions(editableMatrix.dimensions());
+        selectedElement && changeSelectedMatrixElement(selectedElement);
     }
 
     function changeNumberWritten(newNumber) {
         selectedMatrixElement && changeEditableMatrix(
             MatrixOperations.changeElement({
-                matrix: editableMatrix || currentMatrix,
+                matrix: editableMatrix || readyMatrix,
                 ...selectedMatrixElement,
                 numberWritten: newNumber,
             })
@@ -96,11 +103,13 @@ export default function App() {
             <StatusBar barStyle='light-content' />
             <InfoArea 
                 matrixState={matrixState}
-                currentMatrix={currentMatrix}
-                safeChangeCurrentMatrix={changeCurrentMatrix}
+                readyMatrix={readyMatrix}
+                safeChangeReadyMatrix={changeReadyMatrix}
                 onPressBackground={
                     () => {
                         changeMatrixState(MatrixState.ready);
+                        matrixState === MatrixState.editing 
+                            && safeChangeReadyMatrix(editableMatrix);
                         changeSelectedMatrixElement(null);
                     }
                 }
@@ -108,13 +117,21 @@ export default function App() {
                 changeEditableMatrix={changeEditableMatrix}
                 selectedMatrixElement={selectedMatrixElement}
                 changeSelectedMatrixElement={
-                    ({ row, column }) => {
-                        changeSelectedMatrixElement({ row, column });
+                    (selection) => {
+                        changeSelectedMatrixElement(
+                            selection === null 
+                                ? null 
+                                : { 
+                                    row: selection.row, 
+                                    column: selection.column,
+                                }
+                        );
 
-                        if (matrixState == MatrixState.ready) {
-                            changeMatrixState(MatrixState.editing);
-                            changeEditableMatrix(currentMatrix);
-                            changeEditableDimensions(currentMatrix.dimensions());
+                        if (matrixState === MatrixState.ready) {
+                            enterEditingMode({
+                                matrixState: MatrixState.editing,
+                                editableMatrix: readyMatrix,
+                            });
                         }
                     }
                 }
@@ -123,8 +140,9 @@ export default function App() {
             />
             <ButtonsArea
                 matrixState={matrixState}
-                currentMatrix={currentMatrix}
-                changeCurrentMatrix={safeChangeCurrentMatrix}
+                matrixOnScreen={matrixOnScreen}
+                readyMatrix={readyMatrix}
+                changeReadyMatrix={safeChangeReadyMatrix}
                 numberWritten={getNumberWritten()}
                 secondSetOfKeysActive={secondSetOfKeysActive}
                 changeSecondSetOfKeysActive={
@@ -136,12 +154,20 @@ export default function App() {
                 }
                 selectedMatrixElement={selectedMatrixElement}
                 onPressAC={
-                    matrixState == MatrixState.ready
-                        ? () => safeChangeCurrentMatrix(NULL_MATRIX())
-                        : () => {
+                    () => {
+                        const changeMatrixOnScreen = matrixState === MatrixState.ready 
+                            ? safeChangeReadyMatrix
+                            : changeEditableMatrix;
+
+                        changeMatrixOnScreen(
+                            MatrixOperations.emptyMatrix(matrixOnScreen.dimensions())
+                        );
+
+                        if (MatrixOperations.isMatrixEmpty(matrixOnScreen)) {
                             changeMatrixState(MatrixState.ready);
                             changeSelectedMatrixElement(null);
                         }
+                    }
                 }
                 onPressCE={
                     () => changeNumberWritten(null)
@@ -154,20 +180,90 @@ export default function App() {
                             changeNumberWritten(getNumberWritten() + element);
                     }
                 }
+                onPressAxB={() => {
+                    changeMatrixState(MatrixState.ready);
+                }}
+                onPressBxA={() => {
+                    
+                }}
+                onPressAddMatrix={() => {
+                    enterEditingMode({
+                        matrixState: MatrixState.addMatrix,
+                        editableMatrix: MatrixOperations.emptyMatrix(matrixOnScreen.dimensions()),
+                        selectedElement: {
+                            row: 0,
+                            column: 0,
+                        },
+                    });
+                }}
+                onPressSubtractMatrix={() => {
+                    enterEditingMode({
+                        matrixState: MatrixState.subtractMatrix,
+                        editableMatrix: MatrixOperations.emptyMatrix(matrixOnScreen.dimensions()),
+                        selectedElement: {
+                            row: 0,
+                            column: 0,
+                        },
+                    });
+                }}
+                onPressResolveEquation={() => {
+                    
+                }}
+                onPressSave={() => {
+                    
+                }}
+                onPressSavedList={() => {
+                    
+                }}
                 onTranspose={() => {
-                    safeChangeCurrentMatrix(
-                        MatrixOperations.transpose(currentMatrix)
-                    );
+                    
+                    if (matrixState === MatrixState.ready) {
+                        safeChangeReadyMatrix(
+                            MatrixOperations.transpose(readyMatrix)
+                        );
+                    }
+
+                    else {
+                        changeEditableMatrix(
+                            MatrixOperations.transpose(editableMatrix)
+                        );
+                        changeSelectedMatrixElement({
+                            row: selectedMatrixElement.column,
+                            column: selectedMatrixElement.row,
+                        });
+                        changeEditableDimensions({
+                            rows: editableDimensions.columns,
+                            columns: editableDimensions.rows,
+                        });
+                    }
+                    
                 }}
                 onInvert={() => {
-                    safeChangeCurrentMatrix(
-                        MatrixOperations.invert(currentMatrix)
+                    safeChangeReadyMatrix(
+                        MatrixOperations.invert(matrixOnScreen)
                     );
                 }}
                 onEnter={nextElement}
-                isMatrixFull={MatrixOperations.isMatrixFull(editableMatrix)}
+                isMatrixFull={MatrixOperations.isMatrixFull(matrixOnScreen)}
+                isMatrixSquare={MatrixOperations.isMatrixSquare(matrixOnScreen)}
                 onCheck={() => {
-                    safeChangeCurrentMatrix(editableMatrix);
+                    switch (matrixState) {
+                        case MatrixState.editing:
+                            safeChangeReadyMatrix(editableMatrix);
+                            break;
+                        case MatrixState.addMatrix:
+                            safeChangeReadyMatrix(
+                                MatrixOperations.sum(readyMatrix, editableMatrix)
+                            );
+                            break;
+                        case MatrixState.subtractMatrix:
+                            safeChangeReadyMatrix(
+                                MatrixOperations.subtract(readyMatrix, editableMatrix)
+                            );
+                            break;
+                        default:
+                            break;
+                    }
                     changeMatrixState(MatrixState.ready);
                 }}
             />

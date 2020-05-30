@@ -116,6 +116,17 @@ export default class MatrixOperations {
         return true;
     }
 
+    static isMatrixEmpty(matrix) {
+        if (!matrix) return false;
+
+        for (let row = 0; row < matrix.dimensions().rows; row++) {
+            for (let column = 0; column < matrix.dimensions().columns; column++) {
+                if (matrix.data[row][column] !== null) return false;
+            }
+        }
+        return true;
+    }
+
     static isMatrixSquare(matrix) {
         return matrix.dimensions().rows === matrix.dimensions().columns;
     }
@@ -164,6 +175,22 @@ export default class MatrixOperations {
         });
     }
 
+    static emptyMatrix({ rows, columns }) {
+        let matrix = [];
+
+        for (let row = 0; row < rows; row++) {
+            let matrixRow = [];
+            for (let column = 0; column < columns; column++) {
+                matrixRow.push(null);
+            }
+            matrix.push(matrixRow);
+        }
+
+        return new MatrixData({
+            data: matrix,
+        });
+    }
+
     static identity(dimension) {
         let identity = [];
 
@@ -178,6 +205,44 @@ export default class MatrixOperations {
         return new MatrixData({
             data: identity,
         });
+    }
+
+    static sum(matrixA, matrixB) {
+        let matrix = [];
+
+        for (let row = 0; row < matrixA.dimensions().rows; row++) {
+            let matrixRow = [];
+            for (let column = 0; column < matrixA.dimensions().columns; column++) {
+                matrixRow.push(
+                    Number.parseFloat(matrixA.data[row][column])
+                    + Number.parseFloat(matrixB.data[row][column])
+                );
+            }
+            matrix.push(matrixRow);
+        }
+
+        return new MatrixData({
+            data: matrix,
+        });    
+    }
+
+    static subtract(matrixA, matrixB) {
+        let matrix = [];
+
+        for (let row = 0; row < matrixA.dimensions().rows; row++) {
+            let matrixRow = [];
+            for (let column = 0; column < matrixA.dimensions().columns; column++) {
+                matrixRow.push(
+                    Number.parseFloat(matrixA.data[row][column])
+                    - Number.parseFloat(matrixB.data[row][column])
+                );
+            }
+            matrix.push(matrixRow);
+        }
+
+        return new MatrixData({
+            data: matrix,
+        });    
     }
 
     static transpose(matrix) {

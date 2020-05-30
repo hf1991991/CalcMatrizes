@@ -6,8 +6,8 @@ import { MatrixState } from '../utilities/constants';
 
 export default function InfoArea({ 
     matrixState,
-    currentMatrix,
-    changeCurrentMatrix,
+    readyMatrix,
+    changeReadyMatrix,
     onPressBackground,
     editableMatrix,
     changeEditableMatrix,
@@ -28,23 +28,27 @@ export default function InfoArea({
             >
                 <MatrixArea 
                     matrixState={matrixState}
-                    currentMatrix={
-                        matrixState == MatrixState.editing
-                            ? editableMatrix
-                            : currentMatrix
+                    readyMatrix={
+                        matrixState === MatrixState.ready
+                            ? readyMatrix
+                            : editableMatrix
                     }
-                    changeCurrentMatrix={changeCurrentMatrix}
+                    changeReadyMatrix={changeReadyMatrix}
                     editableDimensions={editableDimensions}
                     changeEditableDimensions={({ rows, columns }) => {
                         changeEditableDimensions({ rows, columns });
                         changeEditableMatrix(
                             MatrixOperations.resizeMatrix({
-                                originalMatrix: currentMatrix,
+                                originalMatrix: readyMatrix,
                                 editableMatrix: editableMatrix,
                                 rows,
                                 columns,
                             })
                         );
+                        console.log(selectedMatrixElement);
+                        if (selectedMatrixElement?.row >= rows 
+                            || selectedMatrixElement?.column >= columns
+                        ) changeSelectedMatrixElement(null);
                     }}
                     selectedMatrixElement={selectedMatrixElement}
                     changeSelectedMatrixElement={changeSelectedMatrixElement}

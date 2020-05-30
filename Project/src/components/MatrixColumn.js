@@ -30,7 +30,8 @@ export default function MatrixColumn({
     function formatElement(element) {
         const decimal = element === null || element === undefined
             ? ''
-            : (element.toString().split('.')[1] && element.toString().split('.')[1].length) > 4 ? element.toFixed(4) : element;
+            : element;
+            //: (element.toString().split('.')[1] && element.toString().split('.')[1].length) > 6 ? element.toFixed(6) : element;
         return (decimal === null ? '' : decimal).toString().replace('.', ',');
     }
 

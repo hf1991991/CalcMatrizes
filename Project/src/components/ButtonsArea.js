@@ -37,20 +37,14 @@ export default function ButtonsArea(props) {
                 />
                 <CalculatorButton
                     {...props}
-                    buttonType={
-                        matrixState == MatrixState.ready 
-                            ? ButtonType.Second
-                            : ButtonType.ColumnDirection
-                    }
+                    buttonType={ButtonType.Second}
                 />
                 <CalculatorButton
                     {...props}
                     buttonType={
-                        matrixState == MatrixState.ready 
-                            ? secondSetOfKeysActive
-                                ? ButtonType.LambdaxA
-                                : ButtonType.R
-                            : ButtonType.Divide
+                        secondSetOfKeysActive
+                            ? ButtonType.Transposed
+                            : ButtonType.Inverse
                     }
                 />
             </View>
@@ -71,13 +65,7 @@ export default function ButtonsArea(props) {
                 />
                 <CalculatorButton
                     {...props}
-                    buttonType={
-                        matrixState == MatrixState.ready 
-                            ? secondSetOfKeysActive
-                                ? ButtonType.BxA
-                                : ButtonType.AxB
-                            : ButtonType.Multiply
-                    }
+                    buttonType={ButtonType.LambdaxA}
                 />
             </View>
             <View 
@@ -98,9 +86,9 @@ export default function ButtonsArea(props) {
                 <CalculatorButton
                     {...props}
                     buttonType={
-                        matrixState == MatrixState.ready
-                            ? ButtonType.SubtractMatrix
-                            : ButtonType.Subtract
+                        secondSetOfKeysActive
+                            ? ButtonType.BxA
+                            : ButtonType.AxB
                     }
                 />
             </View>
@@ -122,9 +110,9 @@ export default function ButtonsArea(props) {
                 <CalculatorButton
                     {...props}
                     buttonType={
-                        matrixState == MatrixState.ready
-                            ? ButtonType.AddMatrix
-                            : ButtonType.Add
+                        secondSetOfKeysActive
+                            ? ButtonType.SubtractMatrix
+                            : ButtonType.AddMatrix
                     }
                 />
             </View>
@@ -146,9 +134,7 @@ export default function ButtonsArea(props) {
                     {...props}
                     buttonType={
                         matrixState == MatrixState.ready 
-                            ? secondSetOfKeysActive
-                                ? ButtonType.Transposed
-                                : ButtonType.Inverse
+                            ? ButtonType.R
                             : selectedMatrixElement
                                 ? ButtonType.Enter
                                 : ButtonType.Check

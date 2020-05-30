@@ -1,8 +1,7 @@
 import React from 'react';
 import { Image, TouchableOpacity } from 'react-native';
-import { ButtonType } from '../utilities/constants';
+import { ButtonType, MatrixState } from '../utilities/constants';
 import ButtonData from '../utilities/ButtonData';
-import MatrixOperations from '../utilities/MatrixOperations';
 
 export default function CalculatorButton(props) {
 
@@ -95,59 +94,85 @@ export default function CalculatorButton(props) {
                 });
             case ButtonType.Second:
                 return new ButtonData({
-                    source: props.secondSetOfKeysActive
-                        ? require('../../assets/buttons/ActiveSecond.png')
-                        : require('../../assets/buttons/InactiveSecond.png'),
+                    source: require('../../assets/buttons/InactiveSecond.png'),
+                    sourceActive: require('../../assets/buttons/ActiveSecond.png'),
+                    active: props.secondSetOfKeysActive,
                     onPress: props.changeSecondSetOfKeysActive,
                 });
             case ButtonType.ColumnDirection:
                 return new ButtonData({
-                    source: props.columnDirectionActive
-                        ? require('../../assets/buttons/ActiveColumnDirection.png')
-                        : require('../../assets/buttons/InactiveColumnDirection.png'),
+                    source: require('../../assets/buttons/InactiveColumnDirection.png'),
+                    sourceActive: require('../../assets/buttons/ActiveColumnDirection.png'),
+                    active: props.columnDirectionActive,
                     onPress: props.changeColumnDirectionActive,
                 });
             case ButtonType.R:
                 return new ButtonData({
                     source: require('../../assets/buttons/R.png'),
-                    disabled: !MatrixOperations.isMatrixFull(props.currentMatrix),
+                    sourceActive: require('../../assets/buttons/RSelected.png'),
+                    active: false,
+                    disabled: !props.isMatrixFull,
                 });
             case ButtonType.LambdaxA:
                 return new ButtonData({
                     source: require('../../assets/buttons/LambdaxA.png'), 
-                    disabled: !MatrixOperations.isMatrixFull(props.currentMatrix),
+                    sourceActive: require('../../assets/buttons/LambdaxASelected.png'),
+                    active: props.matrixState == MatrixState.LambdaxA, 
+                    disabled: !props.isMatrixFull,
                 });
             case ButtonType.AxB:
                 return new ButtonData({
                     source: require('../../assets/buttons/AxB.png'), 
-                    disabled: !MatrixOperations.isMatrixFull(props.currentMatrix),
+                    sourceActive: require('../../assets/buttons/AxBSelected.png'),
+                    active: props.matrixState == MatrixState.AxB, 
+                    disabled: !props.isMatrixFull,
+                    onPress: props.onPressAxB,
                 });
             case ButtonType.BxA:
                 return new ButtonData({
                     source: require('../../assets/buttons/BxA.png'), 
-                    disabled: !MatrixOperations.isMatrixFull(props.currentMatrix),
+                    sourceActive: require('../../assets/buttons/BxASelected.png'),
+                    active: props.matrixState == MatrixState.BxA, 
+                    disabled: !props.isMatrixFull,
+                    onPress: props.onPressBxA,
                 });
             case ButtonType.Inverse:
                 return new ButtonData({
                     source: require('../../assets/buttons/Inverse.png'), 
                     onPress: props.onInvert,
-                    disabled: !MatrixOperations.isMatrixFull(props.currentMatrix)
-                        || !MatrixOperations.isMatrixSquare(props.currentMatrix),
+                    disabled: !props.isMatrixFull
+                        || !props.isMatrixSquare,
                 });
             case ButtonType.Transposed:
                 return new ButtonData({
                     source: require('../../assets/buttons/Transposed.png'), 
                     onPress: props.onTranspose,
+                    disabled: (
+                        ([
+                            MatrixState.addMatrix,
+                            MatrixState.subtractMatrix,
+                            MatrixState.AxB,
+                            MatrixState.BxA,
+                        ]
+                        .includes(props.matrixState))
+                        && (!props.isMatrixSquare)
+                    )
                 });
             case ButtonType.SubtractMatrix:
                 return new ButtonData({
-                    source: require('../../assets/buttons/Subtract.png'), 
-                    disabled: !MatrixOperations.isMatrixFull(props.currentMatrix),
+                    source: require('../../assets/buttons/SubtractMatrix.png'),
+                    sourceActive: require('../../assets/buttons/SubtractMatrixSelected.png'),
+                    active: props.matrixState == MatrixState.subtractMatrix, 
+                    disabled: !props.isMatrixFull,
+                    onPress: props.onPressSubtractMatrix,
                 });
             case ButtonType.AddMatrix:
                 return new ButtonData({
-                    source: require('../../assets/buttons/Add.png'), 
-                    disabled: !MatrixOperations.isMatrixFull(props.currentMatrix),
+                    source: require('../../assets/buttons/AddMatrix.png'), 
+                    sourceActive: require('../../assets/buttons/AddMatrixSelected.png'),
+                    active: props.matrixState == MatrixState.addMatrix, 
+                    disabled: !props.isMatrixFull,
+                    onPress: props.onPressAddMatrix,
                 });
             case ButtonType.Subtract:
                 return new ButtonData({
@@ -202,7 +227,11 @@ export default function CalculatorButton(props) {
                 height: undefined,
                 width: undefined,
             }}
-            source={buttonData.source} 
+            source={
+                buttonData.active 
+                    ? buttonData.sourceActive 
+                    : buttonData.source
+            } 
             resizeMode='contain'
         />
         </TouchableOpacity>
