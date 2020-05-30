@@ -17,69 +17,66 @@ const NULL_MATRIX = () => new MatrixData({
 export default function App() {
     let [currentMatrix, changeCurrentMatrix] = useState(NULL_MATRIX());
     let [editableMatrix, changeEditableMatrix] = useState(null);
-    let [numberWritten, changeNumberWritten] = useState(null);
     let [selectedMatrixElement, changeSelectedMatrixElement] = useState(null);
     let [editableDimensions, changeEditableDimensions] = useState(null);
     let [matrixState, changeMatrixState] = useState(MatrixState.ready);
     let [secondSetOfKeysActive, changeSecondSetOfKeysActive] = useState(false);
     let [columnDirectionActive, changeColumnDirectionActive] = useState(false);
 
-    function getNewNumberConfigs(matrix) {
+    function changeNumberWritten(newNumber) {
+        selectedMatrixElement && changeEditableMatrix(
+            MatrixOperations.changeElement({
+                matrix: editableMatrix || currentMatrix,
+                ...selectedMatrixElement,
+                numberWritten: newNumber,
+            })
+        );
+    }
+
+    function getNumberWritten() {
+        const { row, column } = selectedMatrixElement || {};
+        return (
+                (
+                    editableMatrix 
+                    && editableMatrix.data 
+                    && editableMatrix.data[row] 
+                    && editableMatrix.data[row][column]
+                ) || ''
+            ).toString();
+    }
+
+    function nextElement() {
+        const { row, column } = selectedMatrixElement;
+        const maxRows = editableMatrix.dimensions().rows;
+        const maxColumns = editableMatrix.dimensions().columns;
+        
+        let selectedElement = {row: null, column: null};
+
         if (
-            selectedMatrixElement.row == matrix.dimensions().rows - 1
-            && selectedMatrixElement.column == matrix.dimensions().columns - 1
+            !(row == maxRows - 1
+            && column == maxColumns - 1)
+            && selectedElement
         ) {
-            return {
-                number: null,
-                selectedElement: null,
-            };
-        } else {
             if (columnDirectionActive) {
-                if (selectedMatrixElement.row < matrix.dimensions().rows - 1) {
-                    return {
-                        number: matrix.data
-                            [selectedMatrixElement.row + 1]
-                            [selectedMatrixElement.column],
-                        selectedElement: {
-                            ...selectedMatrixElement,
-                            row: selectedMatrixElement.row + 1,
-                        },
-                    };
+                if (row < maxRows - 1) {
+                    selectedElement.column = column;
+                    selectedElement.row = row + 1;
                 } else {
-                    return {
-                        number: matrix.data
-                            [0]
-                            [selectedMatrixElement.column + 1],
-                        selectedElement: {
-                            column: selectedMatrixElement.column + 1,
-                            row: 0,
-                        },
-                    };
+                    selectedElement.column = column + 1;
+                    selectedElement.row = 0;
                 }
             } else {
-                if (selectedMatrixElement.column < matrix.dimensions().columns - 1) {
-                    return {
-                        number: matrix.data
-                            [selectedMatrixElement.row]
-                            [selectedMatrixElement.column + 1],
-                        selectedElement: {
-                            ...selectedMatrixElement,
-                            column: selectedMatrixElement.column + 1,
-                        },
-                    };
+                if (column < maxColumns - 1) {
+                    selectedElement.column = column + 1;
+                    selectedElement.row = row;
                 } else {
-                    return {
-                        number: matrix.data
-                            [selectedMatrixElement.row + 1]
-                            [0],
-                        selectedElement: {
-                            row: selectedMatrixElement.row + 1,
-                            column: 0,
-                        },
-                    };
+                    selectedElement.column = 0;
+                    selectedElement.row = row + 1;
                 }
             }
-        }
+        } else selectedElement = null;
+
+        changeSelectedMatrixElement(selectedElement);
     }
     
     return (
@@ -111,16 +108,12 @@ export default function App() {
                 }
                 editableDimensions={editableDimensions}
                 changeEditableDimensions={changeEditableDimensions}
-                numberWritten={numberWritten}
-                changeNumberWritten={
-                    (number) => changeNumberWritten(
-                        (!selectedMatrixElement && numberWritten) || number
-                    )
-                }
+                numberWritten={getNumberWritten()}
+                changeNumberWritten={changeNumberWritten}
             />
             <ButtonsArea
                 matrixState={matrixState}
-                numberWritten={numberWritten}
+                numberWritten={getNumberWritten()}
                 onPressCE={
                     () => changeNumberWritten(null)
                 }
@@ -134,10 +127,10 @@ export default function App() {
                 }
                 numberButtonPressed={
                     (element) => {
-                        if ((numberWritten || '').length == 0 && element == ',')
+                        if (getNumberWritten().length == 0 && element == ',')
                             changeNumberWritten('0,');
-                        else if (count(numberWritten || '', ',') == 0 || element != ',')
-                            changeNumberWritten((numberWritten || '').toString() + element);
+                        else if (count(getNumberWritten(), ',') == 0 || element != ',')
+                            changeNumberWritten(getNumberWritten() + element);
                     }
                 }
                 secondSetOfKeysActive={secondSetOfKeysActive}
@@ -158,22 +151,7 @@ export default function App() {
                         })
                     );
                 }}
-                onEnter={() => {
-
-                    changeEditableMatrix(
-                        MatrixOperations.changeElement({
-                            currentMatrix: editableMatrix,
-                            ...selectedMatrixElement,
-                            numberWritten,
-                        })
-                    );
-
-                    const { number, selectedElement } = getNewNumberConfigs(editableMatrix);
-
-                    changeNumberWritten(number);
-                    changeSelectedMatrixElement(selectedElement);
-
-                }}
+                onEnter={nextElement}
                 isMatrixFull={MatrixOperations.isMatrixFull(editableMatrix)}
                 onCheck={() => {
                     changeCurrentMatrix(editableMatrix);

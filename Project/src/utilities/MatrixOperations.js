@@ -2,8 +2,8 @@ import MatrixData from "./MatrixData";
 
 export default class MatrixOperations {
 
-    static changeElement({ currentMatrix, column, row, numberWritten }) {
-        let matrixDataCopy = [...currentMatrix.data];
+    static changeElement({ matrix, column, row, numberWritten }) {
+        let matrixDataCopy = [...matrix.data];
         matrixDataCopy[row][column] = numberWritten;
         return new MatrixData({
             data: matrixDataCopy,
@@ -37,6 +37,11 @@ export default class MatrixOperations {
 
         return transposed;
     }
+
+    static minDimensions = (matrix1, matrix2) => ({
+        rows: Math.min(matrix1.dimensions().rows, matrix2.dimensions().rows),
+        columns: Math.min(matrix1.dimensions().columns, matrix2.dimensions().columns),
+    })
 
     static maxDimensions = (matrix1, matrix2) => ({
         rows: Math.max(matrix1.dimensions().rows, matrix2.dimensions().rows),
@@ -100,5 +105,4 @@ export default class MatrixOperations {
         }
         return true;
     }
-
 }

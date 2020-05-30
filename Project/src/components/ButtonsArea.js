@@ -153,9 +153,9 @@ export default function ButtonsArea(props) {
 
 const styles = StyleSheet.create({
     button: {
-        height: (windowWidth/4)*0.75,
+        height: (windowWidth/4)*0.7,
         flexDirection: 'row',
-        marginVertical: 6,
+        marginVertical: 3,
         marginHorizontal: 6,
     },
 });

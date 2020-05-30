@@ -8,7 +8,10 @@ export default function Matrix({
     changeSelectedMatrixElement,
     changeNumberWritten,
 }) {
-    let [flatListWidth, changeFlatListWidth] = useState(0);
+    let [flatListDimensions, changeFlatListDimensions] = useState({
+        height: 0,
+        width: 0,
+    });
 
     function getElementStyle(row, column) {
         return {
@@ -30,7 +33,7 @@ export default function Matrix({
 
     let matrixElements = [];
 
-    for (let row = 0; row < matrixNumbers?.dimensions().rows; row++) {
+    for (let row = matrixNumbers?.dimensions().rows - 1; row >= 0; row--) {
         for (let column = matrixNumbers?.dimensions().columns - 1; column >= 0; column--) {
             matrixElements.push({
                 number: matrixNumbers.data[row][column],
@@ -44,9 +47,11 @@ export default function Matrix({
         <MatrixContainer 
             matrixColumns={
                 <View
-                    style={{flex: 1}}
                     onLayout={(event) => {
-                        changeFlatListWidth(event.nativeEvent.layout.width);
+                        changeFlatListDimensions({
+                            height: event.nativeEvent.layout.height,
+                            width: event.nativeEvent.layout.width,
+                        });
                     }}
                 >
                     <ScrollView
@@ -57,8 +62,14 @@ export default function Matrix({
                         }}
                     >
                         <FlatList
+                            style={{
+                                transform:[{rotateX:'180deg'}],
+                            }}
+                            contentContainerStyle={{
+                                justifyContent: 'center',
+                            }}
                             key={matrixNumbers.dimensions().columns}
-                            scrollEnabled={false}
+                            scrollEnabled
                             numColumns={matrixNumbers.dimensions().columns}
                             keyExtractor={element => `${element.row}:${element.column}`}
                             data={matrixElements}
@@ -68,7 +79,7 @@ export default function Matrix({
                                     <TouchableOpacity
                                         style={{
                                             alignSelf: 'stretch',
-                                            transform:[{rotateY:'180deg'}],
+                                            transform:[{rotateY:'180deg'},{rotateX:'180deg'}],
                                         }}
                                         onPress={
                                             () => {
@@ -76,7 +87,6 @@ export default function Matrix({
                                                     row,
                                                     column,
                                                 });
-                                                changeNumberWritten(number);
                                             }
                                         }
                                     >
@@ -89,8 +99,8 @@ export default function Matrix({
                                                 borderRadius: 10,
                                                 alignSelf: 'center',
                                                 minHeight: 40,
-                                                minWidth: Math.max(
-                                                    flatListWidth/matrixNumbers?.dimensions().columns-10,
+                                                minWidth: Math.min(
+                                                    flatListDimensions.width/matrixNumbers?.dimensions().columns-10,
                                                     50
                                                 ),
                                                 marginHorizontal: 5,

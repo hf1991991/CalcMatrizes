@@ -21,12 +21,12 @@ export default function CalculatorButton(props) {
             case ButtonType[2]:
                 return new ButtonData({
                     source: require('../../assets/buttons/2.png'), 
-                    onPress: () => props.numberButtonPressed(1),
+                    onPress: () => props.numberButtonPressed(2),
                 });
             case ButtonType[3]:
                 return new ButtonData({
                     source: require('../../assets/buttons/3.png'), 
-                    onPress: () => props.numberButtonPressed(1),
+                    onPress: () => props.numberButtonPressed(3),
                 });
             case ButtonType[4]:
                 return new ButtonData({

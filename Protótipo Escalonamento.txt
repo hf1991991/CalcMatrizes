@@ -1,0 +1,97 @@
+
+
+    /* 
+        Escalona a porcao, seja abaixo ou acima, da diagonal principal 
+        de matrixA, assim como retorna o determinante da matriz:
+    */
+    static partialGaussianElimination(matrixA, matrixB, eliminateBelowMainDiagonal, showSteps, verticalElimination) {
+        grau_range = None
+        dimensoes_a = dimensoes(matrixA)
+        dimensoes_b = dimensoes(matrixB)
+        _determinante = 1
+        coluna_sem_pivot = False
+        if eliminateBelowMainDiagonal:
+            grau_range = range(min(dimensoes_a))
+        else:
+            grau_range = range(min(dimensoes_a) - 1, -1, -1)
+    
+        for (
+            let colunaPivot = eliminateBelowMainDiagonal
+                ? 0
+                : )
+        for coluna_pivot in grau_range:
+    
+            pivot = matrixA[coluna_pivot][coluna_pivot]
+    
+            if pivot == 0.0:
+                linha_teste = coluna_pivot + 1
+                while True:
+                    # Se houver uma coluna sem pivot em uma matriz escalonada reduzida, o determinante dela é nulo:
+                    if linha_teste == dimensoes_a[1]:
+                        coluna_sem_pivot = True
+                        break
+                    possivel_novo_pivot = matrixA[linha_teste][coluna_pivot]
+                    if possivel_novo_pivot != 0.0:
+                        break
+                    linha_teste += 1
+    
+                if not coluna_sem_pivot:
+                    nova_linha_copy = matrixA[linha_teste][:]
+                    antiga_linha_copy = matrixA[coluna_pivot][:]
+    
+                    matrixA[coluna_pivot] = nova_linha_copy
+                    matrixA[linha_teste] = antiga_linha_copy
+    
+                    nova_linha_inversa = matrixB[linha_teste][:]
+                    antiga_linha_inversa = matrixB[coluna_pivot][:]
+    
+                    matrixB[coluna_pivot] = nova_linha_inversa
+                    matrixB[linha_teste] = antiga_linha_inversa
+    
+                    pivot = matrixA[coluna_pivot][coluna_pivot]
+    
+                    _determinante *= -1
+    
+            if not coluna_sem_pivot:
+                if pivot != 1.0:
+                    for index in range(dimensoes_a[1]):
+                        matrixA[coluna_pivot][index] /= pivot
+                    for index in range(dimensoes_b[1]):
+                        matrixB[coluna_pivot][index] /= pivot
+    
+                    _determinante *= pivot
+    
+                    if showSteps:
+                        exibicao_passos_resolver_equacao_matricial(matrixA, matrixB, pivot, coluna_pivot+1, coluna_pivot+1, verticalElimination, None)
+    
+                    pivot = matrixA[coluna_pivot][coluna_pivot]
+    
+                index_range = None
+                if eliminateBelowMainDiagonal:
+                    index_range = range(dimensoes_a[0] - coluna_pivot - 1)
+                else:
+                    index_range = range(coluna_pivot - 1, -1, -1)
+    
+                for index in index_range:
+                    index_vertical = None
+                    if eliminateBelowMainDiagonal:
+                        index_vertical = index + coluna_pivot + 1
+                    else:
+                        index_vertical = index
+                    elemento = matrixA[index_vertical][coluna_pivot]
+                    fator_de_eliminacao = -elemento / pivot
+    
+                    for elemento_horizontal in range(dimensoes_a[1]):
+                        matrixA[index_vertical][elemento_horizontal] = \
+                            matrixA[index_vertical][elemento_horizontal] + \
+                            fator_de_eliminacao * matrixA[coluna_pivot][elemento_horizontal]
+    
+                    for elemento_horizontal in range(dimensoes_b[1]):
+                        matrixB[index_vertical][elemento_horizontal] = \
+                            matrixB[index_vertical][elemento_horizontal] + \
+                            fator_de_eliminacao * matrixB[coluna_pivot][elemento_horizontal]
+    
+                    if showSteps:
+                        exibicao_passos_resolver_equacao_matricial(matrixA, matrixB, fator_de_eliminacao, coluna_pivot+1, index_vertical+1, verticalElimination, None)
+        if coluna_sem_pivot: return 0.0
+        else: return arredondamento_na_raca(_determinante, 6)

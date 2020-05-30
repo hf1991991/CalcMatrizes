@@ -22,64 +22,32 @@ export default function InfoArea({
         <View
             style={{
                 flex: 1,
-                justifyContent: 'flex-end',
-                paddingHorizontal: 30,
             }}
         >
-            <ScrollView
-                showsVerticalScrollIndicator={false}
-                style={{
-                    transform:[{rotateX:'180deg'}],
+            <MatrixArea 
+                matrixState={matrixState}
+                currentMatrix={
+                    matrixState == MatrixState.editing
+                        ? editableMatrix
+                        : currentMatrix
+                }
+                changeCurrentMatrix={changeCurrentMatrix}
+                editableDimensions={editableDimensions}
+                changeEditableDimensions={({ rows, columns }) => {
+                    changeEditableDimensions({ rows, columns });
+                    changeEditableMatrix(
+                        MatrixOperations.resizeMatrix({
+                            originalMatrix: currentMatrix,
+                            editableMatrix: editableMatrix,
+                            rows,
+                            columns,
+                        })
+                    );
                 }}
-            >
-                <View
-                    style={{
-                        transform:[{rotateX:'180deg'}],
-                    }}
-                >
-                    <MatrixArea 
-                        matrixState={matrixState}
-                        currentMatrix={
-                            matrixState == MatrixState.editing
-                                ? editableMatrix
-                                : currentMatrix
-                        }
-                        changeCurrentMatrix={changeCurrentMatrix}
-                        editableDimensions={editableDimensions}
-                        changeEditableDimensions={({ rows, columns }) => {
-                            changeEditableDimensions({ rows, columns });
-                            changeEditableMatrix(
-                                MatrixOperations.resizeMatrix({
-                                    originalMatrix: currentMatrix,
-                                    editableMatrix: editableMatrix,
-                                    rows,
-                                    columns,
-                                })
-                            );
-                        }}
-                        selectedMatrixElement={selectedMatrixElement}
-                        changeSelectedMatrixElement={changeSelectedMatrixElement}
-                        changeNumberWritten={changeNumberWritten}
-                    />
-                    <View
-                        style={{
-                            justifyContent: 'center',
-                            minHeight: 100,
-                        }}
-                    >
-                        <Text
-                            style={{
-                                textAlign: 'right',
-                                color: '#fff',
-                                fontSize: 60,
-                                marginVertical: 10,
-                            }}
-                        >
-                            {numberWritten}
-                        </Text>
-                    </View>
-                </View>
-            </ScrollView>
+                selectedMatrixElement={selectedMatrixElement}
+                changeSelectedMatrixElement={changeSelectedMatrixElement}
+                changeNumberWritten={changeNumberWritten}
+            />
         </View>
     );
 }

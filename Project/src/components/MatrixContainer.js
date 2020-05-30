@@ -1,5 +1,7 @@
 import React from 'react';
-import { View } from 'react-native';
+import { View, Dimensions } from 'react-native';
+
+const windowWidth = Dimensions.get('window').width;
 
 const HorizontalLines = () => (
     <View
@@ -10,14 +12,14 @@ const HorizontalLines = () => (
     >
         <View 
             style={{
-                width: 30,
+                width: 15,
                 height: 3,
                 backgroundColor: '#fff',
             }}
         />
         <View 
             style={{
-                width: 30,
+                width: 15,
                 height: 3,
                 backgroundColor: '#fff',
             }}
@@ -27,7 +29,13 @@ const HorizontalLines = () => (
 
 export default function MatrixColumns({ matrixColumns }) {
     return (
-        <>
+        <View
+            style={{
+                justifyContent: 'center',
+                // Largura máxima da matrix é restringida pelo tamanho dos botões de seta (50) e paddingHorizontal de InfoArea (20):
+                maxWidth: windowWidth - (50 + 20)*2,
+            }}
+        >
             <HorizontalLines />
                 <View
                     style={{
@@ -43,6 +51,6 @@ export default function MatrixColumns({ matrixColumns }) {
                     {matrixColumns}
                 </View>
             <HorizontalLines />
-        </>
+        </View>
     );
 }
