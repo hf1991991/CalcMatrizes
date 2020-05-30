@@ -165,12 +165,18 @@ export default class MatrixOperations {
     }
 
     static identity(dimension) {
+        let identity = [];
+
+        for (let row = 0; row < dimension; row++) {
+            let identityRow = [];
+            for (let column = 0; column < dimension; column++) {
+                identityRow.push(row === column ? 1 : 0);
+            }
+            identity.push(identityRow);
+        }
+
         return new MatrixData({
-            data: [
-                [1,0,0],
-                [0,1,0],
-                [0,0,1],
-            ],
+            data: identity,
         });
     }
 
@@ -193,7 +199,7 @@ export default class MatrixOperations {
     static invert(matrix) {
         let firstElimination = MatrixOperations.partialGaussianElimination({
             matrixA: matrix,
-            matrixB: MatrixOperations.identity(3),
+            matrixB: MatrixOperations.identity(matrix.dimensions().rows),
             eliminateBelowMainDiagonal: true,
         });
 
