@@ -17,16 +17,16 @@ export default function MatrixColumn({
     function getElementStyle(row, column) {
         return {
             backgroundColor: selectedMatrixElement?.row == row && selectedMatrixElement?.column == column
-                ? '#3c3c3c'
+                ? '#404040'
                 : (matrixNumbers?.data[row][column] === null)
                     ? '#1c1c1c'
                     : 'transparent',
             ...(
                 (matrixNumbers?.data[row][column] === null)
                 && {
-                    borderColor: '#fff',
-                    borderWidth: 1.5,
-                    borderStyle: 'dashed',
+                    //borderColor: '#fff',
+                    //borderWidth: 1.5,
+                    //borderStyle: 'dashed',
                 }
             )
         };
