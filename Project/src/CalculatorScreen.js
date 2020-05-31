@@ -279,9 +279,11 @@ export default function CalculatorScreen({ isPortrait }) {
                     }
 
                     else {
-                        safeChangeEditableMatrix(
+                        safeChangeReadyMatrix(
                             MatrixOperations.invert(editableMatrix)
                         );
+                        changeSelectedMatrixElement(null);
+                        changeMatrixState(MatrixState.ready);
                     }
                     
                 }}

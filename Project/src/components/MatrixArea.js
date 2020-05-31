@@ -19,7 +19,6 @@ export default function MatrixArea({
     let [matrixAreaWidth, changeMatrixAreaWidth] = useState(0);
 
     function formatDeterminant(determinant) {
-        console.log(determinant);
         return determinant !== null 
             ? findFraction(toFixedOnZeroes(determinant))
             : null;
