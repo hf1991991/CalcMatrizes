@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View } from 'react-native';
 import Matrix from './Matrix';
-import { MatrixState } from '../utilities/constants';
+import { MatrixState, findFraction, toFixedOnZeroes } from '../utilities/constants';
 import ArrowButtonsArea from './ArrowButtonsArea';
 import MatrixOperations from '../utilities/MatrixOperations';
 
@@ -17,6 +17,13 @@ export default function MatrixArea({
 }) {
 
     let [matrixAreaWidth, changeMatrixAreaWidth] = useState(0);
+
+    function formatDeterminant(determinant) {
+        console.log(determinant);
+        return determinant !== null 
+            ? findFraction(toFixedOnZeroes(determinant))
+            : null;
+    }
 
     return (
         <View
@@ -77,7 +84,7 @@ export default function MatrixArea({
                 editableDimensions={editableDimensions}
                 changeEditableDimensions={changeEditableDimensions}
                 determinant={
-                    MatrixOperations.determinant(readyMatrix)
+                    formatDeterminant(MatrixOperations.determinant(readyMatrix))
                 }
                 crossWidth={BUTTON_AREAS_CROSS_WIDTH}
             />

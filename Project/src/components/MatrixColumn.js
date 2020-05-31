@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, FlatList } from 'react-native';
+import { findFraction, smartToFixed, toFixedOnZeroes } from '../utilities/constants';
 
 const ELEMENT_HEIGHT = 40;
 const ELEMENT_VERTICAL_MARGIN = 11;
@@ -14,9 +15,13 @@ export default function MatrixColumn({
     changeFlatListDimensions,
 }) {
 
+    function isElementSelected({ row, column }) {
+        return selectedMatrixElement?.row === row && selectedMatrixElement?.column === column;
+    }
+
     function getElementStyle(row, column) {
         return {
-            backgroundColor: selectedMatrixElement?.row == row && selectedMatrixElement?.column == column
+            backgroundColor: isElementSelected({ row, column })
                 ? '#404040'
                 : (matrixNumbers?.data[row][column] === null)
                     ? '#1c1c1c'
@@ -32,12 +37,14 @@ export default function MatrixColumn({
         };
     }
 
-    function formatElement(element) {
-        const decimal = element === null || element === undefined
-            ? ''
-            : element;
-            //: (element.toString().split('.')[1] && element.toString().split('.')[1].length) > 6 ? element.toFixed(6) : element;
-        return (decimal === null ? '' : decimal).toString().replace('.', ',');
+    function formatElement({ number, row, column }) {
+        if (number === null || number === undefined) return '';
+
+        const possibleFraction = isElementSelected({ row, column })
+            ? toFixedOnZeroes(number.toFixed(6))
+            : findFraction(number);
+        
+        return possibleFraction.toString().replace('.', ',');
     }
 
     return (
@@ -93,7 +100,7 @@ export default function MatrixColumn({
                                     textAlign: 'center',
                                 }}
                             >
-                                {formatElement(number)}
+                                {formatElement(item)}
                             </Text>
                         </View>
                     </TouchableOpacity>
