@@ -17,10 +17,16 @@ export default function CalculatorScreen({ isPortrait }) {
         row: 0,
         column: 0,
     });
+    let [shouldUserInputOverwriteElement, changeShouldUserInputOverwriteElement] = useState(true);
     let [editableDimensions, changeEditableDimensions] = useState(INITIAL_MATRIX.dimensions());
     let [matrixState, changeMatrixState] = useState(MatrixState.editing);
     let [secondSetOfKeysActive, changeSecondSetOfKeysActive] = useState(false);
     let [columnDirectionActive, changeColumnDirectionActive] = useState(true);
+
+    function changeSettingsOfSelectedMatrixElement(selectedElement) {
+        changeSelectedMatrixElement(selectedElement);
+        changeShouldUserInputOverwriteElement(true);
+    }
 
     function safeChangeReadyMatrix(matrix) {
         changeReadyMatrix(
@@ -42,7 +48,7 @@ export default function CalculatorScreen({ isPortrait }) {
         changeMatrixState(matrixState);
         safeChangeEditableMatrix(editableMatrix);
         changeEditableDimensions(editableMatrix.dimensions());
-        selectedElement && changeSelectedMatrixElement(selectedElement);
+        selectedElement && changeSettingsOfSelectedMatrixElement(selectedElement);
     }
 
     function changeNumberWritten(newNumber) {
@@ -56,6 +62,8 @@ export default function CalculatorScreen({ isPortrait }) {
     }
 
     function getNumberWritten() {
+        if (shouldUserInputOverwriteElement) return '';
+
         const { row, column } = selectedMatrixElement || {};
         const matrixNumber = editableMatrix 
             && editableMatrix.data 
@@ -100,7 +108,7 @@ export default function CalculatorScreen({ isPortrait }) {
             }
         } else selectedElement = null;
 
-        changeSelectedMatrixElement(selectedElement);
+        changeSettingsOfSelectedMatrixElement(selectedElement);
     }
     
     return (
@@ -121,7 +129,7 @@ export default function CalculatorScreen({ isPortrait }) {
                         changeMatrixState(MatrixState.ready);
                         matrixState === MatrixState.editing 
                             && safeChangeReadyMatrix(editableMatrix);
-                        changeSelectedMatrixElement(null);
+                        changeSettingsOfSelectedMatrixElement(null);
                     }
                 }
                 editableMatrix={editableMatrix}
@@ -129,7 +137,7 @@ export default function CalculatorScreen({ isPortrait }) {
                 selectedMatrixElement={selectedMatrixElement}
                 changeSelectedMatrixElement={
                     (selection) => {
-                        changeSelectedMatrixElement(
+                        changeSettingsOfSelectedMatrixElement(
                             selection === null 
                                 ? null 
                                 : { 
@@ -177,7 +185,7 @@ export default function CalculatorScreen({ isPortrait }) {
 
                         if (MatrixOperations.isMatrixEmpty(matrixOnScreen)) {
                             changeMatrixState(MatrixState.ready);
-                            changeSelectedMatrixElement(null);
+                            changeSettingsOfSelectedMatrixElement(null);
                         }
                     }
                 }
@@ -186,10 +194,13 @@ export default function CalculatorScreen({ isPortrait }) {
                 }
                 numberButtonPressed={
                     (element) => {
+                        
                         if (getNumberWritten().length === 0 && element === '.')
                             changeNumberWritten('0.');
                         else if (count(getNumberWritten(), /\./, true) === 0 || element !== '.')
                             changeNumberWritten(getNumberWritten() + element);
+                        
+                        changeShouldUserInputOverwriteElement(false);
                     }
                 }
                 onPressAxB={() => {
@@ -261,7 +272,7 @@ export default function CalculatorScreen({ isPortrait }) {
                         safeChangeEditableMatrix(
                             MatrixOperations.transpose(editableMatrix)
                         );
-                        changeSelectedMatrixElement({
+                        changeSettingsOfSelectedMatrixElement({
                             row: selectedMatrixElement.column,
                             column: selectedMatrixElement.row,
                         });
@@ -284,7 +295,7 @@ export default function CalculatorScreen({ isPortrait }) {
                         safeChangeReadyMatrix(
                             MatrixOperations.invert(editableMatrix)
                         );
-                        changeSelectedMatrixElement(null);
+                        changeSettingsOfSelectedMatrixElement(null);
                         changeMatrixState(MatrixState.ready);
                     }
                     
