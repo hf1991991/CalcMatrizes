@@ -13,6 +13,8 @@ export default function MatrixColumn({
     minWidth,
     flatListDimensions,
     changeFlatListDimensions,
+    editableOperatorNumber,
+    secondaryEditableOperatorNumber,
 }) {
 
     function isElementSelected({ row, column }) {
@@ -38,13 +40,25 @@ export default function MatrixColumn({
     }
 
     function formatElement({ number, row, column }) {
-        if (number === null || number === undefined || number.toString().length === 0) return '';
+        let numberToFormat = isElementSelected({ row, column })
+            && editableOperatorNumber 
+                ? editableOperatorNumber 
+                : number;
 
-        const possibleFraction = number.toString().endsWith('.')
-            ? number
+        if (numberToFormat === null 
+            || numberToFormat === undefined 
+            || numberToFormat.toString().length === 0
+        ) return '';
+
+        const possibleFraction = numberToFormat.toString().endsWith('.')
+            ? numberToFormat
             : isElementSelected({ row, column })
-                ? toFixedOnZeroes(Number.parseFloat(number).toFixed(6))
-                : findFraction(number);
+                ? toFixedOnZeroes(
+                    Number.parseFloat(
+                        numberToFormat
+                    ).toFixed(6)
+                )
+                : findFraction(numberToFormat);
         
         return possibleFraction.toString().replace('.', ',');
     }

@@ -202,7 +202,7 @@ export default class MatrixOperations {
         for (let row = 0; row < rows; row++) {
             let matrixRow = [];
             for (let column = 0; column < columns; column++) {
-                matrixRow.push(null);
+                matrixRow.push(0);
             }
             matrix.push(matrixRow);
         }

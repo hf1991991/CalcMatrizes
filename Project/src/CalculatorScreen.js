@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { SafeAreaView, StatusBar, Dimensions } from 'react-native';
 import ButtonsArea from './components/ButtonsArea';
 import InfoArea from './components/InfoArea';
-import { MatrixState, count } from './utilities/constants';
+import { MatrixState, count, Operator } from './utilities/constants';
 import MatrixOperations from './utilities/MatrixOperations';
+import ScalarOperations from './utilities/ScalarOperations';
 
 const INITIAL_MATRIX = MatrixOperations.emptyMatrix({
     rows: 3,
@@ -22,6 +23,10 @@ export default function CalculatorScreen({ isPortrait }) {
     let [editableDimensions, changeEditableDimensions] = useState(INITIAL_MATRIX.dimensions());
     let [matrixState, changeMatrixState] = useState(MatrixState.editing);
     let [secondSetOfKeysActive, changeSecondSetOfKeysActive] = useState(false);
+    let [operatorsActive, changeOperatorsButtonActive] = useState(false);
+    let [selectedOperator, changeSelectedOperator] = useState(null);
+    let [operationHappening, changeOperationHappening] = useState(false);
+    let [editableOperatorNumber, changeEditableOperatorNumber] = useState(null);
     let [columnDirectionActive, changeColumnDirectionActive] = useState(true);
 
     function printState() {
@@ -36,6 +41,10 @@ export default function CalculatorScreen({ isPortrait }) {
             secondSetOfKeysActive,
             columnDirectionActive,
             numberWritten: getNumberWritten(),
+            operatorsActive,
+            selectedOperator,
+            operationHappening,
+            editableOperatorNumber,
         })
     }
 
@@ -72,8 +81,16 @@ export default function CalculatorScreen({ isPortrait }) {
         selectedElement !== undefined && changeSettingsOfSelectedMatrixElement(selectedElement);
     }
 
-    function changeNumberWritten(newNumber) {
-        if (matrixState !== MatrixState.LambdaxA) {
+    function changeNumberWritten({ newNumber, forceNotOperatorNumber=false }) {
+        if (operationHappening && !forceNotOperatorNumber) {
+            changeEditableOperatorNumber(newNumber);
+        }
+
+        else if (matrixState === MatrixState.LambdaxA) {
+            changeEditableScalar(newNumber);
+        }
+
+        else {
             safeChangeEditableMatrix(
                 MatrixOperations.changeElement({
                     matrix: editableMatrix || readyMatrix,
@@ -81,13 +98,16 @@ export default function CalculatorScreen({ isPortrait }) {
                     numberWritten: newNumber,
                 })
             )
-        } else {
-            changeEditableScalar(newNumber);
-        }
+        } 
     }
 
-    function getNumberWritten() {
-        if (shouldUserInputOverwriteElement) return '';
+    function getNumberWritten({ forceNotOperatorNumber=false }={}) {
+        if (operationHappening && !forceNotOperatorNumber) 
+            return editableOperatorNumber === null
+                ? ''
+                : editableOperatorNumber;
+
+        if (shouldUserInputOverwriteElement && !forceNotOperatorNumber) return '';
 
         if (matrixState === MatrixState.LambdaxA) 
             return editableScalar === null
@@ -144,6 +164,25 @@ export default function CalculatorScreen({ isPortrait }) {
     function isEditableScalarReady() {
         return editableScalar !== null && !editableScalar.toString().endsWith('.');
     }
+
+    function resetScalarOperations() {
+        changeEditableOperatorNumber(null);
+        changeOperationHappening(false);
+        changeSelectedOperator(null);
+    }
+
+    function applyOperation() {
+        resetScalarOperations();
+
+        changeNumberWritten({
+            newNumber: ScalarOperations.applyOperation({
+                operation: selectedOperator,
+                scalar1: getNumberWritten({ forceNotOperatorNumber: true }),
+                scalar2: editableOperatorNumber
+            }),
+            forceNotOperatorNumber: true,
+        });
+    }
     
     return (
         <SafeAreaView
@@ -193,6 +232,8 @@ export default function CalculatorScreen({ isPortrait }) {
                 editableDimensions={editableDimensions}
                 changeEditableDimensions={changeEditableDimensions}
                 editableScalar={editableScalar}
+                operationHappening={operationHappening}
+                editableOperatorNumber={editableOperatorNumber}
             />
             <ButtonsArea
                 hidden={!isPortrait}
@@ -218,8 +259,17 @@ export default function CalculatorScreen({ isPortrait }) {
                         ? MatrixOperations.isMatrixFull(matrixOnScreen)
                         : isEditableScalarReady()
                 }
+                operatorsActive={operatorsActive}
+                changeOperatorsButtonActive={() => {
+                    changeOperatorsButtonActive(!operatorsActive);
+                    operatorsActive && resetScalarOperations();
+                }}
+                selectedOperator={selectedOperator}
+                editableOperatorNumber={editableOperatorNumber}
                 onPressAC={
                     () => {
+                        resetScalarOperations();
+
                         if (matrixState !== MatrixState.LambdaxA) {
                             const changeMatrixOnScreen = matrixState === MatrixState.ready 
                                 ? safeChangeReadyMatrix
@@ -231,7 +281,7 @@ export default function CalculatorScreen({ isPortrait }) {
     
                             if (MatrixOperations.isMatrixEmpty(matrixOnScreen)) {
                                 changeMatrixState(MatrixState.ready);
-                                changeSettingsOfSelectedMatrixElement(null);
+                                changeSettingsOfSelectedMatrixElement(0);
                             }
                         } else {
                             changeMatrixState(MatrixState.ready);
@@ -240,21 +290,27 @@ export default function CalculatorScreen({ isPortrait }) {
                 }
                 onPressCE={
                     () => {
-                        printState();
-                        changeNumberWritten(null)
+                        changeNumberWritten({
+                            newNumber: null,
+                        })
                     }
                 }
                 numberButtonPressed={
                     (element) => {
-                        
                         if (getNumberWritten().length === 0 && element === '.')
-                            changeNumberWritten('0.');
+                            changeNumberWritten({ newNumber: '0.' });
                         else if (count(getNumberWritten(), /\./, true) === 0 || element !== '.')
-                            changeNumberWritten(getNumberWritten() + element);
+                            changeNumberWritten({ newNumber: getNumberWritten() + element });
                         
                         changeShouldUserInputOverwriteElement(false);
                     }
                 }
+                onPressOperator={(operator) => {
+                    operationHappening && applyOperation();
+                    changeOperationHappening(true);
+                    changeEditableOperatorNumber(null);
+                    changeSelectedOperator(operator);
+                }}
                 onPressAxB={() => {
                     matrixState !== MatrixState.ready && safeChangeReadyMatrix(editableMatrix);
                     enterEditingMode({
@@ -315,12 +371,6 @@ export default function CalculatorScreen({ isPortrait }) {
                 onPressResolveEquation={() => {
                     
                 }}
-                onPressSave={() => {
-                    
-                }}
-                onPressSavedList={() => {
-                    
-                }}
                 onTranspose={() => {
                     
                     if (matrixState === MatrixState.ready) {
@@ -361,7 +411,10 @@ export default function CalculatorScreen({ isPortrait }) {
                     }
                     
                 }}
-                onEnter={nextElement}
+                onEnter={() => {
+                    operationHappening && applyOperation();
+                    nextElement();
+                }}
                 onCheck={() => {
                     switch (matrixState) {
                         case MatrixState.editing:

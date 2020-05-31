@@ -10,6 +10,7 @@ export default function ButtonsArea(props) {
         numberWritten,
         secondSetOfKeysActive, 
         selectedMatrixElement,
+        operatorsActive,
     } = props;
 
     let [buttonsAreaWidth, changeButtonsAreaWidth] = useState(0);
@@ -45,11 +46,7 @@ export default function ButtonsArea(props) {
                 />
                 <CalculatorButton
                     {...props}
-                    buttonType={
-                        matrixState == MatrixState.ready 
-                            ? ButtonType.Save
-                            : ButtonType.SavedList
-                    }
+                    buttonType={ButtonType.Operators}
                 />
                 <CalculatorButton
                     {...props}
@@ -58,9 +55,11 @@ export default function ButtonsArea(props) {
                 <CalculatorButton
                     {...props}
                     buttonType={
-                        secondSetOfKeysActive
-                            ? ButtonType.Transposed
-                            : ButtonType.Inverse
+                        operatorsActive
+                            ? ButtonType.Divide
+                            : secondSetOfKeysActive
+                                ? ButtonType.Transposed
+                                : ButtonType.Inverse
                     }
                 />
             </View>
@@ -81,7 +80,11 @@ export default function ButtonsArea(props) {
                 />
                 <CalculatorButton
                     {...props}
-                    buttonType={ButtonType.LambdaxA}
+                    buttonType={
+                        operatorsActive
+                            ? ButtonType.Multiply
+                            : ButtonType.LambdaxA
+                    }
                 />
             </View>
             <View 
@@ -102,9 +105,11 @@ export default function ButtonsArea(props) {
                 <CalculatorButton
                     {...props}
                     buttonType={
-                        secondSetOfKeysActive
-                            ? ButtonType.BxA
-                            : ButtonType.AxB
+                        operatorsActive
+                            ? ButtonType.Subtract
+                            : secondSetOfKeysActive
+                                ? ButtonType.BxA
+                                : ButtonType.AxB
                     }
                 />
             </View>
@@ -126,9 +131,11 @@ export default function ButtonsArea(props) {
                 <CalculatorButton
                     {...props}
                     buttonType={
-                        secondSetOfKeysActive
-                            ? ButtonType.SubtractMatrix
-                            : ButtonType.AddMatrix
+                        operatorsActive
+                            ? ButtonType.Add
+                            : secondSetOfKeysActive
+                                ? ButtonType.SubtractMatrix
+                                : ButtonType.AddMatrix
                     }
                 />
             </View>

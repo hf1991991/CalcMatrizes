@@ -1,6 +1,6 @@
 import React from 'react';
 import { Image, TouchableOpacity } from 'react-native';
-import { ButtonType, MatrixState } from '../utilities/constants';
+import { ButtonType, MatrixState, Operator } from '../utilities/constants';
 import ButtonData from '../utilities/ButtonData';
 
 export default function CalculatorButton(props) {
@@ -83,6 +83,13 @@ export default function CalculatorButton(props) {
                 return new ButtonData({
                     source: require('../../assets/buttons/CE.png'), 
                     onPress: props.onPressCE,
+                });
+            case ButtonType.Operators:
+                return new ButtonData({
+                    source: require('../../assets/buttons/InactiveOperators.png'), 
+                    sourceActive: require('../../assets/buttons/ActiveOperators.png'), 
+                    active: props.operatorsActive,
+                    onPress: props.changeOperatorsButtonActive,
                 });
             case ButtonType.Save:
                 return new ButtonData({
@@ -178,18 +185,38 @@ export default function CalculatorButton(props) {
             case ButtonType.Subtract:
                 return new ButtonData({
                     source: require('../../assets/buttons/Subtract.png'), 
+                    sourceActive: require('../../assets/buttons/ActiveSubtract.png'), 
+                    disabled: !props.isKeyboardBeActive,
+                    active: props.selectedOperator === Operator.Subtract 
+                        && props.editableOperatorNumber === null,
+                    onPress: () => props.onPressOperator(Operator.Subtract),
                 });
             case ButtonType.Add:
                 return new ButtonData({
                     source: require('../../assets/buttons/Add.png'), 
+                    sourceActive: require('../../assets/buttons/ActiveAdd.png'), 
+                    disabled: !props.isKeyboardBeActive,
+                    active: props.selectedOperator === Operator.Add 
+                        && props.editableOperatorNumber === null,
+                    onPress: () => props.onPressOperator(Operator.Add),
                 });
             case ButtonType.Multiply:
                 return new ButtonData({
                     source: require('../../assets/buttons/Multiply.png'), 
+                    sourceActive: require('../../assets/buttons/ActiveMultiply.png'), 
+                    disabled: !props.isKeyboardBeActive,
+                    active: props.selectedOperator === Operator.Multiply 
+                        && props.editableOperatorNumber === null,
+                    onPress: () => props.onPressOperator(Operator.Multiply),
                 });
             case ButtonType.Divide:
                 return new ButtonData({
                     source: require('../../assets/buttons/Divide.png'), 
+                    sourceActive: require('../../assets/buttons/ActiveDivide.png'), 
+                    disabled: !props.isKeyboardBeActive,
+                    active: props.selectedOperator === Operator.Divide 
+                        && props.editableOperatorNumber === null,
+                    onPress: () => props.onPressOperator(Operator.Divide),
                 });
             case ButtonType.Enter:
                 return new ButtonData({

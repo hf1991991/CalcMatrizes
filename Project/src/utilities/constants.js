@@ -8,6 +8,13 @@ export const MatrixState = {
     LambdaxA: 'LambdaxA',
 }
 
+export const Operator = {
+    Add: 'Add',
+    Subtract: 'Subtract',
+    Multiply: 'Multiply',
+    Divide: 'Divide',
+}
+
 export const ButtonType = {
     1: 1,
     2: 2,
@@ -22,6 +29,7 @@ export const ButtonType = {
     Comma: 'Comma',
     AC: 'AC',
     CE: 'CE',
+    Operators: 'Operators',
     Save: 'Save',
     SavedList: 'SavedList',
     Second: 'Second',

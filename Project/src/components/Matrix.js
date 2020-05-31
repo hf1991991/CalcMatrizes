@@ -9,6 +9,7 @@ export default function Matrix({
     selectedMatrixElement,
     changeSelectedMatrixElement,
     maxMatrixWidth,
+    editableOperatorNumber,
 }) {
     let [flatListDimensions, changeFlatListDimensions] = useState({
         height: 0,
@@ -57,6 +58,7 @@ export default function Matrix({
                                     minWidth={50}
                                     flatListDimensions={flatListDimensions}
                                     changeFlatListDimensions={changeFlatListDimensions}
+                                    editableOperatorNumber={editableOperatorNumber}
                                 />
                             );
                         }}
