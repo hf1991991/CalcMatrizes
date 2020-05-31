@@ -23,7 +23,7 @@ export default function ButtonsArea(props) {
             marginHorizontal: 6,
         },
     });
-
+    
     return (
         <View
             style={{
@@ -39,9 +39,9 @@ export default function ButtonsArea(props) {
                 <CalculatorButton
                     {...props}
                     buttonType={
-                        numberWritten 
-                            ? ButtonType.CE
-                            : ButtonType.AC
+                        numberWritten === undefined || numberWritten === 0
+                            ? ButtonType.AC
+                            : ButtonType.CE
                     }
                 />
                 <CalculatorButton

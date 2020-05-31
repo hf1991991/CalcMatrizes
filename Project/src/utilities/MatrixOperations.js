@@ -68,8 +68,8 @@ export default class MatrixOperations {
                 && matrix2.data[row] 
                 && matrix2.data[row][column]
             )
-            || null;
-        return joinedElement === undefined ? null : joinedElement;
+            || 0;
+        return joinedElement === undefined ? 0 : joinedElement;
     }
 
     static joinEditableAndOriginalMatrices({ originalMatrix, editableMatrix, rows, columns }) {
@@ -94,7 +94,7 @@ export default class MatrixOperations {
     }
 
     static addColumn(matrix) {
-        for (let row of matrix) row.push(null);
+        for (let row of matrix) row.push(0);
         return matrix;
     }
 
@@ -105,7 +105,7 @@ export default class MatrixOperations {
 
     static addRow(matrix) {
         matrix.push([]);
-        for (let column of matrix[0]) matrix[matrix.length - 1].push(null);
+        for (let column of matrix[0]) matrix[matrix.length - 1].push(0);
         return matrix;
     }
 
@@ -123,7 +123,7 @@ export default class MatrixOperations {
 
         for (let row = 0; row < matrix.dimensions().rows; row++) {
             for (let column = 0; column < matrix.dimensions().columns; column++) {
-                if (matrix.data[row][column] === null) return false;
+                if (Number.isNaN(matrix.data[row][column])) return false;
             }
         }
         return true;
@@ -134,7 +134,7 @@ export default class MatrixOperations {
 
         for (let row = 0; row < matrix.dimensions().rows; row++) {
             for (let column = 0; column < matrix.dimensions().columns; column++) {
-                if (matrix.data[row][column] !== null) return false;
+                if (!Number.isNaN(matrix.data[row][column])) return false;
             }
         }
         return true;
@@ -458,8 +458,8 @@ export default class MatrixOperations {
                     //    exibicao_passos_resolver_equacao_matricial(_matrixA, _matrixB, eliminationFactor, pivotColumn+1, verticalIndex+1, verticalElimination, None)
                 }
             } 
-
-            // MatrixOperations.printMatrix(_matrixA);
+            console.log(pivot);
+            MatrixOperations.printMatrix(_matrixA);
         }
 
         if (noPivotOnColumn) determinant = 0.0;

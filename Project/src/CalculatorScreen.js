@@ -108,7 +108,7 @@ export default function CalculatorScreen({ isPortrait }) {
                 : editableOperatorNumber;
 
         if (shouldUserInputOverwriteElement && !forceNotOperatorNumber) return '';
-
+        
         if (matrixState === MatrixState.LambdaxA) 
             return editableScalar === null
                 ? ''
@@ -119,7 +119,7 @@ export default function CalculatorScreen({ isPortrait }) {
             && editableMatrix.data 
             && editableMatrix.data[row] 
             && editableMatrix.data[row][column];
-        
+            
         return (
             (matrixNumber === null || matrixNumber === undefined)
                 ? ''
@@ -241,7 +241,12 @@ export default function CalculatorScreen({ isPortrait }) {
                 matrixOnScreen={matrixOnScreen}
                 readyMatrix={readyMatrix}
                 changeReadyMatrix={safeChangeReadyMatrix}
-                numberWritten={getNumberWritten()}
+                numberWritten={
+                    editableMatrix
+                    && editableMatrix.data
+                    && editableMatrix.data[selectedMatrixElement?.row]
+                    && editableMatrix.data[selectedMatrixElement?.row][selectedMatrixElement?.column]
+                }
                 secondSetOfKeysActive={secondSetOfKeysActive}
                 changeSecondSetOfKeysActive={
                     () => changeSecondSetOfKeysActive(!secondSetOfKeysActive)
@@ -291,7 +296,7 @@ export default function CalculatorScreen({ isPortrait }) {
                 onPressCE={
                     () => {
                         changeNumberWritten({
-                            newNumber: null,
+                            newNumber: 0,
                         })
                     }
                 }
