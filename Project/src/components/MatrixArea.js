@@ -1,9 +1,11 @@
-import React from 'react';
-import { View, SafeAreaView } from 'react-native';
+import React, { useState } from 'react';
+import { View } from 'react-native';
 import Matrix from './Matrix';
 import { MatrixState } from '../utilities/constants';
 import ArrowButtonsArea from './ArrowButtonsArea';
 import MatrixOperations from '../utilities/MatrixOperations';
+
+const BUTTON_AREAS_CROSS_WIDTH = 70;
 
 export default function MatrixArea({ 
     matrixState,
@@ -13,11 +15,17 @@ export default function MatrixArea({
     editableDimensions,
     changeEditableDimensions,
 }) {
+
+    let [matrixAreaWidth, changeMatrixAreaWidth] = useState(0);
+
     return (
-        <SafeAreaView
+        <View
             style={{
                 flex: 1,
                 marginTop: 20,
+            }}
+            onLayout={(event) => {
+                changeMatrixAreaWidth(event.nativeEvent.layout.width);
             }}
         >
             <View
@@ -32,8 +40,10 @@ export default function MatrixArea({
                     hidden
                     editableDimensions={editableDimensions}
                     changeEditableDimensions={changeEditableDimensions}
+                    crossWidth={BUTTON_AREAS_CROSS_WIDTH}
                 />
                 <Matrix 
+                    maxMatrixWidth={matrixAreaWidth - 2 * BUTTON_AREAS_CROSS_WIDTH}
                     matrixNumbers={readyMatrix}
                     selectedMatrixElement={selectedMatrixElement}
                     changeSelectedMatrixElement={changeSelectedMatrixElement}
@@ -51,6 +61,7 @@ export default function MatrixArea({
                     }
                     editableDimensions={editableDimensions}
                     changeEditableDimensions={changeEditableDimensions}
+                    crossWidth={BUTTON_AREAS_CROSS_WIDTH}
                 />
             </View>
             <ArrowButtonsArea 
@@ -68,7 +79,8 @@ export default function MatrixArea({
                 determinant={
                     MatrixOperations.determinant(readyMatrix)
                 }
+                crossWidth={BUTTON_AREAS_CROSS_WIDTH}
             />
-        </SafeAreaView>
+        </View>
     );
 }

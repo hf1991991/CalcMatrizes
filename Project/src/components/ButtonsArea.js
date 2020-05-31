@@ -1,11 +1,7 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Dimensions } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import CalculatorButton from './CalculatorButton';
-import MatrixOperations from '../utilities/MatrixOperations';
 import { MatrixState, ButtonType } from '../utilities/constants';
-import MatrixData from '../utilities/MatrixData';
-
-const windowWidth = Dimensions.get('window').width;
 
 export default function ButtonsArea(props) {
     const { 
@@ -15,10 +11,25 @@ export default function ButtonsArea(props) {
         secondSetOfKeysActive, 
         selectedMatrixElement,
     } = props;
+
+    let [buttonsAreaWidth, changeButtonsAreaWidth] = useState(0);
+
+    const styles = StyleSheet.create({
+        button: {
+            height: (buttonsAreaWidth/4)*0.7,
+            flexDirection: 'row',
+            marginVertical: 3,
+            marginHorizontal: 6,
+        },
+    });
+
     return (
         <View
             style={{
                 display: hidden && 'none',
+            }}
+            onLayout={(event) => {
+                changeButtonsAreaWidth(event.nativeEvent.layout.width);
             }}
         >
             <View 
@@ -149,12 +160,3 @@ export default function ButtonsArea(props) {
         </View>
     );
 }
-
-const styles = StyleSheet.create({
-    button: {
-        height: (windowWidth/4)*0.7,
-        flexDirection: 'row',
-        marginVertical: 3,
-        marginHorizontal: 6,
-    },
-});

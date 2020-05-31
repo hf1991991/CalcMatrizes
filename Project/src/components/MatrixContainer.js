@@ -1,7 +1,5 @@
 import React from 'react';
-import { View, Dimensions } from 'react-native';
-
-const windowWidth = Dimensions.get('window').width;
+import { View } from 'react-native';
 
 const HorizontalLines = () => (
     <View
@@ -27,13 +25,12 @@ const HorizontalLines = () => (
     </View>
 );
 
-export default function MatrixColumns({ matrixContent }) {
+export default function MatrixColumns({ matrixContent, maxWidth }) {
     return (
         <View
             style={{
                 justifyContent: 'center',
-                // Largura máxima da matrix é restringida pelo tamanho dos botões de seta (50) e paddingHorizontal de InfoArea (20):
-                maxWidth: windowWidth - (50 + 20)*2,
+                maxWidth: maxWidth,
             }}
         >
             <HorizontalLines />

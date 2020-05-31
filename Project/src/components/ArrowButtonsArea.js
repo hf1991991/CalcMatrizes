@@ -9,8 +9,8 @@ export default function ArrowButtonsArea({
     editableDimensions,
     changeEditableDimensions,
     determinant=null,
+    crossWidth,
 }) {
-    console.log(determinant);
     return (
         <View
             style={{
@@ -18,12 +18,12 @@ export default function ArrowButtonsArea({
                 alignItems: 'center',
                 ...(vertical
                     ? {
-                        width: 70,
+                        width: crossWidth,
                     }
                     : { 
                         marginHorizontal: 20,
                         flexDirection: 'row',
-                        height: 70,
+                        height: crossWidth,
                     }
                 ),
             }}

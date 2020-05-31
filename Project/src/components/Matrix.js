@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, FlatList, ScrollView } from 'react-native';
+import { View, FlatList } from 'react-native';
 import MatrixContainer from './MatrixContainer';
 import MatrixColumn from './MatrixColumn';
 import MatrixOperations from '../utilities/MatrixOperations';
@@ -8,6 +8,7 @@ export default function Matrix({
     matrixNumbers,
     selectedMatrixElement,
     changeSelectedMatrixElement,
+    maxMatrixWidth,
 }) {
     let [flatListDimensions, changeFlatListDimensions] = useState({
         height: 0,
@@ -16,6 +17,7 @@ export default function Matrix({
 
     return (
         <MatrixContainer 
+            maxWidth={maxMatrixWidth}
             matrixContent={
                 <View
                     onLayout={(event) => {
