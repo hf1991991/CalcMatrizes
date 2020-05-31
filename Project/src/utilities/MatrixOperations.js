@@ -1,5 +1,5 @@
 import MatrixData from "./MatrixData";
-import { forceRound, smartToFixed } from "./constants";
+import { forceRound, smartToFixed, count } from "./constants";
 
 export default class MatrixOperations {
 
@@ -169,13 +169,19 @@ export default class MatrixOperations {
         });
     }
 
+    static parseFloatPreservingDot(string) {
+        return string !== null && string.toString().endsWith('.')
+            ? string
+            : Number.parseFloat(string);
+    }
+
     static convertStringToNumbers(matrix) {
         let converted = [];
 
         for (let row = 0; row < matrix.dimensions().rows; row++) {
             let convertedRow = [];
             for (let column = 0; column < matrix.dimensions().columns; column++) {
-                const parsed = Number.parseFloat(matrix.data[row][column]);
+                const parsed = MatrixOperations.parseFloatPreservingDot(matrix.data[row][column]);
                 convertedRow.push(matrix.data[row][column] === null ? null : parsed);
             }
             converted.push(convertedRow);

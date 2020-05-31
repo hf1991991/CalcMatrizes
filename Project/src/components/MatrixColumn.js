@@ -40,9 +40,11 @@ export default function MatrixColumn({
     function formatElement({ number, row, column }) {
         if (number === null || number === undefined) return '';
 
-        const possibleFraction = isElementSelected({ row, column })
-            ? toFixedOnZeroes(number.toFixed(6))
-            : findFraction(number);
+        const possibleFraction = number.toString().endsWith('.')
+            ? number
+            : isElementSelected({ row, column })
+                ? toFixedOnZeroes(number.toFixed(6))
+                : findFraction(number);
         
         return possibleFraction.toString().replace('.', ',');
     }

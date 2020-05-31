@@ -52,7 +52,7 @@ export function decimalPlaces(number) {
 }
 
 export function smartToFixed(element) {
-    const PRECISION = 6;
+    const PRECISION = 5;
 
     // A precisao define quantos zeros ou noves seguidos apos a virgula a funcao deveria aceitar para que ela arredende o numero:
     function lastDigitIndex(string) {

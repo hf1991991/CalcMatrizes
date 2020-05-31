@@ -57,14 +57,16 @@ export default function CalculatorScreen({ isPortrait }) {
 
     function getNumberWritten() {
         const { row, column } = selectedMatrixElement || {};
+        const matrixNumber = editableMatrix 
+            && editableMatrix.data 
+            && editableMatrix.data[row] 
+            && editableMatrix.data[row][column];
+        
         return (
-                (
-                    editableMatrix 
-                    && editableMatrix.data 
-                    && editableMatrix.data[row] 
-                    && editableMatrix.data[row][column]
-                ) || ''
-            ).toString();
+            (matrixNumber === null || matrixNumber === undefined)
+                ? ''
+                : matrixNumber
+        ).toString();
     }
 
     function nextElement() {
@@ -184,9 +186,9 @@ export default function CalculatorScreen({ isPortrait }) {
                 }
                 numberButtonPressed={
                     (element) => {
-                        if (getNumberWritten().length == 0 && element == ',')
-                            changeNumberWritten('0,');
-                        else if (count(getNumberWritten(), ',') == 0 || element != ',')
+                        if (getNumberWritten().length === 0 && element === '.')
+                            changeNumberWritten('0.');
+                        else if (count(getNumberWritten(), /\./, true) === 0 || element !== '.')
                             changeNumberWritten(getNumberWritten() + element);
                     }
                 }

@@ -71,7 +71,7 @@ export default function CalculatorButton(props) {
             case ButtonType.Comma:
                 return new ButtonData({
                     source: require('../../assets/buttons/Comma.png'), 
-                    onPress: () => props.numberButtonPressed(','),
+                    onPress: () => props.numberButtonPressed('.'),
                     disabled: !props.selectedMatrixElement,
                 });
             case ButtonType.AC:
