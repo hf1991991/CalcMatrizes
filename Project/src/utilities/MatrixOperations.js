@@ -14,6 +14,8 @@ export default class MatrixOperations {
     static insertElementsPosition(matrix) {
         let positionMatrix = [];
 
+        if (!matrix) return positionMatrix;
+
         for (let column = matrix.dimensions().columns - 1; column >= 0 ; column--) {
             let positionMatrixColumn = [];
             for (let row = matrix.dimensions().rows - 1; row >= 0 ; row--) {
@@ -139,7 +141,7 @@ export default class MatrixOperations {
     }
 
     static isMatrixSquare(matrix) {
-        return matrix.dimensions().rows === matrix.dimensions().columns;
+        return matrix && matrix.dimensions().rows === matrix.dimensions().columns;
     }
 
     static printMatrix(matrix) {
@@ -176,6 +178,8 @@ export default class MatrixOperations {
     }
 
     static convertStringToNumbers(matrix) {
+        if (!matrix) return null;
+
         let converted = [];
 
         for (let row = 0; row < matrix.dimensions().rows; row++) {
@@ -273,6 +277,22 @@ export default class MatrixOperations {
                     newElement += matrixA.data[row][index] * matrixB.data[index][column];
                 }
                 matrixRow.push(newElement);
+            }
+            matrix.push(matrixRow);
+        }
+
+        return new MatrixData({
+            data: matrix,
+        });    
+    }
+
+    static multiplyMatrixByScalar({ matrixA, scalar }) {
+        let matrix = [];
+
+        for (let row = 0; row < matrixA.dimensions().rows; row++) {
+            let matrixRow = [];
+            for (let column = 0; column < matrixA.dimensions().columns; column++) {
+                matrixRow.push(matrixA.data[row][column] * scalar);
             }
             matrix.push(matrixRow);
         }

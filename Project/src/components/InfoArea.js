@@ -15,6 +15,7 @@ export default function InfoArea({
     changeSelectedMatrixElement,
     editableDimensions,
     changeEditableDimensions,
+    editableScalar,
 }) {
 
     return (
@@ -54,6 +55,7 @@ export default function InfoArea({
                     }}
                     selectedMatrixElement={selectedMatrixElement}
                     changeSelectedMatrixElement={changeSelectedMatrixElement}
+                    editableScalar={editableScalar}
                 />
             </View>
         </TouchableWithoutFeedback>

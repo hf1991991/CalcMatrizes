@@ -16,7 +16,7 @@ export default function MatrixColumn({
 }) {
 
     function isElementSelected({ row, column }) {
-        return selectedMatrixElement?.row === row && selectedMatrixElement?.column === column;
+        return selectedMatrixElement && selectedMatrixElement.row === row && selectedMatrixElement.column === column;
     }
 
     function getElementStyle(row, column) {
@@ -38,12 +38,12 @@ export default function MatrixColumn({
     }
 
     function formatElement({ number, row, column }) {
-        if (number === null || number === undefined) return '';
+        if (number === null || number === undefined || number.toString().length === 0) return '';
 
         const possibleFraction = number.toString().endsWith('.')
             ? number
             : isElementSelected({ row, column })
-                ? toFixedOnZeroes(number.toFixed(6))
+                ? toFixedOnZeroes(Number.parseFloat(number).toFixed(6))
                 : findFraction(number);
         
         return possibleFraction.toString().replace('.', ',');

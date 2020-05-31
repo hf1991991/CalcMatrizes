@@ -8,8 +8,9 @@ export default function ArrowButtonsArea({
     disabled=false,
     editableDimensions,
     changeEditableDimensions,
-    determinant=null,
     crossWidth,
+    bottomLeftText,
+    bottomRightText,
 }) {
     return (
         <View
@@ -38,7 +39,7 @@ export default function ArrowButtonsArea({
                             left: 0,
                         }}
                     >
-                        {editableDimensions.rows}x{editableDimensions.columns}
+                        {bottomLeftText}
                     </Text>
                 )
             }
@@ -93,7 +94,7 @@ export default function ArrowButtonsArea({
                 />
             </View>
             {
-                !vertical && determinant !== null && (
+                !vertical && bottomRightText !== null && (
                     <Text
                         style={{
                             color: '#fff',
@@ -102,7 +103,7 @@ export default function ArrowButtonsArea({
                             right: 0,
                         }}
                     >
-                        det: {determinant}
+                        {bottomRightText}
                     </Text>
                 )
             }

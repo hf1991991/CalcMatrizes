@@ -12,67 +12,67 @@ export default function CalculatorButton(props) {
                     source: require('../../assets/buttons/0.png'), 
                     style: {flex: 2},
                     onPress: () => props.numberButtonPressed(0),
-                    disabled: !props.selectedMatrixElement,
+                    disabled: !props.isKeyboardBeActive,
                 });
             case ButtonType[1]:
                 return new ButtonData({
                     source: require('../../assets/buttons/1.png'), 
                     onPress: () => props.numberButtonPressed(1),
-                    disabled: !props.selectedMatrixElement,
+                    disabled: !props.isKeyboardBeActive,
                 });
             case ButtonType[2]:
                 return new ButtonData({
                     source: require('../../assets/buttons/2.png'), 
                     onPress: () => props.numberButtonPressed(2),
-                    disabled: !props.selectedMatrixElement,
+                    disabled: !props.isKeyboardBeActive,
                 });
             case ButtonType[3]:
                 return new ButtonData({
                     source: require('../../assets/buttons/3.png'), 
                     onPress: () => props.numberButtonPressed(3),
-                    disabled: !props.selectedMatrixElement,
+                    disabled: !props.isKeyboardBeActive,
                 });
             case ButtonType[4]:
                 return new ButtonData({
                     source: require('../../assets/buttons/4.png'), 
                     onPress: () => props.numberButtonPressed(4),
-                    disabled: !props.selectedMatrixElement,
+                    disabled: !props.isKeyboardBeActive,
                 });
             case ButtonType[5]:
                 return new ButtonData({
                     source: require('../../assets/buttons/5.png'), 
                     onPress: () => props.numberButtonPressed(5),
-                    disabled: !props.selectedMatrixElement,
+                    disabled: !props.isKeyboardBeActive,
                 });
             case ButtonType[6]:
                 return new ButtonData({
                     source: require('../../assets/buttons/6.png'), 
                     onPress: () => props.numberButtonPressed(6),
-                    disabled: !props.selectedMatrixElement,
+                    disabled: !props.isKeyboardBeActive,
                 });
             case ButtonType[7]:
                 return new ButtonData({
                     source: require('../../assets/buttons/7.png'), 
                     onPress: () => props.numberButtonPressed(7),
-                    disabled: !props.selectedMatrixElement,
+                    disabled: !props.isKeyboardBeActive,
                 });
             case ButtonType[8]:
                 return new ButtonData({
                     source: require('../../assets/buttons/8.png'), 
                     onPress: () => props.numberButtonPressed(8),
-                    disabled: !props.selectedMatrixElement,
+                    disabled: !props.isKeyboardBeActive,
                 });
             case ButtonType[9]:
                 return new ButtonData({
                     source: require('../../assets/buttons/9.png'), 
                     onPress: () => props.numberButtonPressed(9),
-                    disabled: !props.selectedMatrixElement,
+                    disabled: !props.isKeyboardBeActive,
                 });
             case ButtonType.Comma:
                 return new ButtonData({
                     source: require('../../assets/buttons/Comma.png'), 
                     onPress: () => props.numberButtonPressed('.'),
-                    disabled: !props.selectedMatrixElement,
+                    disabled: !props.isKeyboardBeActive,
                 });
             case ButtonType.AC:
                 return new ButtonData({
@@ -119,6 +119,7 @@ export default function CalculatorButton(props) {
                     sourceActive: require('../../assets/buttons/LambdaxASelected.png'),
                     active: props.matrixState == MatrixState.LambdaxA, 
                     disabled: !props.isMatrixFull,
+                    onPress: props.onPressLambdaxA,
                 });
             case ButtonType.AxB:
                 return new ButtonData({
@@ -199,7 +200,7 @@ export default function CalculatorButton(props) {
                 return new ButtonData({
                     source: require('../../assets/buttons/Check.png'), 
                     onPress: props.onCheck,
-                    disabled: !props.isMatrixFull,
+                    disabled: !props.isCheckActive,
                 });
             default:
                 return new ButtonData({

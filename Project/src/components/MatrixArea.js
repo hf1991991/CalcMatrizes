@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View } from 'react-native';
+import { View, Text } from 'react-native';
 import Matrix from './Matrix';
 import { MatrixState, findFraction, toFixedOnZeroes } from '../utilities/constants';
 import ArrowButtonsArea from './ArrowButtonsArea';
@@ -14,13 +14,27 @@ export default function MatrixArea({
     changeSelectedMatrixElement,
     editableDimensions,
     changeEditableDimensions,
+    editableScalar,
 }) {
 
     let [matrixAreaWidth, changeMatrixAreaWidth] = useState(0);
 
+    function formatNumberToFraction(number) {
+        return number !== null 
+            ? findFraction(toFixedOnZeroes(number))
+            : null;
+    }
+
     function formatDeterminant(determinant) {
-        return determinant !== null 
-            ? findFraction(toFixedOnZeroes(determinant))
+        const formatted = formatNumberToFraction(determinant);
+        return formatted !== null 
+            ? `det: ${formatted}`
+            : null;
+    }
+
+    function formatScalar(scalar) {
+        return scalar !== null 
+            ? scalar.toString().replace('.', ',')
             : null;
     }
 
@@ -48,15 +62,38 @@ export default function MatrixArea({
                     changeEditableDimensions={changeEditableDimensions}
                     crossWidth={BUTTON_AREAS_CROSS_WIDTH}
                 />
-                <Matrix 
-                    maxMatrixWidth={matrixAreaWidth - 2 * BUTTON_AREAS_CROSS_WIDTH}
-                    matrixNumbers={readyMatrix}
-                    selectedMatrixElement={selectedMatrixElement}
-                    changeSelectedMatrixElement={changeSelectedMatrixElement}
-                />
+                {
+                    matrixState !== MatrixState.LambdaxA
+                        ? (
+                            <Matrix 
+                                maxMatrixWidth={matrixAreaWidth - 2 * BUTTON_AREAS_CROSS_WIDTH}
+                                matrixNumbers={readyMatrix}
+                                selectedMatrixElement={selectedMatrixElement}
+                                changeSelectedMatrixElement={changeSelectedMatrixElement}
+                            />
+                        )
+                        : (
+                            <View
+                                style={{
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    flex: 1,
+                                }}
+                            >
+                                <Text
+                                    style={{
+                                        color: '#fff',
+                                        fontSize: 60,
+                                    }}
+                                >
+                                    {formatScalar(editableScalar)}
+                                </Text>
+                            </View>
+                        )
+                }
                 <ArrowButtonsArea 
                     vertical
-                    hidden={matrixState === MatrixState.ready}
+                    hidden={matrixState === MatrixState.ready || !editableDimensions}
                     disabled={
                         [
                             MatrixState.addMatrix,
@@ -71,7 +108,7 @@ export default function MatrixArea({
                 />
             </View>
             <ArrowButtonsArea 
-                hidden={matrixState === MatrixState.ready}
+                hidden={matrixState === MatrixState.ready || !editableDimensions}
                 disabled={
                     [
                         MatrixState.addMatrix,
@@ -82,7 +119,14 @@ export default function MatrixArea({
                 }
                 editableDimensions={editableDimensions}
                 changeEditableDimensions={changeEditableDimensions}
-                determinant={
+                bottomLeftText={
+                    matrixState !== MatrixState.LambdaxA
+                        ? editableDimensions
+                            ? `${editableDimensions.rows}x${editableDimensions.columns}`
+                            : ''
+                        : 'Scalar'
+                }
+                bottomRightText={
                     formatDeterminant(MatrixOperations.determinant(readyMatrix))
                 }
                 crossWidth={BUTTON_AREAS_CROSS_WIDTH}
