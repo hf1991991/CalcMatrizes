@@ -22,7 +22,7 @@ export default function Matrix({
                 <View
                     onLayout={(event) => {
                         changeFlatListDimensions({
-                            height: event.nativeEvent.layout.height,
+                            ...flatListDimensions,
                             width: event.nativeEvent.layout.width,
                         });
                     }}
@@ -36,6 +36,9 @@ export default function Matrix({
                         }}
                         showsVerticalScrollIndicator={false}
                         showsHorizontalScrollIndicator={false}
+                        contentContainerStyle={{
+                            height: flatListDimensions.height,
+                        }}
                         contentInset={{
                             top: 1,
                             bottom: 1,
@@ -51,10 +54,9 @@ export default function Matrix({
                                     matrixColumnElements={item.data}
                                     selectedMatrixElement={selectedMatrixElement}
                                     changeSelectedMatrixElement={changeSelectedMatrixElement}
-                                    minWidth={Math.min(
-                                        flatListDimensions.width/matrixNumbers?.dimensions().columns-10,
-                                        50
-                                    )}
+                                    minWidth={50}
+                                    flatListDimensions={flatListDimensions}
+                                    changeFlatListDimensions={changeFlatListDimensions}
                                 />
                             );
                         }}

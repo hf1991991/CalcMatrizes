@@ -215,7 +215,7 @@ export default function CalculatorButton(props) {
         <TouchableOpacity
             style={{
                 flex: 1,
-                opacity: buttonData.disabled && 0.5,
+                opacity: buttonData.disabled && 0.6,
                 ...buttonData.style,
             }}
             disabled={buttonData.disabled}

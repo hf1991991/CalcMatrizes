@@ -1,12 +1,17 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, FlatList } from 'react-native';
 
+const ELEMENT_HEIGHT = 40;
+const ELEMENT_VERTICAL_MARGIN = 11;
+
 export default function MatrixColumn({ 
     matrixNumbers,
     matrixColumnElements,
     selectedMatrixElement,
     changeSelectedMatrixElement,
     minWidth,
+    flatListDimensions,
+    changeFlatListDimensions,
 }) {
 
     function getElementStyle(row, column) {
@@ -41,10 +46,13 @@ export default function MatrixColumn({
                 transform:[{rotateX:'180deg'}],
             }}
             scrollEnabled={false}
-            contentContainerStyle={{
-                justifyContent: 'center',
+            key={JSON.stringify(matrixNumbers.dimensions())}
+            onLayout={() => {
+                changeFlatListDimensions({
+                    ...flatListDimensions,
+                    height: (ELEMENT_HEIGHT + 2 * ELEMENT_VERTICAL_MARGIN) * matrixNumbers.dimensions().rows,
+                });
             }}
-            key={matrixNumbers.dimensions().columns}
             keyExtractor={element => `${element.row}:${element.column}`}
             data={matrixColumnElements}
             renderItem={({ item }) => {
@@ -67,12 +75,13 @@ export default function MatrixColumn({
                         <View
                             style={{
                                 ...(getElementStyle(row, column)),
-                                marginVertical: 13,
+                                marginVertical: ELEMENT_VERTICAL_MARGIN,
                                 paddingVertical: 5,
                                 paddingHorizontal: 20,
                                 borderRadius: 10,
-                                alignSelf: 'center',
-                                minHeight: 40,
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                height: ELEMENT_HEIGHT,
                                 minWidth: minWidth,
                                 marginHorizontal: 5,
                             }}
