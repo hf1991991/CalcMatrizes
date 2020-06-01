@@ -376,10 +376,11 @@ export default class MatrixOperations {
 
                 let testRow = pivotColumn + 1;
                 while (true) {
+                    console.log({testRow});
                     // Se houver uma coluna sem pivot em uma matriz escalonada reduzida, o determinante dela é nulo:
                     if (testRow === dimensionsA.rows) {
                         noPivotOnColumn = true;
-                        break
+                        break;
                     }
 
                     let possibleNewPivot = _matrixA.data[testRow][pivotColumn];

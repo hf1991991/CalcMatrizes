@@ -117,6 +117,7 @@ export function findFraction(number) {
 
 export function toFixedOnZeroes(number) {
     let string = number.toString();
+    if (string.endsWith('.')) return string;
     if (count(string, /\./, true) === 0) return number;
     while (string.endsWith('0')) string = string.substring(0, string.length - 1);
     if (string.endsWith('.')) string = string.substring(0, string.length - 1);

@@ -11,6 +11,7 @@ export default function ButtonsArea(props) {
         secondSetOfKeysActive, 
         selectedMatrixElement,
         operatorsActive,
+        editableOperatorNumber,
     } = props;
 
     let [buttonsAreaWidth, changeButtonsAreaWidth] = useState(0);
@@ -39,7 +40,7 @@ export default function ButtonsArea(props) {
                 <CalculatorButton
                     {...props}
                     buttonType={
-                        numberWritten === undefined || numberWritten === 0
+                        numberWritten === 0 || matrixState === MatrixState.ready
                             ? ButtonType.AC
                             : ButtonType.CE
                     }
@@ -158,7 +159,7 @@ export default function ButtonsArea(props) {
                     buttonType={
                         matrixState == MatrixState.ready 
                             ? ButtonType.R
-                            : selectedMatrixElement
+                            : selectedMatrixElement || editableOperatorNumber !== null
                                 ? ButtonType.Enter
                                 : ButtonType.Check
                     }

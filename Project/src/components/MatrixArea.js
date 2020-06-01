@@ -35,8 +35,15 @@ export default function MatrixArea({
     }
 
     function formatScalar(scalar) {
+        const parsed = MatrixOperations.parseFloatPreservingDot(scalar);
+        console.log(parsed);
+        console.log(parsed.toString().endsWith('.'));
         return scalar !== null 
-            ? scalar.toString().replace('.', ',')
+            ? toFixedOnZeroes(
+                !parsed.toString().endsWith('.') 
+                    ? parsed.toFixed(6)
+                    : parsed
+            ).toString().replace('.', ',')
             : null;
     }
 
@@ -89,7 +96,11 @@ export default function MatrixArea({
                                         fontSize: 60,
                                     }}
                                 >
-                                    {formatScalar(editableScalar)}
+                                    {formatScalar(
+                                        editableOperatorNumber === null
+                                            ? editableScalar
+                                            : editableOperatorNumber
+                                    )}
                                 </Text>
                             </View>
                         )

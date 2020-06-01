@@ -81,6 +81,11 @@ export default function CalculatorScreen({ isPortrait }) {
         selectedElement !== undefined && changeSettingsOfSelectedMatrixElement(selectedElement);
     }
 
+    function exitEditingMode() {
+        changeOperatorsButtonActive(false);
+        changeMatrixState(MatrixState.ready);
+    }
+
     function changeNumberWritten({ newNumber, forceNotOperatorNumber=false }) {
         if (operationHappening && !forceNotOperatorNumber) {
             changeEditableOperatorNumber(newNumber);
@@ -200,7 +205,7 @@ export default function CalculatorScreen({ isPortrait }) {
                 onPressBackground={
                     () => {
                         if (matrixState !== MatrixState.LambdaxA) {
-                            changeMatrixState(MatrixState.ready);
+                            exitEditingMode();
                             matrixState === MatrixState.editing 
                                 && safeChangeReadyMatrix(editableMatrix);
                             changeSettingsOfSelectedMatrixElement(null);
@@ -285,11 +290,11 @@ export default function CalculatorScreen({ isPortrait }) {
                             );
     
                             if (MatrixOperations.isMatrixEmpty(matrixOnScreen)) {
-                                changeMatrixState(MatrixState.ready);
+                                exitEditingMode();
                                 changeSettingsOfSelectedMatrixElement(0);
                             }
                         } else {
-                            changeMatrixState(MatrixState.ready);
+                            exitEditingMode();
                         }
                     }
                 }
@@ -344,11 +349,12 @@ export default function CalculatorScreen({ isPortrait }) {
                 }}
                 onPressLambdaxA={() => {
                     matrixState !== MatrixState.ready && safeChangeReadyMatrix(editableMatrix);
+                    changeOperatorsButtonActive(true);
                     enterEditingMode({
                         matrixState: MatrixState.LambdaxA,
                         editableMatrix: null,
                         selectedElement: null,
-                        scalar: null,
+                        scalar: 0,
                     });
                 }}
                 onPressAddMatrix={() => {
@@ -412,13 +418,13 @@ export default function CalculatorScreen({ isPortrait }) {
                             MatrixOperations.invert(editableMatrix)
                         );
                         changeSettingsOfSelectedMatrixElement(null);
-                        changeMatrixState(MatrixState.ready);
+                        exitEditingMode();
                     }
                     
                 }}
                 onEnter={() => {
                     operationHappening && applyOperation();
-                    nextElement();
+                    selectedMatrixElement && nextElement();
                 }}
                 onCheck={() => {
                     switch (matrixState) {
@@ -456,7 +462,7 @@ export default function CalculatorScreen({ isPortrait }) {
                         default:
                             break;
                     }
-                    changeMatrixState(MatrixState.ready);
+                    exitEditingMode();
                 }}
             />
         </SafeAreaView>
