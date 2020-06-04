@@ -4,6 +4,7 @@ import Matrix from './Matrix';
 import { MatrixState, findFraction, toFixedOnZeroes } from '../utilities/constants';
 import ArrowButtonsArea from './ArrowButtonsArea';
 import MatrixOperations from '../utilities/MatrixOperations';
+import FullEquation from './FullEquation';
 
 const BUTTON_AREAS_CROSS_WIDTH = 70;
 
@@ -18,6 +19,7 @@ export default function MatrixArea({
     operationHappening,
     editableOperatorNumber,
     solutionType,
+    fullEquation,
 }) {
 
     let [matrixAreaWidth, changeMatrixAreaWidth] = useState(0);
@@ -48,6 +50,19 @@ export default function MatrixArea({
             : null;
     }
 
+    function getEquationTypeString(equationType) {
+        switch (equationType) {
+            case MatrixState.AxXeB:
+                return "A×X=B";
+            case MatrixState.BxXeA:
+                return "B×X=A";
+            case MatrixState.XxAeB:
+                return "X×A=B";
+            case MatrixState.XxBeA:
+                return "X×B=A";
+        }
+    }
+
     return (
         <View
             style={{
@@ -74,15 +89,22 @@ export default function MatrixArea({
                 />
                 {
                     matrixState !== MatrixState.LambdaxA
-                        ? (
-                            <Matrix 
-                                maxMatrixWidth={matrixAreaWidth - 2 * BUTTON_AREAS_CROSS_WIDTH}
-                                matrixNumbers={readyMatrix}
-                                selectedMatrixElement={selectedMatrixElement}
-                                changeSelectedMatrixElement={changeSelectedMatrixElement}
-                                editableOperatorNumber={editableOperatorNumber}
-                            />
-                        )
+                        ? fullEquation !== null
+                            ? (
+                                <FullEquation 
+                                    fullEquation={fullEquation}
+                                    totalMaxAreaWidth={matrixAreaWidth - 2 * BUTTON_AREAS_CROSS_WIDTH}
+                                />
+                            )
+                            : (
+                                <Matrix 
+                                    maxMatrixWidth={matrixAreaWidth - 2 * BUTTON_AREAS_CROSS_WIDTH}
+                                    matrixNumbers={readyMatrix}
+                                    selectedMatrixElement={selectedMatrixElement}
+                                    changeSelectedMatrixElement={changeSelectedMatrixElement}
+                                    editableOperatorNumber={editableOperatorNumber}
+                                />
+                            )
                         : (
                             <View
                                 style={{
@@ -140,9 +162,11 @@ export default function MatrixArea({
                 changeEditableDimensions={changeEditableDimensions}
                 bottomLeftText={
                     matrixState !== MatrixState.LambdaxA
-                        ? editableDimensions
-                            ? `${editableDimensions.rows}x${editableDimensions.columns}`
-                            : ''
+                        ? fullEquation !== null
+                            ? getEquationTypeString(fullEquation.equationType)
+                            : editableDimensions
+                                ? `${editableDimensions.rows}x${editableDimensions.columns}`
+                                : ''
                         : 'Scalar'
                 }
                 bottomRightText={

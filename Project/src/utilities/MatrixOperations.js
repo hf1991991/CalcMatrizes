@@ -545,8 +545,11 @@ export default class MatrixOperations {
         /* Se na matriz A houver uma linha completa de 
         elementos nulos e, na mesma linha da matriz B, houver 
         algum elemento não nulo, a expressão é um SI. */
+
+        MatrixOperations.printMatrix(matrixA);
+        MatrixOperations.printMatrix(matrixB);
     
-        for (let row = 0; row < matrixA.dimensions().rows; row++) {
+        for (let row = 0; row < matrixA.dimensions().columns; row++) {
             let allElementsOfRowNull = true;
 
             for (let column = 0; column < matrixA.dimensions().columns; column++) {
@@ -564,17 +567,13 @@ export default class MatrixOperations {
         /* Se, na expressão, houver uma igualdade de um número nulo com 
         um não nulo fora das dimensoes da matrix final, ela é um SI: */
         for (
-            let row = 0; 
-            row < verticalElimination 
-                ? matrixB.dimensions().rows 
-                : matrixA.dimensions().columns; 
+            let row = matrixA.dimensions().columns; 
+            row < matrixB.dimensions().rows; 
             row++
         ) {
             for (
-                let column = matrixA.dimensions().rows; 
-                column < verticalElimination 
-                    ? matrixA.dimensions().rows 
-                    : matrixB.dimensions().columns; 
+                let column = 0; 
+                column < matrixB.dimensions().columns; 
                 column++
             ) {
                 if (matrixB.data[row][column] !== 0) return SystemSolutionType.SI;

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { SafeAreaView, StatusBar, Dimensions } from 'react-native';
+import { SafeAreaView, StatusBar } from 'react-native';
 import ButtonsArea from './components/ButtonsArea';
 import InfoArea from './components/InfoArea';
-import { MatrixState, count, Operator } from './utilities/constants';
+import { MatrixState, count, SystemSolutionType } from './utilities/constants';
 import MatrixOperations from './utilities/MatrixOperations';
 import ScalarOperations from './utilities/ScalarOperations';
 
@@ -25,6 +25,7 @@ export default function CalculatorScreen({ isPortrait }) {
     let [secondSetOfKeysActive, changeSecondSetOfKeysActive] = useState(false);
     let [isRActive, changeIsRActive] = useState(false);
     let [solutionType, changeSolutionType] = useState(null);
+    let [fullEquation, changeFullEquation] = useState(null);
     let [operatorsActive, changeOperatorsButtonActive] = useState(true);
     let [selectedOperator, changeSelectedOperator] = useState(null);
     let [operationHappening, changeOperationHappening] = useState(false);
@@ -73,6 +74,7 @@ export default function CalculatorScreen({ isPortrait }) {
 
     function enterEditingMode({ editableMatrix, matrixState, selectedElement, scalar }) {
         changeMatrixState(matrixState);
+        changeFullEquation(null);
         changeSolutionType(null);
         editableMatrix !== null && changeOperatorsButtonActive(true);
         safeChangeEditableMatrix(editableMatrix);
@@ -216,8 +218,16 @@ export default function CalculatorScreen({ isPortrait }) {
                 ].includes(matrixState),
             showSteps: false,
         });
+        changeFullEquation({
+            equationType: matrixState,
+            solutionType: systemSolutionsType,
+            matrixA: readyMatrix,
+            matrixB: editableMatrix,
+            matrixC: solution,
+            matrixD: partiallyEliminatedOriginal,
+        });
         changeSolutionType(systemSolutionsType);
-        safeChangeReadyMatrix(solution);
+        systemSolutionsType == SystemSolutionType.SPD && safeChangeReadyMatrix(solution);
     }
     
     return (
@@ -236,6 +246,7 @@ export default function CalculatorScreen({ isPortrait }) {
                 onPressBackground={
                     () => {
                         if (matrixState !== MatrixState.LambdaxA) {
+                            changeFullEquation(null);
                             exitEditingMode();
                             matrixState === MatrixState.editing 
                                 && safeChangeReadyMatrix(editableMatrix);
@@ -271,6 +282,7 @@ export default function CalculatorScreen({ isPortrait }) {
                 operationHappening={operationHappening}
                 editableOperatorNumber={editableOperatorNumber}
                 solutionType={solutionType}
+                fullEquation={fullEquation}
             />
             <ButtonsArea
                 hidden={!isPortrait}

@@ -6,10 +6,10 @@ import MatrixOperations from '../utilities/MatrixOperations';
 
 export default function Matrix({ 
     matrixNumbers,
-    selectedMatrixElement,
-    changeSelectedMatrixElement,
+    selectedMatrixElement=null,
+    changeSelectedMatrixElement=() => {},
     maxMatrixWidth,
-    editableOperatorNumber,
+    editableOperatorNumber=null,
 }) {
     let [flatListDimensions, changeFlatListDimensions] = useState({
         height: 0,
