@@ -26,6 +26,7 @@ export default function CalculatorScreen({ isPortrait }) {
     let [isRActive, changeIsRActive] = useState(false);
     let [solutionType, changeSolutionType] = useState(null);
     let [fullEquation, changeFullEquation] = useState(null);
+    let [viewReduced, changeViewReduced] = useState(false);
     let [operatorsActive, changeOperatorsButtonActive] = useState(true);
     let [selectedOperator, changeSelectedOperator] = useState(null);
     let [operationHappening, changeOperationHappening] = useState(false);
@@ -218,6 +219,7 @@ export default function CalculatorScreen({ isPortrait }) {
                 ].includes(matrixState),
             showSteps: false,
         });
+        changeViewReduced(false);
         changeFullEquation({
             equationType: matrixState,
             solutionType: systemSolutionsType,
@@ -283,6 +285,9 @@ export default function CalculatorScreen({ isPortrait }) {
                 editableOperatorNumber={editableOperatorNumber}
                 solutionType={solutionType}
                 fullEquation={fullEquation}
+                viewReduced={viewReduced}
+                changeViewReduced={changeViewReduced}
+                isPortrait={isPortrait}
             />
             <ButtonsArea
                 hidden={!isPortrait}

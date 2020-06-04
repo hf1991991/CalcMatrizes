@@ -368,7 +368,7 @@ export default class MatrixOperations {
         for (
             let pivotColumn = (eliminateBelowMainDiagonal ? 0 : minDimensionsA - 1);
             pivotColumn != (eliminateBelowMainDiagonal ? minDimensionsA : -1);
-            pivotColumn += (eliminateBelowMainDiagonal? 1 : -1)
+            pivotColumn += (eliminateBelowMainDiagonal ? 1 : -1)
         ) {
             let pivot = _matrixA.data[pivotColumn][pivotColumn]
 
@@ -456,6 +456,7 @@ export default class MatrixOperations {
                     //if (showSteps)
                     //    exibicao_passos_resolver_equacao_matricial(_matrixA, _matrixB, eliminationFactor, pivotColumn+1, verticalIndex+1, verticalElimination, None)
                 }
+                MatrixOperations.printMatrix(_matrixA);
             } 
         }
 
@@ -521,11 +522,11 @@ export default class MatrixOperations {
                 matrixX,
                 verticalElimination,
             });
-    
-            if (verticalElimination) {
-                solution = MatrixOperations.transpose(solution);
-                partiallyEliminatedOriginal = MatrixOperations.transpose(partiallyEliminatedOriginal);
-            }
+        }
+
+        if (verticalElimination) {
+            solution = MatrixOperations.transpose(solution);
+            partiallyEliminatedOriginal = MatrixOperations.transpose(partiallyEliminatedOriginal);
         }
 
         console.log({
@@ -553,12 +554,12 @@ export default class MatrixOperations {
             let allElementsOfRowNull = true;
 
             for (let column = 0; column < matrixA.dimensions().columns; column++) {
-                if (matrixA.data[row][column] !== 0.0) allElementsOfRowNull = false;
+                if (matrixA.data && matrixA.data[row] && matrixA.data[row][column] !== 0.0) allElementsOfRowNull = false;
             }
 
             if (allElementsOfRowNull) {
                 for (let column = 0; column < matrixB.dimensions().columns; column++) {
-                    if (matrixB.data[row][column] !== 0.0) return SystemSolutionType.SI;
+                    if (matrixB.data && matrixB.data[row] && matrixB.data[row][column] !== 0.0) return SystemSolutionType.SI;
                 }
                 return SystemSolutionType.SPI;
             }
@@ -576,7 +577,7 @@ export default class MatrixOperations {
                 column < matrixB.dimensions().columns; 
                 column++
             ) {
-                if (matrixB.data[row][column] !== 0) return SystemSolutionType.SI;
+                if (matrixB.data && matrixB.data[row] && matrixB.data[row][column] !== 0) return SystemSolutionType.SI;
             }
         }
         

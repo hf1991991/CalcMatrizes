@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import ArrowButton from './ArrowButton';
 
 export default function ArrowButtonsArea({ 
@@ -12,6 +12,9 @@ export default function ArrowButtonsArea({
     bottomLeftText,
     bottomRightText,
     bottomMiddleText,
+    onPressBottomLeftText,
+    onPressBottomMiddleText,
+    onPressBottomRightText,
 }) {
     return (
         <View
@@ -32,16 +35,22 @@ export default function ArrowButtonsArea({
         >
             {
                 !vertical && (
-                    <Text
+                    <TouchableOpacity
+                        onPress={onPressBottomLeftText}
                         style={{
-                            color: '#fff',
-                            fontSize: 25,
                             position: 'absolute',
                             left: 0,
                         }}
                     >
-                        {bottomLeftText}
-                    </Text>
+                        <Text
+                            style={{
+                                color: '#fff',
+                                fontSize: 25,
+                            }}
+                        >
+                            {bottomLeftText}
+                        </Text>
+                    </TouchableOpacity>
                 )
             }
             <View
@@ -96,31 +105,43 @@ export default function ArrowButtonsArea({
             </View>
             {
                 !vertical && bottomRightText !== null && (
-                    <Text
+                    <TouchableOpacity
+                        onPress={onPressBottomRightText}
                         style={{
-                            color: '#fff',
-                            fontSize: 25,
                             position: 'absolute',
                             right: 0,
                         }}
                     >
-                        {bottomRightText}
-                    </Text>
+                        <Text
+                            style={{
+                                color: '#fff',
+                                fontSize: 25,
+                            }}
+                        >
+                            {bottomRightText}
+                        </Text>
+                    </TouchableOpacity>
                 )
             }
             {
                 !vertical && bottomMiddleText !== null && (
-                    <Text
+                    <TouchableOpacity
+                        onPress={onPressBottomMiddleText}
                         style={{
-                            color: '#fff',
-                            fontSize: 25,
                             position: 'absolute',
                             flex: 1,
                             justifyContent: 'center'
                         }}
                     >
-                        {bottomMiddleText}
-                    </Text>
+                        <Text
+                            style={{
+                                color: '#fff',
+                                fontSize: 25,
+                            }}
+                        >
+                            {bottomMiddleText}
+                        </Text>
+                    </TouchableOpacity>
                 )
             }
         </View>

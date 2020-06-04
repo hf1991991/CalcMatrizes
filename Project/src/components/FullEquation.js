@@ -4,12 +4,18 @@ import Matrix from './Matrix';
 import EquationData from '../utilities/EquationData';
 
 const OPERATORS_WIDTH = 40;
-const X_OPERATOR_WIDTH = 20;
+const X_OPERATOR_WIDTH = 50;
 
 export default function FullEquation({ 
     fullEquation,
     totalMaxAreaWidth,
+    viewReduced,
 }) {
+
+    const equationData = new EquationData({
+        fullEquation, 
+        viewReduced,
+    });
 
     function XOperator() {
         return (
@@ -22,12 +28,26 @@ export default function FullEquation({
                     width: X_OPERATOR_WIDTH,
                 }}
             >
-                X
+                <Text
+                    style={{
+                        color: '#fff',
+                        fontSize: 30,
+                    }}
+                >
+                    X
+                </Text>
+                <Text
+                    style={{
+                        color: '#fff',
+                        fontSize: 14,
+                        top: 50,
+                    }}
+                >
+                    {equationData.getVariableDimensions()}
+                </Text>
             </Text>
         );
     }
-
-    const equationData = new EquationData(fullEquation);
     const singleMatrixMaxWidth = (
             totalMaxAreaWidth 
             - equationData.getQuantityOfOperators() * OPERATORS_WIDTH

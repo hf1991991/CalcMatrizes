@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text } from 'react-native';
 import Matrix from './Matrix';
-import { MatrixState, findFraction, toFixedOnZeroes } from '../utilities/constants';
+import { MatrixState, findFraction, toFixedOnZeroes, SystemSolutionType } from '../utilities/constants';
 import ArrowButtonsArea from './ArrowButtonsArea';
 import MatrixOperations from '../utilities/MatrixOperations';
 import FullEquation from './FullEquation';
@@ -20,6 +20,9 @@ export default function MatrixArea({
     editableOperatorNumber,
     solutionType,
     fullEquation,
+    viewReduced,
+    changeViewReduced,
+    isPortrait,
 }) {
 
     let [matrixAreaWidth, changeMatrixAreaWidth] = useState(0);
@@ -89,11 +92,12 @@ export default function MatrixArea({
                 />
                 {
                     matrixState !== MatrixState.LambdaxA
-                        ? fullEquation !== null
+                        ? fullEquation !== null && !isPortrait
                             ? (
                                 <FullEquation 
                                     fullEquation={fullEquation}
                                     totalMaxAreaWidth={matrixAreaWidth - 2 * BUTTON_AREAS_CROSS_WIDTH}
+                                    viewReduced={viewReduced}
                                 />
                             )
                             : (
@@ -162,7 +166,7 @@ export default function MatrixArea({
                 changeEditableDimensions={changeEditableDimensions}
                 bottomLeftText={
                     matrixState !== MatrixState.LambdaxA
-                        ? fullEquation !== null
+                        ? fullEquation !== null && !isPortrait
                             ? getEquationTypeString(fullEquation.equationType)
                             : editableDimensions
                                 ? `${editableDimensions.rows}x${editableDimensions.columns}`
@@ -170,11 +174,19 @@ export default function MatrixArea({
                         : 'Scalar'
                 }
                 bottomRightText={
-                    !operationHappening
-                        && formatDeterminant(MatrixOperations.determinant(readyMatrix))
+                    fullEquation !== null && !isPortrait
+                        ? fullEquation.solutionType !== SystemSolutionType.SPD
+                            ? viewReduced ? 'Reduzida' : 'Original'
+                            : null
+                        : !operationHappening
+                            && formatDeterminant(MatrixOperations.determinant(readyMatrix))
                 }
                 bottomMiddleText={
                     matrixState === MatrixState.ready && solutionType
+                }
+                onPressBottomRightText={
+                    fullEquation !== null && !isPortrait
+                        && (() => changeViewReduced(!viewReduced))
                 }
                 crossWidth={BUTTON_AREAS_CROSS_WIDTH}
             />
