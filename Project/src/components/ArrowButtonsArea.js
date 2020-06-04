@@ -11,6 +11,7 @@ export default function ArrowButtonsArea({
     crossWidth,
     bottomLeftText,
     bottomRightText,
+    bottomMiddleText,
 }) {
     return (
         <View
@@ -104,6 +105,21 @@ export default function ArrowButtonsArea({
                         }}
                     >
                         {bottomRightText}
+                    </Text>
+                )
+            }
+            {
+                !vertical && bottomMiddleText !== null && (
+                    <Text
+                        style={{
+                            color: '#fff',
+                            fontSize: 25,
+                            position: 'absolute',
+                            flex: 1,
+                            justifyContent: 'center'
+                        }}
+                    >
+                        {bottomMiddleText}
                     </Text>
                 )
             }

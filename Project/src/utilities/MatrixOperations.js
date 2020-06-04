@@ -505,11 +505,11 @@ export default class MatrixOperations {
         matrixACopy = secondElimination.matrixA;
         matrixX = secondElimination.matrixB;
     
-        const systemSolutionsType = SystemSolutionType.SPD;/*MatrixOperations.systemSolutionTypesVerification({
+        const systemSolutionsType = MatrixOperations.systemSolutionTypesVerification({
             matrixA: matrixACopy, 
             matrixB: matrixX, 
             verticalElimination,
-        });*/
+        });
         
         let partiallyEliminatedOriginal = matrixACopy;
         let solution = matrixX;
@@ -544,15 +544,7 @@ export default class MatrixOperations {
     static systemSolutionTypesVerification({ matrixA, matrixB, verticalElimination }) {
         /* Se na matriz A houver uma linha completa de 
         elementos nulos e, na mesma linha da matriz B, houver 
-        algum elemento não nulo, a expressão é um SPI: */
-
-        /*if (matrixA.dimensions().columns > matrixA.dimensions().rows)
-            return SystemSolutionType.SPI;*/
-    
-        if (verticalElimination) {
-            matrixA = MatrixOperations.transpose(matrixA);
-            matrixB = MatrixOperations.transpose(matrixB);
-        }
+        algum elemento não nulo, a expressão é um SI. */
     
         for (let row = 0; row < matrixA.dimensions().rows; row++) {
             let allElementsOfRowNull = true;
@@ -569,22 +561,26 @@ export default class MatrixOperations {
             }
         }
 
-        /* Se, na expressão, houver uma igualdade de 
-        um número nulo com um não nulo, ela é um SI: */
-        if (!verticalElimination) {
-            for (let row = matrixA.dimensions().columns; row < matrixB.dimensions().rows; row++) {
-                for (let column = 0; column < matrixB.dimensions().columns; column++) {
-                    if (matrixB.data[row][column] != 0) return SystemSolutionType.SI;
-                }
+        /* Se, na expressão, houver uma igualdade de um número nulo com 
+        um não nulo fora das dimensoes da matrix final, ela é um SI: */
+        for (
+            let row = 0; 
+            row < verticalElimination 
+                ? matrixB.dimensions().rows 
+                : matrixA.dimensions().columns; 
+            row++
+        ) {
+            for (
+                let column = matrixA.dimensions().rows; 
+                column < verticalElimination 
+                    ? matrixA.dimensions().rows 
+                    : matrixB.dimensions().columns; 
+                column++
+            ) {
+                if (matrixB.data[row][column] !== 0) return SystemSolutionType.SI;
             }
         }
-        else {
-            for (let row = 0; row < matrixB.dimensions().rows; row++) {
-                for (let column = matrixA.dimensions().rows; column < matrixB.dimensions().columns; column++) {
-                    if (matrixB.data[row][column] !== 0) return SystemSolutionType.SI;
-                }
-            }
-        }
+        
         return SystemSolutionType.SPD;
     }
     

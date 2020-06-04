@@ -1,9 +1,13 @@
 def shorten(number):
-    float = "%.8f" % number
-    if len(float) > len(str(number)):
-        return str(number)
-    else: 
-        return float
+    if str(number) != number:
+        float = "%.8f" % number
+        if len(float) > len(str(number)):
+            return str(number)
+        else: 
+            return float
+    else:
+        return number
+
 
 def split_matriz(string):
     return [[float(j) for j in i.split(",")] for i in string.split(";")]
@@ -200,10 +204,6 @@ def verificacao_se_solucao_para_equacao_matricial_existe(matriz_a, matriz_b, inc
     # Se na matriz A houver uma linha completa de elementos nulos e, na mesma linha da matriz B, houver algum elemento não nulo, a expressão é um SPI:
     if len(matriz_a[0]) > len(matriz_a):
         return "SPI"
-
-    if incognita_precede:
-        matriz_a = transposta(matriz_a)
-        matriz_b = transposta(matriz_b)
 
     for l in range(len(matriz_a)):
         todos_elementos_da_linha_nulos = True

@@ -4,25 +4,11 @@ import MatrixArea from './MatrixArea';
 import MatrixOperations from '../utilities/MatrixOperations';
 import { MatrixState } from '../utilities/constants';
 
-export default function InfoArea({ 
-    matrixState,
-    readyMatrix,
-    changeReadyMatrix,
-    onPressBackground,
-    editableMatrix,
-    changeEditableMatrix,
-    selectedMatrixElement,
-    changeSelectedMatrixElement,
-    editableDimensions,
-    changeEditableDimensions,
-    editableScalar,
-    operationHappening,
-    editableOperatorNumber,
-}) {
+export default function InfoArea(props) {
 
     return (
         <TouchableWithoutFeedback
-            onPress={onPressBackground}
+            onPress={props.onPressBackground}
         >
             <View
                 style={{
@@ -30,36 +16,29 @@ export default function InfoArea({
                 }}
             >
                 <MatrixArea 
-                    matrixState={matrixState}
+                    {...props}
                     readyMatrix={
-                        matrixState === MatrixState.ready
-                            ? readyMatrix
-                            : editableMatrix
+                        props.matrixState === MatrixState.ready
+                            ? props.readyMatrix
+                            : props.editableMatrix
                     }
-                    changeReadyMatrix={changeReadyMatrix}
-                    editableDimensions={editableDimensions}
                     changeEditableDimensions={({ rows, columns }) => {
-                        changeEditableDimensions({ rows, columns });
-                        changeEditableMatrix(
+                        props.changeEditableDimensions({ rows, columns });
+                        props.changeEditableMatrix(
                             MatrixOperations.resizeMatrix({
-                                originalMatrix: matrixState === MatrixState.editing
-                                    ? readyMatrix
-                                    : editableMatrix,
-                                editableMatrix: editableMatrix,
+                                originalMatrix: props.matrixState === MatrixState.editing
+                                    ? props.readyMatrix
+                                    : props.editableMatrix,
+                                editableMatrix: props.editableMatrix,
                                 rows,
                                 columns,
                             })
                         );
                         
-                        if (selectedMatrixElement?.row >= rows 
-                            || selectedMatrixElement?.column >= columns
-                        ) changeSelectedMatrixElement(null);
+                        if (props.selectedMatrixElement?.row >= rows 
+                            || props.selectedMatrixElement?.column >= columns
+                        ) props.changeSelectedMatrixElement(null);
                     }}
-                    selectedMatrixElement={selectedMatrixElement}
-                    changeSelectedMatrixElement={changeSelectedMatrixElement}
-                    editableScalar={editableScalar}
-                    operationHappening={operationHappening}
-                    editableOperatorNumber={editableOperatorNumber}
                 />
             </View>
         </TouchableWithoutFeedback>

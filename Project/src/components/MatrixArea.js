@@ -17,6 +17,7 @@ export default function MatrixArea({
     editableScalar,
     operationHappening,
     editableOperatorNumber,
+    solutionType,
 }) {
 
     let [matrixAreaWidth, changeMatrixAreaWidth] = useState(0);
@@ -147,6 +148,9 @@ export default function MatrixArea({
                 bottomRightText={
                     !operationHappening
                         && formatDeterminant(MatrixOperations.determinant(readyMatrix))
+                }
+                bottomMiddleText={
+                    matrixState === MatrixState.ready && solutionType
                 }
                 crossWidth={BUTTON_AREAS_CROSS_WIDTH}
             />

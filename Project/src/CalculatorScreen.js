@@ -24,6 +24,7 @@ export default function CalculatorScreen({ isPortrait }) {
     let [matrixState, changeMatrixState] = useState(MatrixState.editing);
     let [secondSetOfKeysActive, changeSecondSetOfKeysActive] = useState(false);
     let [isRActive, changeIsRActive] = useState(false);
+    let [solutionType, changeSolutionType] = useState(null);
     let [operatorsActive, changeOperatorsButtonActive] = useState(true);
     let [selectedOperator, changeSelectedOperator] = useState(null);
     let [operationHappening, changeOperationHappening] = useState(false);
@@ -72,6 +73,7 @@ export default function CalculatorScreen({ isPortrait }) {
 
     function enterEditingMode({ editableMatrix, matrixState, selectedElement, scalar }) {
         changeMatrixState(matrixState);
+        changeSolutionType(null);
         editableMatrix !== null && changeOperatorsButtonActive(true);
         safeChangeEditableMatrix(editableMatrix);
         changeEditableDimensions(
@@ -192,6 +194,31 @@ export default function CalculatorScreen({ isPortrait }) {
             forceNotOperatorNumber: true,
         });
     }
+
+    function isAFirst() {
+        return [
+            MatrixState.XxAeB,
+            MatrixState.AxXeB,
+        ].includes(matrixState);
+    }
+
+    function onCheckResolveEquation() {
+        let {
+            partiallyEliminatedOriginal,
+            solution,
+            systemSolutionsType,
+        } = MatrixOperations.findSolutionForMatrixEquation({
+            matrixA: isAFirst() ? readyMatrix : editableMatrix,
+            matrixB: isAFirst() ? editableMatrix : readyMatrix,
+            verticalElimination: [
+                    MatrixState.XxAeB,
+                    MatrixState.XxBeA,
+                ].includes(matrixState),
+            showSteps: false,
+        });
+        changeSolutionType(systemSolutionsType);
+        safeChangeReadyMatrix(solution);
+    }
     
     return (
         <SafeAreaView
@@ -243,6 +270,7 @@ export default function CalculatorScreen({ isPortrait }) {
                 editableScalar={editableScalar}
                 operationHappening={operationHappening}
                 editableOperatorNumber={editableOperatorNumber}
+                solutionType={solutionType}
             />
             <ButtonsArea
                 hidden={!isPortrait}
@@ -475,44 +503,16 @@ export default function CalculatorScreen({ isPortrait }) {
                             );
                             break;
                         case MatrixState.AxXeB:
-                            safeChangeReadyMatrix(
-                                MatrixOperations.findSolutionForMatrixEquation({
-                                    matrixA: readyMatrix,
-                                    matrixB: editableMatrix,
-                                    verticalElimination: false,
-                                    showSteps: false,
-                                }).solution
-                            );
+                            onCheckResolveEquation();
                             break;
                         case MatrixState.BxXeA:
-                            safeChangeReadyMatrix(
-                                MatrixOperations.findSolutionForMatrixEquation({
-                                    matrixA: editableMatrix,
-                                    matrixB: readyMatrix,
-                                    verticalElimination: false,
-                                    showSteps: false,
-                                }).solution
-                            );
+                            onCheckResolveEquation();
                             break;
                         case MatrixState.XxAeB:
-                            safeChangeReadyMatrix(
-                                MatrixOperations.findSolutionForMatrixEquation({
-                                    matrixA: readyMatrix,
-                                    matrixB: editableMatrix,
-                                    verticalElimination: true,
-                                    showSteps: false,
-                                }).solution
-                            );
+                            onCheckResolveEquation();
                             break;
                         case MatrixState.XxBeA:
-                            safeChangeReadyMatrix(
-                                MatrixOperations.findSolutionForMatrixEquation({
-                                    matrixA: editableMatrix,
-                                    matrixB: readyMatrix,
-                                    verticalElimination: true,
-                                    showSteps: false,
-                                }).solution
-                            );
+                            onCheckResolveEquation();
                             break;
                         default:
                             break;
