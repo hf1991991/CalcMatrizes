@@ -113,6 +113,8 @@ export default function MatrixArea({
                             MatrixState.addMatrix,
                             MatrixState.subtractMatrix,
                             MatrixState.BxA,
+                            MatrixState.XxAeB,
+                            MatrixState.XxBeA,
                         ]
                         .includes(matrixState)
                     }
@@ -128,6 +130,8 @@ export default function MatrixArea({
                         MatrixState.addMatrix,
                         MatrixState.subtractMatrix,
                         MatrixState.AxB,
+                        MatrixState.AxXeB,
+                        MatrixState.BxXeA,
                     ]
                     .includes(matrixState)
                 }

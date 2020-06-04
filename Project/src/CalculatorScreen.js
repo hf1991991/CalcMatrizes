@@ -23,6 +23,7 @@ export default function CalculatorScreen({ isPortrait }) {
     let [editableDimensions, changeEditableDimensions] = useState(INITIAL_MATRIX.dimensions());
     let [matrixState, changeMatrixState] = useState(MatrixState.editing);
     let [secondSetOfKeysActive, changeSecondSetOfKeysActive] = useState(false);
+    let [isRActive, changeIsRActive] = useState(false);
     let [operatorsActive, changeOperatorsButtonActive] = useState(true);
     let [selectedOperator, changeSelectedOperator] = useState(null);
     let [operationHappening, changeOperationHappening] = useState(false);
@@ -272,6 +273,7 @@ export default function CalculatorScreen({ isPortrait }) {
                         ? MatrixOperations.isMatrixFull(matrixOnScreen)
                         : isEditableScalarReady()
                 }
+                isRActive={isRActive}
                 operatorsActive={operatorsActive}
                 changeOperatorsButtonActive={() => {
                     changeOperatorsButtonActive(!operatorsActive);
@@ -382,10 +384,12 @@ export default function CalculatorScreen({ isPortrait }) {
                         },
                     });
                 }}
-                onPressResolveEquation={() => {
+                onPressR={() => changeIsRActive(!isRActive)}
+                onPressResolveEquation={(newState) => {
+                    changeIsRActive(false);
                     matrixState !== MatrixState.ready && safeChangeReadyMatrix(editableMatrix);
                     enterEditingMode({
-                        matrixState: MatrixState.AxXeB,
+                        matrixState: newState,
                         editableMatrix: MatrixOperations.emptyMatrix(matrixOnScreen.dimensions()),
                         selectedElement: {
                             row: 0,
@@ -476,6 +480,36 @@ export default function CalculatorScreen({ isPortrait }) {
                                     matrixA: readyMatrix,
                                     matrixB: editableMatrix,
                                     verticalElimination: false,
+                                    showSteps: false,
+                                }).solution
+                            );
+                            break;
+                        case MatrixState.BxXeA:
+                            safeChangeReadyMatrix(
+                                MatrixOperations.findSolutionForMatrixEquation({
+                                    matrixA: editableMatrix,
+                                    matrixB: readyMatrix,
+                                    verticalElimination: false,
+                                    showSteps: false,
+                                }).solution
+                            );
+                            break;
+                        case MatrixState.XxAeB:
+                            safeChangeReadyMatrix(
+                                MatrixOperations.findSolutionForMatrixEquation({
+                                    matrixA: readyMatrix,
+                                    matrixB: editableMatrix,
+                                    verticalElimination: true,
+                                    showSteps: false,
+                                }).solution
+                            );
+                            break;
+                        case MatrixState.XxBeA:
+                            safeChangeReadyMatrix(
+                                MatrixOperations.findSolutionForMatrixEquation({
+                                    matrixA: editableMatrix,
+                                    matrixB: readyMatrix,
+                                    verticalElimination: true,
                                     showSteps: false,
                                 }).solution
                             );

@@ -12,6 +12,7 @@ export default function ButtonsArea(props) {
         selectedMatrixElement,
         operatorsActive,
         editableOperatorNumber,
+        isRActive,
     } = props;
 
     let [buttonsAreaWidth, changeButtonsAreaWidth] = useState(0);
@@ -58,9 +59,11 @@ export default function ButtonsArea(props) {
                     buttonType={
                         operatorsActive
                             ? ButtonType.Divide
-                            : secondSetOfKeysActive
-                                ? ButtonType.Transposed
-                                : ButtonType.Inverse
+                            : isRActive 
+                                ? ButtonType.XxBeA
+                                : secondSetOfKeysActive
+                                    ? ButtonType.Transposed
+                                    : ButtonType.Inverse
                     }
                 />
             </View>
@@ -84,7 +87,9 @@ export default function ButtonsArea(props) {
                     buttonType={
                         operatorsActive
                             ? ButtonType.Multiply
-                            : ButtonType.LambdaxA
+                            : isRActive 
+                                ? ButtonType.XxAeB
+                                : ButtonType.LambdaxA
                     }
                 />
             </View>
@@ -108,9 +113,11 @@ export default function ButtonsArea(props) {
                     buttonType={
                         operatorsActive
                             ? ButtonType.Subtract
-                            : secondSetOfKeysActive
-                                ? ButtonType.BxA
-                                : ButtonType.AxB
+                            : isRActive 
+                                ? ButtonType.BxXeA
+                                : secondSetOfKeysActive
+                                    ? ButtonType.BxA
+                                    : ButtonType.AxB
                     }
                 />
             </View>
@@ -134,9 +141,11 @@ export default function ButtonsArea(props) {
                     buttonType={
                         operatorsActive
                             ? ButtonType.Add
-                            : secondSetOfKeysActive
-                                ? ButtonType.SubtractMatrix
-                                : ButtonType.AddMatrix
+                            : isRActive 
+                                ? ButtonType.AxXeB
+                                : secondSetOfKeysActive
+                                    ? ButtonType.SubtractMatrix
+                                    : ButtonType.AddMatrix
                     }
                 />
             </View>

@@ -528,6 +528,12 @@ export default class MatrixOperations {
             }
         }
 
+        console.log({
+            partiallyEliminatedOriginal,
+            solution,
+            systemSolutionsType,
+        });
+
         return {
             partiallyEliminatedOriginal,
             solution,

@@ -39,6 +39,10 @@ export const ButtonType = {
     Second: 'Second',
     ColumnDirection: 'ColumnDirection',
     R: 'R',
+    AxXeB: 'AxXeB',
+    BxXeA: 'BxXeA',
+    XxAeB: 'XxAeB',
+    XxBeA: 'XxBeA',
     LambdaxA: 'LambdaxA',
     AxB: 'AxB',
     BxA: 'BxA',
@@ -140,7 +144,6 @@ export const SystemSolutionType = {
 };
 
 export function toFixedWithThreeDots(number) {
-    console.log(number);
     number = toFixedOnZeroes(number);
     if (decimalPlaces(number) > PRECISION 
         && count(number.toString(), /\./, true) !== 0

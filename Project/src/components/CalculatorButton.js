@@ -117,9 +117,41 @@ export default function CalculatorButton(props) {
                 return new ButtonData({
                     source: require('../../assets/buttons/R.png'),
                     sourceActive: require('../../assets/buttons/RSelected.png'),
+                    active: props.isRActive,
+                    disabled: !props.isMatrixFull,
+                    onPress: props.onPressR,
+                });
+            case ButtonType.AxXeB:
+                return new ButtonData({
+                    source: require('../../assets/buttons/AxXeB.png'),
+                    sourceActive: require('../../assets/buttons/AxXeBActive.png'),
                     active: props.matrixState === MatrixState.AxXeB,
                     disabled: !props.isMatrixFull,
-                    onPress: props.onPressResolveEquation,
+                    onPress: () => props.onPressResolveEquation(MatrixState.AxXeB),
+                });
+            case ButtonType.BxXeA:
+                return new ButtonData({
+                    source: require('../../assets/buttons/BxXeA.png'),
+                    sourceActive: require('../../assets/buttons/BxXeAActive.png'),
+                    active: props.matrixState === MatrixState.BxXeA,
+                    disabled: !props.isMatrixFull,
+                    onPress: () => props.onPressResolveEquation(MatrixState.BxXeA),
+                });
+            case ButtonType.XxAeB:
+                return new ButtonData({
+                    source: require('../../assets/buttons/XxAeB.png'),
+                    sourceActive: require('../../assets/buttons/XxAeBActive.png'),
+                    active: props.matrixState === MatrixState.XxAeB,
+                    disabled: !props.isMatrixFull,
+                    onPress: () => props.onPressResolveEquation(MatrixState.XxAeB),
+                });
+            case ButtonType.XxBeA:
+                return new ButtonData({
+                    source: require('../../assets/buttons/XxBeA.png'),
+                    sourceActive: require('../../assets/buttons/XxBeAActive.png'),
+                    active: props.matrixState === MatrixState.XxBeA,
+                    disabled: !props.isMatrixFull,
+                    onPress: () => props.onPressResolveEquation(MatrixState.XxBeA),
                 });
             case ButtonType.LambdaxA:
                 return new ButtonData({
