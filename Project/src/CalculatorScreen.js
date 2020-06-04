@@ -23,7 +23,7 @@ export default function CalculatorScreen({ isPortrait }) {
     let [editableDimensions, changeEditableDimensions] = useState(INITIAL_MATRIX.dimensions());
     let [matrixState, changeMatrixState] = useState(MatrixState.editing);
     let [secondSetOfKeysActive, changeSecondSetOfKeysActive] = useState(false);
-    let [operatorsActive, changeOperatorsButtonActive] = useState(false);
+    let [operatorsActive, changeOperatorsButtonActive] = useState(true);
     let [selectedOperator, changeSelectedOperator] = useState(null);
     let [operationHappening, changeOperationHappening] = useState(false);
     let [editableOperatorNumber, changeEditableOperatorNumber] = useState(null);
@@ -71,6 +71,7 @@ export default function CalculatorScreen({ isPortrait }) {
 
     function enterEditingMode({ editableMatrix, matrixState, selectedElement, scalar }) {
         changeMatrixState(matrixState);
+        editableMatrix !== null && changeOperatorsButtonActive(true);
         safeChangeEditableMatrix(editableMatrix);
         changeEditableDimensions(
             editableMatrix 
@@ -162,6 +163,8 @@ export default function CalculatorScreen({ isPortrait }) {
                 }
             }
         } else selectedElement = null;
+
+        if (selectedElement === null) changeOperatorsButtonActive(false);
 
         changeSettingsOfSelectedMatrixElement(selectedElement);
     }
@@ -380,7 +383,15 @@ export default function CalculatorScreen({ isPortrait }) {
                     });
                 }}
                 onPressResolveEquation={() => {
-                    
+                    matrixState !== MatrixState.ready && safeChangeReadyMatrix(editableMatrix);
+                    enterEditingMode({
+                        matrixState: MatrixState.AxXeB,
+                        editableMatrix: MatrixOperations.emptyMatrix(matrixOnScreen.dimensions()),
+                        selectedElement: {
+                            row: 0,
+                            column: 0,
+                        },
+                    });
                 }}
                 onTranspose={() => {
                     
@@ -457,6 +468,16 @@ export default function CalculatorScreen({ isPortrait }) {
                                     matrixA: readyMatrix,
                                     scalar: editableScalar,
                                 })
+                            );
+                            break;
+                        case MatrixState.AxXeB:
+                            safeChangeReadyMatrix(
+                                MatrixOperations.findSolutionForMatrixEquation({
+                                    matrixA: readyMatrix,
+                                    matrixB: editableMatrix,
+                                    verticalElimination: false,
+                                    showSteps: false,
+                                }).solution
                             );
                             break;
                         default:

@@ -6,6 +6,10 @@ export const MatrixState = {
     AxB: 'AxB',
     BxA: 'BxA',
     LambdaxA: 'LambdaxA',
+    AxXeB: 'AxXeB',
+    BxXeA: 'BxXeA',
+    XxAeB: 'XxAeB',
+    XxBeA: 'XxBeA',
 }
 
 export const Operator = {
@@ -123,3 +127,9 @@ export function toFixedOnZeroes(number) {
     if (string.endsWith('.')) string = string.substring(0, string.length - 1);
     return Number.parseFloat(string);
 }
+
+export const SystemSolutionType = {
+    SPI: 'SPI',
+    SPD: 'SPD',
+    SI: 'SI',
+};

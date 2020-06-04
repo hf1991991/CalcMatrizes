@@ -117,14 +117,15 @@ export default function CalculatorButton(props) {
                 return new ButtonData({
                     source: require('../../assets/buttons/R.png'),
                     sourceActive: require('../../assets/buttons/RSelected.png'),
-                    active: false,
+                    active: props.matrixState === MatrixState.AxXeB,
                     disabled: !props.isMatrixFull,
+                    onPress: props.onPressResolveEquation,
                 });
             case ButtonType.LambdaxA:
                 return new ButtonData({
                     source: require('../../assets/buttons/LambdaxA.png'), 
                     sourceActive: require('../../assets/buttons/LambdaxASelected.png'),
-                    active: props.matrixState == MatrixState.LambdaxA, 
+                    active: props.matrixState === MatrixState.LambdaxA, 
                     disabled: !props.isMatrixFull,
                     onPress: props.onPressLambdaxA,
                 });
@@ -132,7 +133,7 @@ export default function CalculatorButton(props) {
                 return new ButtonData({
                     source: require('../../assets/buttons/AxB.png'), 
                     sourceActive: require('../../assets/buttons/AxBSelected.png'),
-                    active: props.matrixState == MatrixState.AxB, 
+                    active: props.matrixState === MatrixState.AxB, 
                     disabled: !props.isMatrixFull,
                     onPress: props.onPressAxB,
                 });
@@ -140,7 +141,7 @@ export default function CalculatorButton(props) {
                 return new ButtonData({
                     source: require('../../assets/buttons/BxA.png'), 
                     sourceActive: require('../../assets/buttons/BxASelected.png'),
-                    active: props.matrixState == MatrixState.BxA, 
+                    active: props.matrixState === MatrixState.BxA, 
                     disabled: !props.isMatrixFull,
                     onPress: props.onPressBxA,
                 });
@@ -170,7 +171,7 @@ export default function CalculatorButton(props) {
                 return new ButtonData({
                     source: require('../../assets/buttons/SubtractMatrix.png'),
                     sourceActive: require('../../assets/buttons/SubtractMatrixSelected.png'),
-                    active: props.matrixState == MatrixState.subtractMatrix, 
+                    active: props.matrixState === MatrixState.subtractMatrix, 
                     disabled: !props.isMatrixFull,
                     onPress: props.onPressSubtractMatrix,
                 });
@@ -178,7 +179,7 @@ export default function CalculatorButton(props) {
                 return new ButtonData({
                     source: require('../../assets/buttons/AddMatrix.png'), 
                     sourceActive: require('../../assets/buttons/AddMatrixSelected.png'),
-                    active: props.matrixState == MatrixState.addMatrix, 
+                    active: props.matrixState === MatrixState.addMatrix, 
                     disabled: !props.isMatrixFull,
                     onPress: props.onPressAddMatrix,
                 });

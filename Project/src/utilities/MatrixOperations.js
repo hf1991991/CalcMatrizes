@@ -1,5 +1,5 @@
 import MatrixData from "./MatrixData";
-import { forceRound, smartToFixed, count } from "./constants";
+import { forceRound, smartToFixed, count, SystemSolutionType } from "./constants";
 
 export default class MatrixOperations {
 
@@ -376,7 +376,6 @@ export default class MatrixOperations {
 
                 let testRow = pivotColumn + 1;
                 while (true) {
-                    console.log({testRow});
                     // Se houver uma coluna sem pivot em uma matriz escalonada reduzida, o determinante dela é nulo:
                     if (testRow === dimensionsA.rows) {
                         noPivotOnColumn = true;
@@ -391,7 +390,6 @@ export default class MatrixOperations {
                 }
 
                 if (!noPivotOnColumn) {
-
                     let _matrixACopy = MatrixOperations.copyMatrixData(_matrixA);
                     let _matrixBCopy = MatrixOperations.copyMatrixData(_matrixB);
 
@@ -459,8 +457,6 @@ export default class MatrixOperations {
                     //    exibicao_passos_resolver_equacao_matricial(_matrixA, _matrixB, eliminationFactor, pivotColumn+1, verticalIndex+1, verticalElimination, None)
                 }
             } 
-            console.log(pivot);
-            MatrixOperations.printMatrix(_matrixA);
         }
 
         if (noPivotOnColumn) determinant = 0.0;
@@ -473,4 +469,125 @@ export default class MatrixOperations {
         // return arredondamento_na_raca(determinant, 6);
     }
 
+
+    /* 
+        Resolve o sistema A * X = B, quando a incognita procede a matriz A conhecida, 
+        ou o sistema X * A = B, quando a incognita precede a matriz A conhecida.
+        OBS: verticalElimination deve ser verdadeiro se a ordem da equação a ser escalonada é X*A=B.
+    */
+    static findSolutionForMatrixEquation({ matrixA, matrixB, verticalElimination=false, showSteps }) {
+        let matrixACopy = MatrixOperations.copyMatrixData(matrixA);
+        let matrixX = MatrixOperations.copyMatrixData(matrixB);
+    
+        if (verticalElimination) {
+            matrixACopy = MatrixOperations.transpose(matrixACopy);
+            matrixX = MatrixOperations.transpose(matrixX);
+        }
+    
+        /* if showSteps:
+            exibicao_passos_resolver_equacao_matricial(matrixACopy, matrixX, None, None, None, verticalElimination, "Equação inicial:\n") */
+    
+        const firstElimination = MatrixOperations.partialGaussianElimination({
+            matrixA: matrixACopy, 
+            matrixB: matrixX, 
+            eliminateBelowMainDiagonal: true, 
+            showSteps, 
+            verticalElimination,
+        });
+        
+        const secondElimination = MatrixOperations.partialGaussianElimination({
+            ...firstElimination,
+            eliminateBelowMainDiagonal: false, 
+            showSteps, 
+            verticalElimination,
+        });
+
+        matrixACopy = secondElimination.matrixA;
+        matrixX = secondElimination.matrixB;
+    
+        const systemSolutionsType = SystemSolutionType.SPD;/*MatrixOperations.systemSolutionTypesVerification({
+            matrixA: matrixACopy, 
+            matrixB: matrixX, 
+            verticalElimination,
+        });*/
+        
+        let partiallyEliminatedOriginal = matrixACopy;
+        let solution = matrixX;
+
+        if (systemSolutionsType === SystemSolutionType.SPD) {
+            solution = MatrixOperations.resizeMatrixAfterPartialElimination({
+                matrixA,
+                matrixB,
+                matrixX,
+                verticalElimination,
+            });
+    
+            if (verticalElimination) {
+                solution = MatrixOperations.transpose(solution);
+                partiallyEliminatedOriginal = MatrixOperations.transpose(partiallyEliminatedOriginal);
+            }
+        }
+
+        return {
+            partiallyEliminatedOriginal,
+            solution,
+            systemSolutionsType,
+        };
+    }
+    
+    static systemSolutionTypesVerification({ matrixA, matrixB, verticalElimination }) {
+        /* Se na matriz A houver uma linha completa de 
+        elementos nulos e, na mesma linha da matriz B, houver 
+        algum elemento não nulo, a expressão é um SPI: */
+
+        /*if (matrixA.dimensions().columns > matrixA.dimensions().rows)
+            return SystemSolutionType.SPI;*/
+    
+        if (verticalElimination) {
+            matrixA = MatrixOperations.transpose(matrixA);
+            matrixB = MatrixOperations.transpose(matrixB);
+        }
+    
+        for (let row = 0; row < matrixA.dimensions().rows; row++) {
+            let allElementsOfRowNull = true;
+
+            for (let column = 0; column < matrixA.dimensions().columns; column++) {
+                if (matrixA.data[row][column] !== 0.0) allElementsOfRowNull = false;
+            }
+
+            if (allElementsOfRowNull) {
+                for (let column = 0; column < matrixB.dimensions().columns; column++) {
+                    if (matrixB.data[row][column] !== 0.0) return SystemSolutionType.SI;
+                }
+                return SystemSolutionType.SPI;
+            }
+        }
+
+        /* Se, na expressão, houver uma igualdade de 
+        um número nulo com um não nulo, ela é um SI: */
+        if (!verticalElimination) {
+            for (let row = matrixA.dimensions().columns; row < matrixB.dimensions().rows; row++) {
+                for (let column = 0; column < matrixB.dimensions().columns; column++) {
+                    if (matrixB.data[row][column] != 0) return SystemSolutionType.SI;
+                }
+            }
+        }
+        else {
+            for (let row = 0; row < matrixB.dimensions().rows; row++) {
+                for (let column = matrixA.dimensions().rows; column < matrixB.dimensions().columns; column++) {
+                    if (matrixB.data[row][column] !== 0) return SystemSolutionType.SI;
+                }
+            }
+        }
+        return SystemSolutionType.SPD;
+    }
+    
+    static resizeMatrixAfterPartialElimination({ matrixA, matrixB, matrixX, verticalElimination }) {
+        return MatrixOperations.resizeMatrix({
+            originalMatrix: MatrixOperations.emptyMatrix(matrixX.dimensions()),
+            editableMatrix: matrixX,
+            rows: verticalElimination ? matrixB.dimensions().rows : matrixA.dimensions().columns,
+            columns: verticalElimination ? matrixA.dimensions().rows : matrixB.dimensions().columns,
+        });
+    }
 }
