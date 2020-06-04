@@ -63,9 +63,9 @@ export function decimalPlaces(number) {
     return number.toString().split(".").pop().length;
 }
 
-export function smartToFixed(element) {
-    const PRECISION = 5;
+const PRECISION = 4;
 
+export function smartToFixed(element) {
     // A precisao define quantos zeros ou noves seguidos apos a virgula a funcao deveria aceitar para que ela arredende o numero:
     function lastDigitIndex(string) {
         let index = 0;
@@ -116,13 +116,18 @@ export function findFraction(number) {
         }
     }
 
-    return number;
+    return toFixedWithThreeDots(
+        number,
+        PRECISION,
+    );
 }
 
 export function toFixedOnZeroes(number) {
+    if (number === number.toString() && number.startsWith('0.')) return number.toString();
     let string = number.toString();
     if (string.endsWith('.')) return string;
     if (count(string, /\./, true) === 0) return number;
+    console.log(string);
     while (string.endsWith('0')) string = string.substring(0, string.length - 1);
     if (string.endsWith('.')) string = string.substring(0, string.length - 1);
     return Number.parseFloat(string);
@@ -133,3 +138,12 @@ export const SystemSolutionType = {
     SPD: 'SPD',
     SI: 'SI',
 };
+
+export function toFixedWithThreeDots(number) {
+    console.log(number);
+    number = toFixedOnZeroes(number);
+    if (decimalPlaces(number) > PRECISION 
+        && count(number.toString(), /\./, true) !== 0
+    ) return Number.parseFloat(number).toFixed(PRECISION) + '...';
+    return number;
+}

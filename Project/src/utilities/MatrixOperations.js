@@ -172,7 +172,7 @@ export default class MatrixOperations {
     }
 
     static parseFloatPreservingDot(string) {
-        return string !== null && string.toString().endsWith('.')
+        return string !== null && (string.toString().endsWith('.') || string.toString().startsWith('0.'))
             ? string
             : Number.parseFloat(string);
     }

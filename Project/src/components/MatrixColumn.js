@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, FlatList } from 'react-native';
-import { findFraction, smartToFixed, toFixedOnZeroes } from '../utilities/constants';
+import { findFraction, smartToFixed, toFixedOnZeroes, toFixedWithThreeDots } from '../utilities/constants';
 
 const ELEMENT_HEIGHT = 40;
 const ELEMENT_VERTICAL_MARGIN = 11;
@@ -53,11 +53,7 @@ export default function MatrixColumn({
         const possibleFraction = numberToFormat.toString().endsWith('.')
             ? numberToFormat
             : isElementSelected({ row, column })
-                ? toFixedOnZeroes(
-                    Number.parseFloat(
-                        numberToFormat
-                    ).toFixed(6)
-                )
+                ? toFixedWithThreeDots(numberToFormat)
                 : findFraction(numberToFormat);
         
         return possibleFraction.toString().replace('.', ',');
