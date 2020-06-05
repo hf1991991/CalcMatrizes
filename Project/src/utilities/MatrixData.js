@@ -1,7 +1,9 @@
+import MatrixOperations from "./MatrixOperations";
+
 export default class MatrixData {
 
     constructor({ data }) {
-        this.data = data;
+        this.data = MatrixOperations.applyFrescuresToMatrixData(data);
     }
 
     dimensions() {

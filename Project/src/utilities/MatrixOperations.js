@@ -155,20 +155,18 @@ export default class MatrixOperations {
         console.log('\n');
     }
 
-    static smartToFixedOnMatrix(matrix) {
+    static smartToFixedOnMatrix(matrixData) {
         let fixed = [];
 
-        for (let row = 0; row < matrix.dimensions().rows; row++) {
+        for (let row = 0; row < matrixData.length; row++) {
             let fixedRow = [];
-            for (let column = 0; column < matrix.dimensions().columns; column++) {
-                fixedRow.push(smartToFixed(matrix.data[row][column]));
+            for (let column = 0; column < matrixData[0].length; column++) {
+                fixedRow.push(smartToFixed(matrixData[row][column]));
             }
             fixed.push(fixedRow);
         }
 
-        return new MatrixData({
-            data: fixed,
-        });
+        return fixed;
     }
 
     static parseFloatPreservingDot(string) {
@@ -177,23 +175,21 @@ export default class MatrixOperations {
             : Number.parseFloat(string);
     }
 
-    static convertStringToNumbers(matrix) {
-        if (!matrix) return null;
+    static applyFrescuresToMatrixData(matrixData) {
+        if (!matrixData) return null;
 
         let converted = [];
 
-        for (let row = 0; row < matrix.dimensions().rows; row++) {
+        for (let row = 0; row < matrixData.length; row++) {
             let convertedRow = [];
-            for (let column = 0; column < matrix.dimensions().columns; column++) {
-                const parsed = MatrixOperations.parseFloatPreservingDot(matrix.data[row][column]);
-                convertedRow.push(matrix.data[row][column] === null ? null : parsed);
+            for (let column = 0; column < matrixData[0].length; column++) {
+                const parsed = MatrixOperations.parseFloatPreservingDot(matrixData[row][column]);
+                convertedRow.push(matrixData[row][column] === null ? null : parsed);
             }
             converted.push(convertedRow);
         }
 
-        return new MatrixData({
-            data: converted,
-        });
+        return MatrixOperations.smartToFixedOnMatrix(converted);
     }
 
     static emptyMatrix({ rows, columns }) {
@@ -330,7 +326,7 @@ export default class MatrixOperations {
             eliminateBelowMainDiagonal: false,
         });
 
-        return MatrixOperations.smartToFixedOnMatrix(secondElimination.matrixB);
+        return MatrixOperations.copyMatrixData(secondElimination.matrixB);
     }
 
     static determinant(matrix) {
@@ -463,8 +459,8 @@ export default class MatrixOperations {
         if (noPivotOnColumn) determinant = 0.0;
 
         return {
-            matrixA: _matrixA,
-            matrixB: _matrixB,
+            matrixA: MatrixOperations.copyMatrixData(_matrixA),
+            matrixB: MatrixOperations.copyMatrixData(_matrixB),
             determinant: smartToFixed(determinant), 
         };
         // return arredondamento_na_raca(determinant, 6);
