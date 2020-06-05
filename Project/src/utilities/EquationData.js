@@ -88,6 +88,53 @@ export default class EquationData {
                     this.matrix3 = fullEquation.matrixA;
                 }
                 break;
+            case MatrixState.addMatrix:
+                this.matrix1 = fullEquation.matrixA;
+                this.firstOperator = '+';
+                this.matrix2 = fullEquation.matrixB;
+                this.secondOperator = '=';
+                this.matrix3 = fullEquation.matrixC;
+                break;
+            case MatrixState.subtractMatrix:
+                this.matrix1 = fullEquation.matrixA;
+                this.firstOperator = '-';
+                this.matrix2 = fullEquation.matrixB;
+                this.secondOperator = '=';
+                this.matrix3 = fullEquation.matrixC;
+                break;
+            case MatrixState.AxB:
+                this.matrix1 = fullEquation.matrixA;
+                this.firstOperator = '×';
+                this.matrix2 = fullEquation.matrixB;
+                this.secondOperator = '=';
+                this.matrix3 = fullEquation.matrixC;
+                break;
+            case MatrixState.BxA:
+                this.matrix1 = fullEquation.matrixA;
+                this.firstOperator = '×';
+                this.matrix2 = fullEquation.matrixB;
+                this.secondOperator = '=';
+                this.matrix3 = fullEquation.matrixC;
+                break;
+            case MatrixState.LambdaxA:
+                this.scalar = fullEquation.scalar;
+                this.firstOperator = '×';
+                this.matrix2 = fullEquation.matrixB;
+                this.secondOperator = '=';
+                this.matrix3 = fullEquation.matrixC;
+                break;
+            case MatrixState.transpose:
+                this.matrix1 = fullEquation.matrixA;
+                this.singleMatrixOperator = 'T';
+                this.firstOperator = '=';
+                this.matrix2 = fullEquation.matrixB;
+                break;
+            case MatrixState.invert:
+                this.matrix1 = fullEquation.matrixA;
+                this.singleMatrixOperator = '-1';
+                this.firstOperator = '=';
+                this.matrix2 = fullEquation.matrixB;
+                break;
             default:
                 break;
         }
@@ -98,7 +145,7 @@ export default class EquationData {
     }
 
     getQuantityOfOperators() {
-        return (this.firstOperator !== undefined) + (this.secondOperator !== undefined);
+        return (this.firstOperator !== undefined) + (this.secondOperator !== undefined) + (this.singleMatrixOperator !== undefined);
     }
 
     hasXOperator() {

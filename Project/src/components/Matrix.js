@@ -10,6 +10,7 @@ export default function Matrix({
     changeSelectedMatrixElement=() => {},
     maxMatrixWidth,
     editableOperatorNumber=null,
+    onLayout,
 }) {
     let [flatListDimensions, changeFlatListDimensions] = useState({
         height: 0,
@@ -26,6 +27,7 @@ export default function Matrix({
                             ...flatListDimensions,
                             width: event.nativeEvent.layout.width,
                         });
+                        onLayout && onLayout(event);
                     }}
                 >
                     <FlatList

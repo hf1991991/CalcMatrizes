@@ -175,9 +175,15 @@ export default function MatrixArea({
                 }
                 bottomRightText={
                     fullEquation !== null && !isPortrait
-                        ? fullEquation.solutionType !== SystemSolutionType.SPD
-                            ? viewReduced ? 'Reduzida' : 'Original'
-                            : null
+                        ? [
+                            MatrixState.AxXeB,
+                            MatrixState.BxXeA,
+                            MatrixState.XxAeB,
+                            MatrixState.XxBeA,
+                        ].includes(fullEquation.equationType) 
+                            && fullEquation.solutionType !== SystemSolutionType.SPD
+                                ? viewReduced ? 'Reduzida' : 'Original'
+                                : null
                         : !operationHappening
                             && formatDeterminant(MatrixOperations.determinant(readyMatrix))
                 }

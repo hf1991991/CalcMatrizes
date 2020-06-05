@@ -260,7 +260,7 @@ export default function CalculatorButton(props) {
                 return new ButtonData({
                     source: require('../../assets/buttons/Check.png'), 
                     onPress: props.onCheck,
-                    disabled: !props.isCheckActive,
+                    disabled: !props.isCheckActive || props.matrixState === MatrixState.ready,
                 });
             default:
                 return new ButtonData({

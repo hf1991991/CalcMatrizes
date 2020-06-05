@@ -48,7 +48,7 @@ export default function ButtonsArea(props) {
                 />
                 <CalculatorButton
                     {...props}
-                    buttonType={ButtonType.Operators}
+                    buttonType={ButtonType.R}
                 />
                 <CalculatorButton
                     {...props}
@@ -166,11 +166,9 @@ export default function ButtonsArea(props) {
                 <CalculatorButton
                     {...props}
                     buttonType={
-                        matrixState == MatrixState.ready 
-                            ? ButtonType.R
-                            : selectedMatrixElement || editableOperatorNumber !== null
-                                ? ButtonType.Enter
-                                : ButtonType.Check
+                        selectedMatrixElement || editableOperatorNumber !== null
+                            ? ButtonType.Enter
+                            : ButtonType.Check
                     }
                 />
             </View>

@@ -10,6 +10,8 @@ export const MatrixState = {
     BxXeA: 'BxXeA',
     XxAeB: 'XxAeB',
     XxBeA: 'XxBeA',
+    transpose: 'transpose',
+    invert: 'invert',
 }
 
 export const Operator = {

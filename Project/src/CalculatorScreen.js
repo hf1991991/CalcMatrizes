@@ -199,13 +199,14 @@ export default function CalculatorScreen({ isPortrait }) {
     }
 
     function isAFirst() {
-        return [
-            MatrixState.XxAeB,
-            MatrixState.AxXeB,
+        return ![
+            MatrixState.BxA,
+            MatrixState.BxXeA,
+            MatrixState.XxBeA,
         ].includes(matrixState);
     }
 
-    function onCheckResolveEquation() {
+    function solveOperationsFullEquationSetup() {
         let {
             partiallyEliminatedOriginal,
             solution,
@@ -230,6 +231,34 @@ export default function CalculatorScreen({ isPortrait }) {
         });
         changeSolutionType(systemSolutionsType);
         systemSolutionsType == SystemSolutionType.SPD && safeChangeReadyMatrix(solution);
+    }
+
+    function singleInputFullEquationSetup(matrixOperation) {
+        const oldMatrix = matrixState === MatrixState.ready 
+            ? readyMatrix 
+            : editableMatrix;
+
+        const newMatrix = matrixOperation === MatrixState.transpose 
+            ? MatrixOperations.transpose(oldMatrix)
+            : MatrixOperations.invert(oldMatrix);
+        
+        changeFullEquation({
+            equationType: matrixOperation,
+            matrixA: oldMatrix,
+            matrixB: newMatrix,
+        });
+    }
+
+    function generalFullEquationSetup({ newMatrix, scalar }) {
+        safeChangeReadyMatrix(newMatrix);
+        console.log({scalar});
+        changeFullEquation({
+            equationType: matrixState,
+            matrixA: isAFirst() ? readyMatrix : editableMatrix,
+            matrixB: isAFirst() ? editableMatrix : readyMatrix,
+            matrixC: newMatrix,
+            scalar,
+        });
     }
     
     return (
@@ -463,6 +492,8 @@ export default function CalculatorScreen({ isPortrait }) {
                             columns: editableDimensions.rows,
                         });
                     }
+
+                    singleInputFullEquationSetup(MatrixState.transpose);
                     
                 }}
                 onInvert={() => {
@@ -480,6 +511,8 @@ export default function CalculatorScreen({ isPortrait }) {
                         changeSettingsOfSelectedMatrixElement(null);
                         exitEditingMode();
                     }
+
+                    singleInputFullEquationSetup(MatrixState.invert);
                     
                 }}
                 onEnter={() => {
@@ -492,44 +525,45 @@ export default function CalculatorScreen({ isPortrait }) {
                             safeChangeReadyMatrix(editableMatrix);
                             break;
                         case MatrixState.addMatrix:
-                            safeChangeReadyMatrix(
-                                MatrixOperations.sum(readyMatrix, editableMatrix)
-                            );
+                            generalFullEquationSetup({
+                                newMatrix: MatrixOperations.sum(readyMatrix, editableMatrix)
+                            });
                             break;
                         case MatrixState.subtractMatrix:
-                            safeChangeReadyMatrix(
-                                MatrixOperations.subtract(readyMatrix, editableMatrix)
-                            );
+                            generalFullEquationSetup({
+                                newMatrix: MatrixOperations.subtract(readyMatrix, editableMatrix)
+                            });
                             break;
                         case MatrixState.AxB:
-                            safeChangeReadyMatrix(
-                                MatrixOperations.multiplyMatrix(readyMatrix, editableMatrix)
-                            );
+                            generalFullEquationSetup({
+                                newMatrix: MatrixOperations.multiplyMatrix(readyMatrix, editableMatrix)
+                            });
                             break;
                         case MatrixState.BxA:
-                            safeChangeReadyMatrix(
-                                MatrixOperations.multiplyMatrix(editableMatrix, readyMatrix)
-                            );
+                            generalFullEquationSetup({
+                                newMatrix: MatrixOperations.multiplyMatrix(editableMatrix, readyMatrix),
+                            });
                             break;
                         case MatrixState.LambdaxA:
-                            safeChangeReadyMatrix(
-                                MatrixOperations.multiplyMatrixByScalar({
+                            generalFullEquationSetup({
+                                newMatrix: MatrixOperations.multiplyMatrixByScalar({
                                     matrixA: readyMatrix,
                                     scalar: editableScalar,
-                                })
-                            );
+                                }),
+                                scalar: editableScalar,
+                            });
                             break;
                         case MatrixState.AxXeB:
-                            onCheckResolveEquation();
+                            solveOperationsFullEquationSetup();
                             break;
                         case MatrixState.BxXeA:
-                            onCheckResolveEquation();
+                            solveOperationsFullEquationSetup();
                             break;
                         case MatrixState.XxAeB:
-                            onCheckResolveEquation();
+                            solveOperationsFullEquationSetup();
                             break;
                         case MatrixState.XxBeA:
-                            onCheckResolveEquation();
+                            solveOperationsFullEquationSetup();
                             break;
                         default:
                             break;

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text } from 'react-native';
 import Matrix from './Matrix';
 import EquationData from '../utilities/EquationData';
@@ -11,6 +11,7 @@ export default function FullEquation({
     totalMaxAreaWidth,
     viewReduced,
 }) {
+    let [matrix1Height, changeMatrix1Height] = useState(0);
 
     const equationData = new EquationData({
         fullEquation, 
@@ -68,10 +69,29 @@ export default function FullEquation({
                         <Matrix 
                             maxMatrixWidth={singleMatrixMaxWidth}
                             matrixNumbers={equationData.matrix1}
+                            onLayout={(event) => {
+                                changeMatrix1Height(event.nativeEvent.layout.height);
+                            }}
                         />
                     )
                     : equationData.variablePosition === 1
                         && <XOperator />
+            }
+            {
+                equationData.singleMatrixOperator && (
+                    <Text
+                        style={{
+                            color: '#fff',
+                            textAlign: 'center',
+                            fontSize: 30,
+                            justifyContent: 'flex-start',
+                            width: OPERATORS_WIDTH,
+                            top: -matrix1Height / 2,
+                        }}
+                    >
+                        {equationData.singleMatrixOperator}
+                    </Text>
+                )
             }
             {
                 equationData.firstOperator && (
