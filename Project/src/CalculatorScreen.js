@@ -249,15 +249,23 @@ export default function CalculatorScreen({ isPortrait }) {
         });
     }
 
-    function generalFullEquationSetup({ newMatrix, scalar }) {
+    function scalarFullEquationSetup({ newMatrix, scalar }) {
         safeChangeReadyMatrix(newMatrix);
-        console.log({scalar});
+        changeFullEquation({
+            equationType: matrixState,
+            matrixB: readyMatrix,
+            matrixC: newMatrix,
+            scalar,
+        });
+    }
+
+    function generalFullEquationSetup({ newMatrix }) {
+        safeChangeReadyMatrix(newMatrix);
         changeFullEquation({
             equationType: matrixState,
             matrixA: isAFirst() ? readyMatrix : editableMatrix,
             matrixB: isAFirst() ? editableMatrix : readyMatrix,
             matrixC: newMatrix,
-            scalar,
         });
     }
     
@@ -545,7 +553,7 @@ export default function CalculatorScreen({ isPortrait }) {
                             });
                             break;
                         case MatrixState.LambdaxA:
-                            generalFullEquationSetup({
+                            scalarFullEquationSetup({
                                 newMatrix: MatrixOperations.multiplyMatrixByScalar({
                                     matrixA: readyMatrix,
                                     scalar: editableScalar,

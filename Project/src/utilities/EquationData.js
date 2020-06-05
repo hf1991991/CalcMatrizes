@@ -145,7 +145,7 @@ export default class EquationData {
     }
 
     getQuantityOfOperators() {
-        return (this.firstOperator !== undefined) + (this.secondOperator !== undefined) + (this.singleMatrixOperator !== undefined);
+        return (this.firstOperator !== undefined) + (this.secondOperator !== undefined) + (this.singleMatrixOperator !== undefined) + (this.scalar !== undefined);
     }
 
     hasXOperator() {

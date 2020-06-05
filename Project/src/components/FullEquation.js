@@ -3,7 +3,7 @@ import { View, Text } from 'react-native';
 import Matrix from './Matrix';
 import EquationData from '../utilities/EquationData';
 
-const OPERATORS_WIDTH = 40;
+const OPERATORS_WIDTH = 50;
 const X_OPERATOR_WIDTH = 50;
 
 export default function FullEquation({ 
@@ -17,6 +17,22 @@ export default function FullEquation({
         fullEquation, 
         viewReduced,
     });
+
+    function Scalar({ scalar }) {
+        return (
+            <Text
+                style={{
+                    color: '#fff',
+                    textAlign: 'center',
+                    fontSize: 30,
+                    top: 2,
+                    width: OPERATORS_WIDTH,
+                }}
+            >
+                {scalar}
+            </Text>
+        );
+    }
 
     function XOperator() {
         return (
@@ -74,8 +90,10 @@ export default function FullEquation({
                             }}
                         />
                     )
-                    : equationData.variablePosition === 1
-                        && <XOperator />
+                    : equationData.scalar !== undefined
+                        ? <Scalar scalar={equationData.scalar} />
+                        : equationData.variablePosition === 1
+                            && <XOperator />
             }
             {
                 equationData.singleMatrixOperator && (
