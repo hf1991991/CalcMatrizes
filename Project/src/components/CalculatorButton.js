@@ -181,8 +181,7 @@ export default function CalculatorButton(props) {
                 return new ButtonData({
                     source: require('../../assets/buttons/Inverse.png'), 
                     onPress: props.onInvert,
-                    disabled: !props.isMatrixFull
-                        || !props.isMatrixSquare,
+                    disabled: !props.isInverseEnabled,
                 });
             case ButtonType.Transposed:
                 return new ButtonData({

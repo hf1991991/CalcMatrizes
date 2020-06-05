@@ -355,6 +355,11 @@ export default function CalculatorScreen({ isPortrait }) {
                         ? MatrixOperations.isMatrixFull(matrixOnScreen)
                         : isEditableScalarReady()
                 }
+                isInverseEnabled={
+                    MatrixOperations.isMatrixFull(matrixOnScreen)
+                    && MatrixOperations.isMatrixSquare(matrixOnScreen)
+                    && MatrixOperations.determinant(matrixOnScreen) !== 0.0
+                }
                 isRActive={isRActive}
                 operatorsActive={operatorsActive}
                 changeOperatorsButtonActive={() => {

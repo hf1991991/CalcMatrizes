@@ -350,7 +350,7 @@ export default class MatrixOperations {
         de matrixA, assim como retorna o determinante da matriz.
         OBS: verticalElimination deve ser verdadeiro se a ordem da equação a ser escalonada é X*A=B.
     */
-    static partialGaussianElimination({ matrixA, matrixB, eliminateBelowMainDiagonal, showSteps=false, verticalElimination=false }) {
+    static partialGaussianElimination({ matrixA, matrixB, eliminateBelowMainDiagonal=true, showSteps=false, verticalElimination=false }) {
         let _matrixA = MatrixOperations.copyMatrixData(matrixA);
         let _matrixB = MatrixOperations.copyMatrixData(matrixB);
 
@@ -370,14 +370,14 @@ export default class MatrixOperations {
             pivotColumn != (eliminateBelowMainDiagonal ? minDimensionsA : -1);
             pivotColumn += (eliminateBelowMainDiagonal ? 1 : -1)
         ) {
-            let pivot = _matrixA.data[pivotColumn][pivotColumn]
+            let pivot = _matrixA.data[pivotColumn][pivotColumn];
 
             if (pivot === 0.0) {
 
                 let testRow = pivotColumn + 1;
                 while (true) {
                     // Se houver uma coluna sem pivot em uma matriz escalonada reduzida, o determinante dela é nulo:
-                    if (testRow === dimensionsA.rows) {
+                    if (testRow === dimensionsA.columns) {
                         noPivotOnColumn = true;
                         break;
                     }
@@ -456,7 +456,7 @@ export default class MatrixOperations {
                     //if (showSteps)
                     //    exibicao_passos_resolver_equacao_matricial(_matrixA, _matrixB, eliminationFactor, pivotColumn+1, verticalIndex+1, verticalElimination, None)
                 }
-                MatrixOperations.printMatrix(_matrixA);
+                // MatrixOperations.printMatrix(_matrixA);
             } 
         }
 
@@ -547,8 +547,10 @@ export default class MatrixOperations {
         elementos nulos e, na mesma linha da matriz B, houver 
         algum elemento não nulo, a expressão é um SI. */
 
+        /*
         MatrixOperations.printMatrix(matrixA);
         MatrixOperations.printMatrix(matrixB);
+        */
     
         for (let row = 0; row < matrixA.dimensions().columns; row++) {
             let allElementsOfRowNull = true;
