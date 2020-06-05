@@ -104,6 +104,7 @@ export default function CalculatorButton(props) {
                     source: require('../../assets/buttons/InactiveSecond.png'),
                     sourceActive: require('../../assets/buttons/ActiveSecond.png'),
                     active: props.secondSetOfKeysActive,
+                    disabled: props.isKeyboardBeActive || props.isRActive,
                     onPress: props.changeSecondSetOfKeysActive,
                 });
             case ButtonType.ColumnDirection:
@@ -118,7 +119,7 @@ export default function CalculatorButton(props) {
                     source: require('../../assets/buttons/R.png'),
                     sourceActive: require('../../assets/buttons/RSelected.png'),
                     active: props.isRActive,
-                    disabled: !props.isMatrixFull,
+                    disabled: !props.isMatrixFull || props.isKeyboardBeActive,
                     onPress: props.onPressR,
                 });
             case ButtonType.AxXeB:

@@ -77,6 +77,10 @@ export default function CalculatorScreen({ isPortrait }) {
         changeMatrixState(matrixState);
         changeFullEquation(null);
         changeSolutionType(null);
+        /*
+        changeSecondSetOfKeysActive(false);
+        changeIsRActive(false);
+        */
         editableMatrix !== null && changeOperatorsButtonActive(true);
         safeChangeEditableMatrix(editableMatrix);
         changeEditableDimensions(
