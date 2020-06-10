@@ -191,8 +191,11 @@ export default function MatrixArea({
                     matrixState === MatrixState.ready && solutionType
                 }
                 onPressBottomRightText={
-                    fullEquation !== null && !isPortrait
-                        && (() => changeViewReduced(!viewReduced))
+                    fullEquation !== null 
+                        ? !isPortrait
+                            ? (() => changeViewReduced(!viewReduced))
+                            : () => {}
+                        : () => {}
                 }
                 crossWidth={BUTTON_AREAS_CROSS_WIDTH}
             />
