@@ -12,7 +12,7 @@ export default function CalculatorButton(props) {
                     source: require('../../assets/buttons/0.png'), 
                     style: {flex: 2},
                     onPress: () => props.numberButtonPressed(0),
-                    disabled: !props.isKeyboardBeActive,
+                    disabled: !props.isKeyboardBeActive || props.isVariableKeyboardActive,
                 });
             case ButtonType[1]:
                 return new ButtonData({
@@ -72,7 +72,52 @@ export default function CalculatorButton(props) {
                 return new ButtonData({
                     source: require('../../assets/buttons/Comma.png'), 
                     onPress: () => props.numberButtonPressed('.'),
-                    disabled: !props.isKeyboardBeActive,
+                    disabled: !props.isKeyboardBeActive || props.isVariableKeyboardActive,
+                });
+            case ButtonType.a:
+                return new ButtonData({
+                    source: require('../../assets/buttons/a.png'), 
+                    onPress: () => props.numberButtonPressed('a'),
+                });
+            case ButtonType.b:
+                return new ButtonData({
+                    source: require('../../assets/buttons/b.png'), 
+                    onPress: () => props.numberButtonPressed('b'),
+                });
+            case ButtonType.c:
+                return new ButtonData({
+                    source: require('../../assets/buttons/c.png'), 
+                    onPress: () => props.numberButtonPressed('c'),
+                });
+            case ButtonType.d:
+                return new ButtonData({
+                    source: require('../../assets/buttons/d.png'), 
+                    onPress: () => props.numberButtonPressed('d'),
+                });
+            case ButtonType.e:
+                return new ButtonData({
+                    source: require('../../assets/buttons/e.png'), 
+                    onPress: () => props.numberButtonPressed('e'),
+                });
+            case ButtonType.f:
+                return new ButtonData({
+                    source: require('../../assets/buttons/f.png'), 
+                    onPress: () => props.numberButtonPressed('f'),
+                });
+            case ButtonType.g:
+                return new ButtonData({
+                    source: require('../../assets/buttons/g.png'), 
+                    onPress: () => props.numberButtonPressed('g'),
+                });
+            case ButtonType.h:
+                return new ButtonData({
+                    source: require('../../assets/buttons/h.png'), 
+                    onPress: () => props.numberButtonPressed('h'),
+                });
+            case ButtonType.i:
+                return new ButtonData({
+                    source: require('../../assets/buttons/i.png'), 
+                    onPress: () => props.numberButtonPressed('i'),
                 });
             case ButtonType.AC:
                 return new ButtonData({
@@ -83,6 +128,13 @@ export default function CalculatorButton(props) {
                 return new ButtonData({
                     source: require('../../assets/buttons/CE.png'), 
                     onPress: props.onPressCE,
+                });
+            case ButtonType.abc:
+                return new ButtonData({
+                    source: require('../../assets/buttons/abc.png'), 
+                    sourceActive: require('../../assets/buttons/abcSelected.png'), 
+                    active: props.isVariableKeyboardActive,
+                    onPress: () => props.changeIsVariableKeyboardActive(!props.isVariableKeyboardActive),
                 });
             case ButtonType.Operators:
                 return new ButtonData({

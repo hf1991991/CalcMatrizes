@@ -169,7 +169,42 @@ export default class MatrixOperations {
         return fixed;
     }
 
-    static parseFloatPreservingDot(string) {
+    static getVariable(string) {
+        for (let variable of [
+            'a',
+            'b',
+            'c',
+            'd',
+            'e',
+            'f',
+            'g',
+            'h',
+            'i',
+        ]) {
+            if (!Number.isNaN(string) && (string || '').toString() !== 'Infinity' && count(string || '', variable, true) > 0) {
+                return variable;
+            }
+        }
+        return null;
+    }
+
+    static getOperator(string) {
+        for (let operator of [
+            '+',
+            '-',
+            'x',
+            '/',
+        ]) {
+            const index = (string || '').toString().indexOf(operator)
+            if (index !== -1 && index !== 0) {
+                return operator;
+            }
+        }
+        return null;
+    }
+
+    static parseFloatPreservingDotAndVariables(string) {
+        if (MatrixOperations.getVariable(string)) return string;
         return string !== null && (string.toString().endsWith('.') || string.toString().startsWith('0.'))
             ? string
             : Number.parseFloat(string);
@@ -183,7 +218,7 @@ export default class MatrixOperations {
         for (let row = 0; row < matrixData.length; row++) {
             let convertedRow = [];
             for (let column = 0; column < matrixData[0].length; column++) {
-                const parsed = MatrixOperations.parseFloatPreservingDot(matrixData[row][column]);
+                const parsed = MatrixOperations.parseFloatPreservingDotAndVariables(matrixData[row][column]);
                 convertedRow.push(matrixData[row][column] === null ? null : parsed);
             }
             converted.push(convertedRow);
@@ -336,9 +371,147 @@ export default class MatrixOperations {
         ) 
             ? MatrixOperations.partialGaussianElimination({
                 matrixA: matrix,
-                matrixB: MatrixOperations.identity(matrix.dimensions().rows)
+                matrixB: MatrixOperations.identity(matrix.dimensions().rows),
+                acceptVariables: true,
             }).determinant
             : null;
+    }
+
+    static simplifyVarOp(number1, operation, number2) {
+        let simplified1 = number1;
+        let simplified2 = number2;
+
+        /*
+        */
+        
+        switch (operation) {
+            case '+':
+                if (number1 === 0) {
+                    simplified1 = null;
+                }
+                if (number2 === 0) {
+                    simplified2 = null;
+                }
+                break;
+            case '-':
+                break;
+            case '*':
+                if (number1 === 1) {
+                    simplified1 = simplified2;
+                    simplified2 = null;
+                }
+                if (number2 === 1) {
+                    simplified2 = null;
+                }
+                if (number2 === -1) {
+                    simplified1 = '-' + number1;
+                    simplified2 = null;
+                }
+                if (number1 === -1) {
+                    simplified2 = '-' + number2;
+                    simplified1 = null;
+                }
+                break;
+            case '/':
+                if (number1 === 0) {
+                    simplified2 = null;
+                }
+                if (number1 === number2) {
+                    simplified1 = 1;
+                    simplified2 = null;
+                }
+                if (number2 === 1) {
+                    simplified2 = null;
+                }
+                break;
+        }
+
+        return {
+            simplified1,
+            simplified2,
+        };
+
+    }
+
+    static simplifyAll(number) {
+
+    }
+
+    static varOperation(number1, operation, number2) {
+
+        function commas(string) {
+            return operator1 ? `(${string})` : string;
+        }
+
+        function isNumber(element) {
+            console.log({element});
+            const letters = /^[a-i]+$/;
+            if (element.toString().match(letters)) return false;
+            return !Number.isNaN(element) 
+                && count(element.toString(), '\\(', true) === 0
+                && count(element.toString(), '\\)', true) === 0;
+        }
+
+        console.log('aaaa');
+
+        console.log({
+            number1,
+            number2,
+            operation,
+        });
+
+        number1 = number1.toString().startsWith('-')
+            ? `(${number1})`
+            : number1;
+        number2 = number2.toString().startsWith('-')
+            ? `(${number2})`
+            : number2;
+
+        console.log({
+            number1,
+            number2,
+            operation,
+        });
+
+        if (number1 === null) return number2;
+
+        if (number2 === null) return number1;
+
+        const operator1 = MatrixOperations.getOperator(number1);
+
+        const var1 = MatrixOperations.getVariable(number1);
+        const var2 = MatrixOperations.getVariable(number2);
+
+        const isNaN = !isNumber(number1) || !isNumber(number2);
+
+        console.log({isNaN})
+
+        if (!isNaN) {
+            number1 = Number.parseFloat(number1);
+            number2 = Number.parseFloat(number2);
+        }
+        
+        switch (operation) {
+            case '+':
+                return isNaN
+                    ? commas(number1) + '+' + number2
+                    : number1 + number2;
+            case '-':
+                return isNaN
+                    ? commas(number1) + '-' + number2
+                    : number1 - number2;
+            case '*':
+                return isNaN
+                    ? commas(number1) + 'x' + number2
+                    : number1 * number2;
+            case '/':
+                return isNaN
+                    ? commas(number1) + '/' + number2
+                    : number1 / number2;
+        }
+
+
+
     }
 
     /* 
@@ -346,9 +519,11 @@ export default class MatrixOperations {
         de matrixA, assim como retorna o determinante da matriz.
         OBS: verticalElimination deve ser verdadeiro se a ordem da equação a ser escalonada é X*A=B.
     */
-    static partialGaussianElimination({ matrixA, matrixB, eliminateBelowMainDiagonal=true, showSteps=false, verticalElimination=false }) {
+    static partialGaussianElimination({ matrixA, matrixB, eliminateBelowMainDiagonal=true, acceptVariables=false }) {
         let _matrixA = MatrixOperations.copyMatrixData(matrixA);
         let _matrixB = MatrixOperations.copyMatrixData(matrixB);
+
+        MatrixOperations.printMatrix(_matrixA);
 
         const dimensionsA = _matrixA.dimensions();
         const dimensionsB = _matrixB.dimensions();
@@ -397,18 +572,20 @@ export default class MatrixOperations {
 
                     pivot = _matrixA.data[pivotColumn][pivotColumn];
 
-                    determinant *= -1;
+                    determinant = MatrixOperations.varOperation(determinant, '*', -1);
                 }
             }
 
             if (!noPivotOnColumn) {
                 if (pivot !== 1.0) {
                     for (let index = 0; index < dimensionsA.columns; index++)
-                        _matrixA.data[pivotColumn][index] /= pivot;
+                        _matrixA.data[pivotColumn][index] = 
+                            MatrixOperations.varOperation(_matrixA.data[pivotColumn][index], '/', pivot);
                     for (let index = 0; index < dimensionsB.columns; index++)
-                        _matrixB.data[pivotColumn][index] /= pivot;
+                        _matrixB.data[pivotColumn][index] =
+                            MatrixOperations.varOperation(_matrixB.data[pivotColumn][index], '/', pivot);
 
-                    determinant *= pivot;
+                    determinant = MatrixOperations.varOperation(determinant, '*', pivot);
 
                     //if (showSteps)
                     //    exibicao_passos_resolver_equacao_matricial(_matrixA, _matrixB, pivot, pivotColumn+1, pivotColumn+1, verticalElimination, None)
@@ -437,22 +614,46 @@ export default class MatrixOperations {
                         verticalIndex = index;
 
                     const element = _matrixA.data[verticalIndex][pivotColumn];
-                    const eliminationFactor = -element / pivot;
+                    const eliminationFactor = MatrixOperations.varOperation(
+                        MatrixOperations.varOperation(
+                            element, 
+                            '*', 
+                            -1
+                        ), 
+                        '/', 
+                        pivot,
+                    );
+                    MatrixOperations.printMatrix(_matrixA);
 
-                    for (let horizontalIndex = 0; horizontalIndex < dimensionsA.columns; horizontalIndex++)
-                        _matrixA.data[verticalIndex][horizontalIndex] = 
-                            _matrixA.data[verticalIndex][horizontalIndex] + 
-                            eliminationFactor * _matrixA.data[pivotColumn][horizontalIndex];
+                    console.log({element, pivot, eliminationFactor})
+
+                    for (let horizontalIndex = 0; horizontalIndex < dimensionsA.columns; horizontalIndex++) {
+                        _matrixA.data[verticalIndex][horizontalIndex] = MatrixOperations.varOperation(
+                            _matrixA.data[verticalIndex][horizontalIndex],
+                            '+',
+                            MatrixOperations.varOperation(
+                                eliminationFactor,
+                                '*',
+                                _matrixA.data[pivotColumn][horizontalIndex]
+                            ),
+                        );
+                    }
 
                     for (let horizontalIndex = 0; horizontalIndex < dimensionsB.columns; horizontalIndex++)
-                        _matrixB.data[verticalIndex][horizontalIndex] = 
-                            _matrixB.data[verticalIndex][horizontalIndex] + 
-                            eliminationFactor * _matrixB.data[pivotColumn][horizontalIndex];
+                        _matrixB.data[verticalIndex][horizontalIndex] = MatrixOperations.varOperation(
+                            _matrixB.data[verticalIndex][horizontalIndex],
+                            '+',
+                            MatrixOperations.varOperation(
+                                eliminationFactor,
+                                '*',
+                                _matrixB.data[pivotColumn][horizontalIndex]
+                            ),
+                        );
 
                     //if (showSteps)
                     //    exibicao_passos_resolver_equacao_matricial(_matrixA, _matrixB, eliminationFactor, pivotColumn+1, verticalIndex+1, verticalElimination, None)
                 }
-                // MatrixOperations.printMatrix(_matrixA);
+                MatrixOperations.printMatrix(_matrixA);
             } 
         }
 

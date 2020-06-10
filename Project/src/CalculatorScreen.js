@@ -32,6 +32,7 @@ export default function CalculatorScreen({ isPortrait }) {
     let [operationHappening, changeOperationHappening] = useState(false);
     let [editableOperatorNumber, changeEditableOperatorNumber] = useState(null);
     let [columnDirectionActive, changeColumnDirectionActive] = useState(true);
+    let [isVariableKeyboardActive, changeIsVariableKeyboardActive] = useState(false);
 
     function printState() {
         console.log({
@@ -86,6 +87,9 @@ export default function CalculatorScreen({ isPortrait }) {
     }
 
     function changeNumberWritten({ newNumber, forceNotOperatorNumber=false }) {
+        console.log({
+            operationHappening, forceNotOperatorNumber
+        });
         if (operationHappening && !forceNotOperatorNumber) {
             changeEditableOperatorNumber(newNumber);
         }
@@ -352,6 +356,8 @@ export default function CalculatorScreen({ isPortrait }) {
                     && MatrixOperations.isMatrixSquare(matrixOnScreen)
                     && MatrixOperations.determinant(matrixOnScreen) !== 0.0
                 }
+                isVariableKeyboardActive={isVariableKeyboardActive}
+                changeIsVariableKeyboardActive={changeIsVariableKeyboardActive}
                 isRActive={isRActive}
                 operatorsActive={operatorsActive}
                 changeOperatorsButtonActive={() => {
@@ -391,7 +397,10 @@ export default function CalculatorScreen({ isPortrait }) {
                 }
                 numberButtonPressed={
                     (element) => {
-                        if (getNumberWritten().length === 0 && element === '.')
+                        const letters = /^[a-i]+$/;
+                        if (element.toString().match(letters))
+                            changeNumberWritten({ newNumber: element });
+                        else if (getNumberWritten().length === 0 && element === '.')
                             changeNumberWritten({ newNumber: '0.' });
                         else if (count(getNumberWritten(), /\./, true) === 0 || element !== '.')
                             changeNumberWritten({ newNumber: getNumberWritten() + element });

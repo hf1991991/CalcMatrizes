@@ -13,6 +13,8 @@ export default function ButtonsArea(props) {
         operatorsActive,
         editableOperatorNumber,
         isRActive,
+        isKeyboardBeActive,
+        isVariableKeyboardActive=true,
     } = props;
 
     let [buttonsAreaWidth, changeButtonsAreaWidth] = useState(0);
@@ -48,7 +50,11 @@ export default function ButtonsArea(props) {
                 />
                 <CalculatorButton
                     {...props}
-                    buttonType={ButtonType.R}
+                    buttonType={
+                        isKeyboardBeActive
+                            ? ButtonType.abc
+                            : ButtonType.R
+                    }
                 />
                 <CalculatorButton
                     {...props}
@@ -72,15 +78,27 @@ export default function ButtonsArea(props) {
             >
                 <CalculatorButton
                     {...props}
-                    buttonType={ButtonType[7]}
+                    buttonType={
+                        isVariableKeyboardActive 
+                            ? ButtonType.g
+                            : ButtonType[7]
+                    }
                 />
                 <CalculatorButton
                     {...props}
-                    buttonType={ButtonType[8]}
+                    buttonType={
+                        isVariableKeyboardActive 
+                            ? ButtonType.h
+                            : ButtonType[8]
+                    }
                 />
                 <CalculatorButton
                     {...props}
-                    buttonType={ButtonType[9]}
+                    buttonType={
+                        isVariableKeyboardActive 
+                            ? ButtonType.i
+                            : ButtonType[9]
+                    }
                 />
                 <CalculatorButton
                     {...props}
@@ -98,15 +116,27 @@ export default function ButtonsArea(props) {
             >
                 <CalculatorButton
                     {...props}
-                    buttonType={ButtonType[4]}
+                    buttonType={
+                        isVariableKeyboardActive 
+                            ? ButtonType.d
+                            : ButtonType[4]
+                    }
                 />
                 <CalculatorButton
                     {...props}
-                    buttonType={ButtonType[5]}
+                    buttonType={
+                        isVariableKeyboardActive 
+                            ? ButtonType.e
+                            : ButtonType[5]
+                    }
                 />
                 <CalculatorButton
                     {...props}
-                    buttonType={ButtonType[6]}
+                    buttonType={
+                        isVariableKeyboardActive 
+                            ? ButtonType.f
+                            : ButtonType[6]
+                    }
                 />
                 <CalculatorButton
                     {...props}
@@ -126,15 +156,27 @@ export default function ButtonsArea(props) {
             >
                 <CalculatorButton
                     {...props}
-                    buttonType={ButtonType[1]}
+                    buttonType={
+                        isVariableKeyboardActive 
+                            ? ButtonType.a
+                            : ButtonType[1]
+                    }
                 />
                 <CalculatorButton
                     {...props}
-                    buttonType={ButtonType[2]}
+                    buttonType={
+                        isVariableKeyboardActive 
+                            ? ButtonType.b
+                            : ButtonType[2]
+                    }
                 />
                 <CalculatorButton
                     {...props}
-                    buttonType={ButtonType[3]}
+                    buttonType={
+                        isVariableKeyboardActive 
+                            ? ButtonType.c
+                            : ButtonType[3]
+                    }
                 />
                 <CalculatorButton
                     {...props}

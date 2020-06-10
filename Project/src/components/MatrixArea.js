@@ -41,7 +41,7 @@ export default function MatrixArea({
     }
 
     function formatScalar(scalar) {
-        const parsed = MatrixOperations.parseFloatPreservingDot(scalar);
+        const parsed = MatrixOperations.parseFloatPreservingDotAndVariables(scalar);
         console.log(parsed);
         console.log(parsed.toString().endsWith('.'));
         return scalar !== null 

@@ -14,7 +14,6 @@ export default function MatrixColumn({
     flatListDimensions,
     changeFlatListDimensions,
     editableOperatorNumber,
-    secondaryEditableOperatorNumber,
 }) {
 
     function isElementSelected({ row, column }) {
