@@ -18,7 +18,7 @@ Obs.: Para conseguir a senha, só mandar uma mensagem pra mim pelo WhatsApp.
 - [Como remover senha de chave privada .p12](https://serverfault.com/questions/515833/how-to-remove-private-key-password-from-pkcs12-container)
 - [Como alterar variáveis de ambiente no Mac](https://medium.com/@youngstone89/setting-up-environment-variables-in-mac-os-28e5941c771c)
 
-## Links de como resolver certos erros com os procedimentos dos links acima:
+## Links de como resolver certos erros com os procedimentos dos links acima
 
 - [Servidores da Apple em manutenção](https://github.com/fastlane/fastlane/issues/12683)
 - [Bundler::GemNotFound: Could not find CFPropertyList-3.0.0 in any of the sources](https://github.com/fastlane/fastlane/issues/15056)
