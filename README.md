@@ -2,12 +2,13 @@
 
 Autor: Henrique Falconer
 
-## Repositório com certificados:
+## Repositório com certificados
 
 [Clique aqui](https://github.com/hf1991991/CalcMatrizesCodeSigning)
-Para conseguir a senha, só mandar uma mensagem pra mim pelo WhatsApp.
 
-## Link de referência:
+Obs.: Para conseguir a senha, só mandar uma mensagem pra mim pelo WhatsApp.
+
+## Link de referência
 
 - [Deploy para TestFlight com FastLane](https://www.boorje.com/deploy-react-native-app/)
 - [Usando ```fastlane match``` com certificados existentes no FastLane](https://medium.com/@jonathancardoso/using-fastlane-match-with-existing-certificates-without-revoking-them-a325be69dac6)
