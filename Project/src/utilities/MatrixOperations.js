@@ -1,5 +1,8 @@
 import MatrixData from "./MatrixData";
-import { forceRound, smartToFixed, count, SystemSolutionType } from "./constants";
+import { smartToFixed, SystemSolutionType, Operator } from "./constants";
+import ScalarOperations from "./ScalarOperations";
+import * as ExpressionSimplification from "./ExpressionSimplification";
+import { ElementData, ExpressionData } from "./ExpressionClasses";
 
 export default class MatrixOperations {
 
@@ -148,7 +151,7 @@ export default class MatrixOperations {
         for (row of matrix.data) {
             let rowString = '';
             for (elem of row) {
-                rowString += ` ${elem} `;
+                rowString += ` ${elem.stringify()} `;
             }
             console.log(rowString);
         }
@@ -169,42 +172,8 @@ export default class MatrixOperations {
         return fixed;
     }
 
-    static getVariable(string) {
-        for (let variable of [
-            'a',
-            'b',
-            'c',
-            'd',
-            'e',
-            'f',
-            'g',
-            'h',
-            'i',
-        ]) {
-            if (!Number.isNaN(string) && (string || '').toString() !== 'Infinity' && count(string || '', variable, true) > 0) {
-                return variable;
-            }
-        }
-        return null;
-    }
-
-    static getOperator(string) {
-        for (let operator of [
-            '+',
-            '-',
-            'x',
-            '/',
-        ]) {
-            const index = (string || '').toString().indexOf(operator)
-            if (index !== -1 && index !== 0) {
-                return operator;
-            }
-        }
-        return null;
-    }
-
     static parseFloatPreservingDotAndVariables(string) {
-        if (MatrixOperations.getVariable(string)) return string;
+        if (ExpressionSimplification.getVariables(string)) return string;
         return string !== null && (string.toString().endsWith('.') || string.toString().startsWith('0.'))
             ? string
             : Number.parseFloat(string);
@@ -218,13 +187,24 @@ export default class MatrixOperations {
         for (let row = 0; row < matrixData.length; row++) {
             let convertedRow = [];
             for (let column = 0; column < matrixData[0].length; column++) {
-                const parsed = MatrixOperations.parseFloatPreservingDotAndVariables(matrixData[row][column]);
-                convertedRow.push(matrixData[row][column] === null ? null : parsed);
+                let element = matrixData[row][column];
+
+                if (!(element instanceof ElementData)) {
+                    // console.log('applyFrescuresToMatrixData: elemento não é um ElementData: ' + element);
+                    element = new ElementData({
+                        scalar: element
+                    });
+                }
+
+                // if (!element.unfilteredString)
+                //     element = Number.parseFloat(element.scalar)
+
+                convertedRow.push(element);
             }
             converted.push(convertedRow);
         }
 
-        return MatrixOperations.smartToFixedOnMatrix(converted);
+        return converted;
     }
 
     static emptyMatrix({ rows, columns }) {
@@ -377,143 +357,6 @@ export default class MatrixOperations {
             : null;
     }
 
-    static simplifyVarOp(number1, operation, number2) {
-        let simplified1 = number1;
-        let simplified2 = number2;
-
-        /*
-        */
-        
-        switch (operation) {
-            case '+':
-                if (number1 === 0) {
-                    simplified1 = null;
-                }
-                if (number2 === 0) {
-                    simplified2 = null;
-                }
-                break;
-            case '-':
-                break;
-            case '*':
-                if (number1 === 1) {
-                    simplified1 = simplified2;
-                    simplified2 = null;
-                }
-                if (number2 === 1) {
-                    simplified2 = null;
-                }
-                if (number2 === -1) {
-                    simplified1 = '-' + number1;
-                    simplified2 = null;
-                }
-                if (number1 === -1) {
-                    simplified2 = '-' + number2;
-                    simplified1 = null;
-                }
-                break;
-            case '/':
-                if (number1 === 0) {
-                    simplified2 = null;
-                }
-                if (number1 === number2) {
-                    simplified1 = 1;
-                    simplified2 = null;
-                }
-                if (number2 === 1) {
-                    simplified2 = null;
-                }
-                break;
-        }
-
-        return {
-            simplified1,
-            simplified2,
-        };
-
-    }
-
-    static simplifyAll(number) {
-
-    }
-
-    static varOperation(number1, operation, number2) {
-
-        function commas(string) {
-            return operator1 ? `(${string})` : string;
-        }
-
-        function isNumber(element) {
-            console.log({element});
-            const letters = /^[a-i]+$/;
-            if (element.toString().match(letters)) return false;
-            return !Number.isNaN(element) 
-                && count(element.toString(), '\\(', true) === 0
-                && count(element.toString(), '\\)', true) === 0;
-        }
-
-        console.log('aaaa');
-
-        console.log({
-            number1,
-            number2,
-            operation,
-        });
-
-        number1 = number1.toString().startsWith('-')
-            ? `(${number1})`
-            : number1;
-        number2 = number2.toString().startsWith('-')
-            ? `(${number2})`
-            : number2;
-
-        console.log({
-            number1,
-            number2,
-            operation,
-        });
-
-        if (number1 === null) return number2;
-
-        if (number2 === null) return number1;
-
-        const operator1 = MatrixOperations.getOperator(number1);
-
-        const var1 = MatrixOperations.getVariable(number1);
-        const var2 = MatrixOperations.getVariable(number2);
-
-        const isNaN = !isNumber(number1) || !isNumber(number2);
-
-        console.log({isNaN})
-
-        if (!isNaN) {
-            number1 = Number.parseFloat(number1);
-            number2 = Number.parseFloat(number2);
-        }
-        
-        switch (operation) {
-            case '+':
-                return isNaN
-                    ? commas(number1) + '+' + number2
-                    : number1 + number2;
-            case '-':
-                return isNaN
-                    ? commas(number1) + '-' + number2
-                    : number1 - number2;
-            case '*':
-                return isNaN
-                    ? commas(number1) + 'x' + number2
-                    : number1 * number2;
-            case '/':
-                return isNaN
-                    ? commas(number1) + '/' + number2
-                    : number1 / number2;
-        }
-
-
-
-    }
-
     /* 
         Escalona a porcao, seja abaixo ou acima, da diagonal principal 
         de matrixA, assim como retorna o determinante da matriz.
@@ -533,7 +376,7 @@ export default class MatrixOperations {
             dimensionsA.columns,
         );
 
-        let determinant = 1;
+        let determinant = new ElementData({ scalar: 1 });
         let noPivotOnColumn = false;
 
         for (
@@ -543,7 +386,7 @@ export default class MatrixOperations {
         ) {
             let pivot = _matrixA.data[pivotColumn][pivotColumn];
 
-            if (pivot === 0.0) {
+            if (pivot.scalar === 0.0) {
 
                 let testRow = pivotColumn + 1;
                 while (true) {
@@ -555,7 +398,7 @@ export default class MatrixOperations {
 
                     let possibleNewPivot = _matrixA.data[testRow][pivotColumn];
 
-                    if (possibleNewPivot !== 0.0) break;
+                    if (possibleNewPivot instanceof ElementData && possibleNewPivot.scalar !== 0.0 && possibleNewPivot.variables.length === 0) break;
 
                     testRow++;
                 }
@@ -572,20 +415,27 @@ export default class MatrixOperations {
 
                     pivot = _matrixA.data[pivotColumn][pivotColumn];
 
-                    determinant = MatrixOperations.varOperation(determinant, '*', -1);
+                    determinant = ExpressionSimplification.varOperation(determinant, Operator.Multiply, new ElementData({ scalar: -1 }));
                 }
             }
 
             if (!noPivotOnColumn) {
-                if (pivot !== 1.0) {
+
+                console.log({pivot: pivot.stringify(), pivotColumn})
+
+                if (
+                    (pivot instanceof ElementData && (pivot.scalar !== 1.0 || pivot.variables.length !== 0))
+                    ||
+                    (pivot instanceof ExpressionData)
+                ) {
                     for (let index = 0; index < dimensionsA.columns; index++)
                         _matrixA.data[pivotColumn][index] = 
-                            MatrixOperations.varOperation(_matrixA.data[pivotColumn][index], '/', pivot);
+                            ExpressionSimplification.varOperation(_matrixA.data[pivotColumn][index], Operator.Divide, pivot);
                     for (let index = 0; index < dimensionsB.columns; index++)
                         _matrixB.data[pivotColumn][index] =
-                            MatrixOperations.varOperation(_matrixB.data[pivotColumn][index], '/', pivot);
+                            ExpressionSimplification.varOperation(_matrixB.data[pivotColumn][index], Operator.Divide, pivot);
 
-                    determinant = MatrixOperations.varOperation(determinant, '*', pivot);
+                    determinant = ExpressionSimplification.varOperation(determinant, Operator.Multiply, pivot);
 
                     //if (showSteps)
                     //    exibicao_passos_resolver_equacao_matricial(_matrixA, _matrixB, pivot, pivotColumn+1, pivotColumn+1, verticalElimination, None)
@@ -614,38 +464,38 @@ export default class MatrixOperations {
                         verticalIndex = index;
 
                     const element = _matrixA.data[verticalIndex][pivotColumn];
-                    const eliminationFactor = MatrixOperations.varOperation(
-                        MatrixOperations.varOperation(
+                    const eliminationFactor = ExpressionSimplification.varOperation(
+                        ExpressionSimplification.varOperation(
                             element, 
-                            '*', 
-                            -1
+                            Operator.Multiply, 
+                            new ElementData({ scalar: -1 })
                         ), 
-                        '/', 
+                        Operator.Divide, 
                         pivot,
                     );
                     MatrixOperations.printMatrix(_matrixA);
 
-                    console.log({element, pivot, eliminationFactor})
+                    console.log({element: element.stringify(), pivot: pivot.stringify(), eliminationFactor: eliminationFactor.stringify()})
 
                     for (let horizontalIndex = 0; horizontalIndex < dimensionsA.columns; horizontalIndex++) {
-                        _matrixA.data[verticalIndex][horizontalIndex] = MatrixOperations.varOperation(
+                        _matrixA.data[verticalIndex][horizontalIndex] = ExpressionSimplification.varOperation(
                             _matrixA.data[verticalIndex][horizontalIndex],
-                            '+',
-                            MatrixOperations.varOperation(
+                            Operator.Add,
+                            ExpressionSimplification.varOperation(
                                 eliminationFactor,
-                                '*',
+                                Operator.Multiply,
                                 _matrixA.data[pivotColumn][horizontalIndex]
                             ),
                         );
                     }
 
                     for (let horizontalIndex = 0; horizontalIndex < dimensionsB.columns; horizontalIndex++)
-                        _matrixB.data[verticalIndex][horizontalIndex] = MatrixOperations.varOperation(
+                        _matrixB.data[verticalIndex][horizontalIndex] = ExpressionSimplification.varOperation(
                             _matrixB.data[verticalIndex][horizontalIndex],
-                            '+',
-                            MatrixOperations.varOperation(
+                            Operator.Add,
+                            ExpressionSimplification.varOperation(
                                 eliminationFactor,
-                                '*',
+                                Operator.Multiply,
                                 _matrixB.data[pivotColumn][horizontalIndex]
                             ),
                         );
@@ -657,7 +507,13 @@ export default class MatrixOperations {
             } 
         }
 
-        if (noPivotOnColumn) determinant = 0.0;
+        if (noPivotOnColumn) determinant = new ElementData({
+            scalar: 0
+        });
+
+        console.log({determinant})
+
+        console.log({ determinantString: determinant.stringify() });
 
         return {
             matrixA: MatrixOperations.copyMatrixData(_matrixA),
@@ -726,11 +582,11 @@ export default class MatrixOperations {
             partiallyEliminatedOriginal = MatrixOperations.transpose(partiallyEliminatedOriginal);
         }
 
-        console.log({
-            partiallyEliminatedOriginal,
-            solution,
-            systemSolutionsType,
-        });
+        // console.log({
+        //     partiallyEliminatedOriginal,
+        //     solution,
+        //     systemSolutionsType,
+        // });
 
         return {
             partiallyEliminatedOriginal,

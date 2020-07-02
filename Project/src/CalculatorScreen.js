@@ -5,6 +5,8 @@ import InfoArea from './components/InfoArea';
 import { MatrixState, count, SystemSolutionType } from './utilities/constants';
 import MatrixOperations from './utilities/MatrixOperations';
 import ScalarOperations from './utilities/ScalarOperations';
+import { simplifyExpression, varOperation } from './utilities/ExpressionSimplification';
+import { ElementData, VariableData } from './utilities/ExpressionClasses';
 
 const INITIAL_MATRIX = MatrixOperations.emptyMatrix({
     rows: 3,
@@ -131,7 +133,7 @@ export default function CalculatorScreen({ isPortrait }) {
         return (
             (matrixNumber === null || matrixNumber === undefined)
                 ? ''
-                : matrixNumber
+                : `${matrixNumber.scalar}${matrixNumber.variables.join('')}`
         ).toString();
     }
 
@@ -185,11 +187,11 @@ export default function CalculatorScreen({ isPortrait }) {
         resetScalarOperations();
 
         changeNumberWritten({
-            newNumber: ScalarOperations.applyOperation({
-                operation: selectedOperator,
-                scalar1: getNumberWritten({ forceNotOperatorNumber: true }),
-                scalar2: editableOperatorNumber
-            }),
+            newNumber: varOperation(
+                getNumberWritten({ forceNotOperatorNumber: true }),
+                selectedOperator,
+                editableOperatorNumber
+            ),
             forceNotOperatorNumber: true,
         });
     }
@@ -280,6 +282,8 @@ export default function CalculatorScreen({ isPortrait }) {
                 changeReadyMatrix={changeReadyMatrix}
                 onPressBackground={
                     () => {
+                        // const result = simplifyExpression("((1*a)*(2+(((b*-1)/(a/a))*(d/a))))*((9+(((c*-1)/(a/a))*(g/a)))+((((f+(((c*-1)/(a/a))*(d/a)))*-1)/((2+(((b*-1)/(a/a))*(d/a)))/(2+(((b*-1)/(a/a))*(d/a)))))*((h+(((b*-1)/(a/a))*(g/a)))/(2+(((b*-1)/(a/a))*(d/a))))))");   
+                        // console.log({result});
                         if (matrixState !== MatrixState.LambdaxA) {
                             changeFullEquation(null);
                             exitEditingMode();
@@ -399,11 +403,27 @@ export default function CalculatorScreen({ isPortrait }) {
                     (element) => {
                         const letters = /^[a-i]+$/;
                         if (element.toString().match(letters))
-                            changeNumberWritten({ newNumber: element });
+                            changeNumberWritten({ 
+                                newNumber: new ElementData({
+                                    variables: [
+                                        new VariableData({
+                                            variable: element
+                                        })
+                                    ]
+                                })
+                            });
                         else if (getNumberWritten().length === 0 && element === '.')
-                            changeNumberWritten({ newNumber: '0.' });
+                            changeNumberWritten({
+                                newNumber: new ElementData({
+                                    unfilteredString: '0.'
+                                })
+                            });
                         else if (count(getNumberWritten(), /\./, true) === 0 || element !== '.')
-                            changeNumberWritten({ newNumber: getNumberWritten() + element });
+                            changeNumberWritten({
+                                newNumber: new ElementData({
+                                    scalar: getNumberWritten() + element,
+                                })
+                            });
                         
                         changeShouldUserInputOverwriteElement(false);
                     }

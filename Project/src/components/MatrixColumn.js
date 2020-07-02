@@ -39,10 +39,11 @@ export default function MatrixColumn({
     }
 
     function formatElement({ number, row, column }) {
+        // console.log({number})
         let numberToFormat = isElementSelected({ row, column })
             && editableOperatorNumber 
-                ? editableOperatorNumber 
-                : number;
+                ? editableOperatorNumber.stringify() 
+                : number.stringify();
 
         if (numberToFormat === null 
             || numberToFormat === undefined 

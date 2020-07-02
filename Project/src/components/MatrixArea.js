@@ -5,6 +5,7 @@ import { MatrixState, findFraction, toFixedOnZeroes, SystemSolutionType } from '
 import ArrowButtonsArea from './ArrowButtonsArea';
 import MatrixOperations from '../utilities/MatrixOperations';
 import FullEquation from './FullEquation';
+import ScalarOperations from '../utilities/ScalarOperations';
 
 const BUTTON_AREAS_CROSS_WIDTH = 70;
 
@@ -34,7 +35,10 @@ export default function MatrixArea({
     }
 
     function formatDeterminant(determinant) {
-        const formatted = formatNumberToFraction(determinant);
+        if (determinant === null) return null
+        stringDeterminant = determinant.stringify();
+        if (stringDeterminant && !ScalarOperations.isNumber(stringDeterminant)) return `det: ${stringDeterminant}`;
+        const formatted = formatNumberToFraction(stringDeterminant);
         return formatted !== null 
             ? `det: ${formatted}`
             : null;
