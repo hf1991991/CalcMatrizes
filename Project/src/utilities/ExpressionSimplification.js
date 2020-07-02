@@ -81,7 +81,7 @@ function getIndexOfVariable(simplifiedElements, variablesSearch) {
         return true;
     }
 
-    console.log({variablesSearch, simplifiedElements});
+    console.log(JSON.stringify({variablesSearch, simplifiedElements}));
 
     for (let index = 0; index < simplifiedElements.length; index++) {
 
@@ -94,11 +94,72 @@ function getIndexOfVariable(simplifiedElements, variablesSearch) {
     return -1;
 }
 
+function distributiveMultiplication(distributives) {
+
+    while (distributives.length > 1) {
+
+        let biDistribution = []
+    
+        for (distElement1 of distributives.shift()) {
+            for (distElement2 of distributives.shift()) {
+                biDistribution.push(
+                    doOperation(
+                        new ExpressionData({
+                            operator: Operator.Multiply,
+                            elements: [
+                                distElement1,
+                                distElement2
+                            ]
+                        })
+                    )
+                );
+            }
+        }
+
+        distributives = doOperation(
+            new ExpressionData({
+                operator: Operator.Add,
+                elements: biDistribution
+            })
+        );
+
+    }
+
+    return distributives[0];
+
+}
+
+function simpleMultiplication(multipliers) {
+
+    console.log(JSON.stringify({multipliers}))
+
+    scalar = 1;
+    variables = []
+
+    for (element of multipliers) {
+
+        if (element.scalar === 0)
+            return new ElementData({
+                scalar: 0,
+            });
+
+        scalar *= element.scalar;
+        variables = variables.concat(element.variables)
+
+    }
+
+    return new ElementData({
+        scalar,
+        variables
+    });
+}
+
 function doOperation(expression) {
 
     let scalar = null;
     let variables = null;
     let simplifiedElements = null;
+    let element = null;
  
     switch (expression.operator) {
         case Operator.Divide:
@@ -154,39 +215,72 @@ function doOperation(expression) {
 
         case Operator.Multiply:
 
-            scalar = 1;
-            variables = []
+            let multipliers = [];
+            let distributives = [];
 
-            for (element of expression.elements) {
+            for (let multiplierIndex = 0; multiplierIndex < expression.elements.length; multiplierIndex++) {
 
-                if (element instanceof ExpressionData) {
-                    if (element.operator === expression.operator) {
-                        expression = new ExpressionData({
-                            operator: expression.operator,
-                            elements: [...element.elements, ...expression.elements]
-                        })
-                    }
+                // Se expression.elements[multiplierIndex] for um ExpressionData:
+                if (expression.elements[multiplierIndex] instanceof ExpressionData) {
+
+                    if (expression.elements[multiplierIndex].operator === Operator.Add)
+                        distributives.push(expression.elements[multiplierIndex])
+
+                    else if (expression.elements[multiplierIndex].operator === Operator.Multiply)
+                        multipliers.concat(expression.elements[multiplierIndex].elements)
+                    
                     else {
-                        console.log('ERRO em doOperation: Expressão muito complicada.')
-                        // console.log(JSON.stringify(expression))
-                        expression.isSimplified = true;
-                        return expression;
+                        console.log('ERRO em doOperation: um dos multiplicadores não é aceitável: ' + expression.elements[multiplierIndex].operator);
+                        multipliers.push(
+                            new ElementData({
+                                variables: [
+                                    'ERRO'
+                                ]
+                            })
+                        );
                     }
-                }
 
-                if (element.scalar === 0)
-                    return new ElementData({
-                        scalar: 0,
-                    });
+                } 
+                
+                // Se expression.elements[multiplierIndex] for um ElementData:
+                else
+                    multipliers.push(expression.elements[multiplierIndex])
 
-                scalar *= element.scalar;
-                variables = variables.concat(element.variables)
             }
 
-            return new ElementData({
-                scalar,
-                variables
-            });
+            let multipliersResult = simpleMultiplication(multipliers);
+
+            if (distributives.length === 0)
+                return multipliersResult;
+
+            console.log(JSON.stringify({distributives}))
+            
+            let simplifiedDistributives = distributiveMultiplication(distributives);
+
+            console.log(simplifiedDistributives)
+
+            if (simplifiedDistributives instanceof ExpressionData) {
+                let finalResult = []
+                for (let distr of simplifiedDistributives.elements) {
+                    finalResult.push(
+                        simpleMultiplication([
+                            multipliersResult,
+                            distr
+                        ])
+                    );
+                }
+
+                return new ExpressionData({
+                    operator: Operator.Add,
+                    elements: finalResult,
+                    isSimplified: true
+                });
+            }
+
+            return simpleMultiplication([
+                multipliersResult,
+                simplifiedDistributives
+            ]);
 
         case Operator.Add:
 
@@ -199,10 +293,12 @@ function doOperation(expression) {
 
                 if (element instanceof ExpressionData) {
                     if (element.operator === expression.operator) {
-                        expression = new ExpressionData({
-                            operator: expression.operator,
-                            elements: [...element.elements, ...expression.elements]
-                        })
+                        return doOperation(
+                            new ExpressionData({
+                                operator: expression.operator,
+                                elements: [...element.elements, ...expression.elements]
+                            })
+                        );
                     }
                     else {
                         console.log('ERRO em doOperation: Expressão muito complicada.')
@@ -238,8 +334,13 @@ function doOperation(expression) {
                     })
                 ];
 
-            if (simplifiedElements.length === 1)
+            if (simplifiedElements.length === 1) {
+                if (simplifiedElements[0].scalar === 0)
+                    return new ElementData({
+                        scalar: 0
+                    })
                 return simplifiedElements[0];
+            }
             
             return new ExpressionData({
                 operator: expression.operator,

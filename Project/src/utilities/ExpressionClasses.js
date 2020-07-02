@@ -30,11 +30,15 @@ export class ElementData {
 
         for (variableData of this.variables) {
             const index = fixed.map(vari => vari.variable).indexOf(variableData.variable)
-            if (index !== -1)
-                fixed[index] = new VariableData({
-                    variable: variableData.variable,
-                    exponent: fixed[index].exponent + variableData.exponent
-                });
+            if (index !== -1) {
+                if (fixed[index].exponent + variableData.exponent !== 0)
+                    fixed[index] = new VariableData({
+                        variable: variableData.variable,
+                        exponent: fixed[index].exponent + variableData.exponent
+                    });
+                else
+                    fixed.splice(index)
+            }
             else
                 fixed.push(variableData);
         }
@@ -50,7 +54,7 @@ export class ElementData {
 
     stringify() {
         const formatScalar = 
-            () => this.scalar === 1
+            () => this.scalar === 1 && this.variables.length !== 0
                 ? ''
                 : this.scalar === -1
                     ? '-'
