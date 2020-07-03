@@ -19,6 +19,7 @@ export const Operator = {
     Subtract: 'Subtract',
     Multiply: 'Multiply',
     Divide: 'Divide',
+    Elevate: 'Elevate',
 }
 
 export const ButtonType = {

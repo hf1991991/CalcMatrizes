@@ -62,32 +62,71 @@ function raiseVariablesExponent(variables, exponent) {
     return newVariables;
 }
 
-function getIndexOfVariable(simplifiedElements, variablesSearch) {
+function additionMatches(elements1, elements2) {
+    return elements1.stringify() === elements2.stringify();
+    // if (elements1.length !== elements2.length) return false;
+    // else if (elements1.length === 0) return true;
+    // for (let i = 0; i < elements1.length; i++) {
+    //     let found = false
+    //     for (let j = 0; j < elements2.length; j++) {
+    //         if (
+    //             elements1[i].scalar === elements2[j].scalar
+    //             &&
+    //             variablesMatch(elements1[i].variables, elements2[i].variables)
+    //         ) found = true;
+    //     }
+    //     if (!found) return false;
+    // }
+    // return true;
+}
 
-    function variablesMatch(variables1, variables2) {
-        if (variables1.length !== variables2.length) return false;
-        else if (variables1.length === 0) return true;
-        for (let i = 0; i < variables1.length; i++) {
-            let found = false
-            for (let j = 0; j < variables2.length; j++) {
-                if (
-                    variables1[i].variable === variables2[j].variable
-                    &&
-                    variables1[i].exponent === variables2[j].exponent
-                ) found = true;
-            }
-            if (!found) return false;
+function getIndexOfAddition(additionElements, additionSearch) {
+
+    console.log(JSON.stringify({additionSearch, additionElements}));
+
+    for (let index = 0; index < additionElements.length; index++) {
+
+        if (additionElements[index].operator !== Operator.Add) {
+            console.log('ERRO em getIndexOfAddition: operação não é de adição: ' + additionElements[index].operator);
+            return -1;
         }
-        return true;
+
+        // console.log({bbb: additionElements[index], index})
+
+        if (additionMatches(additionElements[index], additionSearch)) return index;
+
     }
 
-    console.log(JSON.stringify({variablesSearch, simplifiedElements}));
+    return -1;
+}
+
+function variablesMatch(variables1, variables2) {
+    return variables1.stringify({ onlyVariables: true }) === variables2.stringify({ onlyVariables: true });
+    // if (variables1.length !== variables2.length) return false;
+    // else if (variables1.length === 0) return true;
+    // for (let i = 0; i < variables1.length; i++) {
+    //     let found = false
+    //     for (let j = 0; j < variables2.length; j++) {
+    //         if (
+    //             variables1[i].variable === variables2[j].variable
+    //             &&
+    //             variables1[i].exponent === variables2[j].exponent
+    //         ) found = true;
+    //     }
+    //     if (!found) return false;
+    // }
+    // return true;
+}
+
+function getIndexOfVariable(simplifiedElements, variablesSearch) {
+
+    console.log(JSON.stringify({variablesSearch: variablesSearch, simplifiedElements: simplifiedElements}));
 
     for (let index = 0; index < simplifiedElements.length; index++) {
 
-        console.log({aaa: simplifiedElements[index].variables, index})
+        // console.log({aaa: simplifiedElements[index].variables, index})
 
-        if (variablesMatch(simplifiedElements[index].variables, variablesSearch)) return index;
+        if (variablesMatch(simplifiedElements[index], variablesSearch)) return index;
 
     }
 
@@ -99,9 +138,21 @@ function distributiveMultiplication(distributives) {
     while (distributives.length > 1) {
 
         let biDistribution = []
+
+        const distrib1 = distributives.shift();
+        const distrib2 = distributives.shift();
+
+        distrib1 = distrib1 instanceof ExpressionData
+            ? distrib1.elements
+            : distrib1;
+        distrib2 = distrib2 instanceof ExpressionData
+            ? distrib2.elements
+            : distrib2;
     
-        for (distElement1 of distributives.shift()) {
-            for (distElement2 of distributives.shift()) {
+        for (distElement1 of distrib1) {
+            for (distElement2 of distrib2) {
+                console.log('ENTERING MULTIPLICATION SUB-LOOP')
+                console.log({distElement1: distElement1.stringify(), distElement2: distElement2.stringify()})
                 biDistribution.push(
                     doOperation(
                         new ExpressionData({
@@ -113,15 +164,23 @@ function distributiveMultiplication(distributives) {
                         })
                     )
                 );
+                console.log('ENDED MULTIPLICATION SUB-LOOP')
+                console.log({biDistribution: biDistribution.map(a => a.stringify())})
             }
         }
 
-        distributives = doOperation(
+        console.log('ENTERING ADDITION SUB-LOOP')
+
+        distributives.splice(0, 0, doOperation(
             new ExpressionData({
                 operator: Operator.Add,
                 elements: biDistribution
             })
-        );
+        ));
+
+        console.log('ENDED ADDITION SUB-LOOP')
+        console.log({distributives: distributives.map(a => a.stringify())})
+
 
     }
 
@@ -131,7 +190,7 @@ function distributiveMultiplication(distributives) {
 
 function simpleMultiplication(multipliers) {
 
-    console.log(JSON.stringify({multipliers}))
+    // console.log(JSON.stringify({multipliers}))
 
     scalar = 1;
     variables = []
@@ -146,12 +205,47 @@ function simpleMultiplication(multipliers) {
         scalar *= element.scalar;
         variables = variables.concat(element.variables)
 
+        // console.log('abacate')
+        // console.log(JSON.stringify({scalar, variables}))
+
     }
 
     return new ElementData({
         scalar,
         variables
     });
+}
+
+function addNumbersWithSameVariables(adders) {
+    console.log('start')
+
+    simplifiedElements = [];
+
+    for (element of adders) {
+
+        if (element.scalar !== 0) {
+            const usedVariablesIndex = getIndexOfVariable(simplifiedElements, element);
+
+            console.log({addIndex: usedVariablesIndex})
+
+            if (usedVariablesIndex === -1)
+                simplifiedElements.push(element);
+            else
+                simplifiedElements[usedVariablesIndex] = new ElementData({
+                    scalar: Number.parseFloat(simplifiedElements[usedVariablesIndex].scalar) 
+                        + Number.parseFloat(element.scalar),
+                    variables: simplifiedElements[usedVariablesIndex].scalar + element.scalar === 0
+                        ? []
+                        : element.variables,
+                });
+            
+        }
+
+    }
+    console.log('finish')
+
+    return simplifiedElements;
+
 }
 
 function doOperation(expression) {
@@ -162,75 +256,143 @@ function doOperation(expression) {
     let element = null;
  
     switch (expression.operator) {
+        case Operator.Elevate:
+
+            if (expression.elements.length !== 2) {
+                console.log('ERRO em doOperation: expressão de elevado não possui dois elementos.');
+                return new ElementData({
+                    variables: [
+                        new VariableData({
+                            variable: 'ERRO'
+                        })
+                    ]
+                });
+            }
+
+            let base = expression.elements[0];
+            let exponent = expression.elements[1].scalar;
+
+            // console.log({base, picles: exponent, jacaSeca: expression.elements[1]})
+
+            if (base instanceof ElementData) 
+                return new ElementData({
+                    scalar: Math.pow(base.scalar, exponent),
+                    variables: raiseVariablesExponent(base.variables, exponent)
+                })
+
+            if (exponent === 0)
+                return new ElementData({
+                    scalar: 1
+                });
+
+            if (exponent === 1)
+                return base;
+
+            return new ExpressionData({
+                operator: expression.operator,
+                elements: expression.elements,
+                isSimplified: true,
+            })
+
         case Operator.Divide:
 
-            scalar = null;
-            variables = [];
+            multiplicationElements = []
+
+            let first = true;
 
             for (element of expression.elements) {
 
-                if (element instanceof ExpressionData) {
-                    console.log('ERRO em doOperation: Expressão muito complicada.')
-                    // console.log(JSON.stringify(expression))
-                    expression.isSimplified = true;
-                    return expression;
-                }
+                if (first)
+                    multiplicationElements.push(element);
 
-                if (element.scalar === 0) {
-                    if (scalar !== null) {
-                        console.log('ERRO em doOperation: Divisão por zero.')
-                        return new ElementData({
-                            variables: [
-                                new VariableData({
-                                    variable: 'ERRO'
-                                })
-                            ]
-                        });
-                    } else 
-                        return new ElementData({
-                            scalar: 0,
-                        });
-                }
-
-                if (scalar === null) {
-                    scalar = element.scalar;
-                    variables = variables.concat(element.variables);
-                }
                 else {
-                    scalar /= element.scalar;
-                    variables = variables.concat(raiseVariablesExponent(element.variables, -1))
+
+                    if (element instanceof ExpressionData) 
+                        multiplicationElements.push(
+                            doOperation(
+                                new ExpressionData({
+                                    operator: Operator.Elevate,
+                                    elements: [
+                                        element,
+                                        new ElementData({
+                                            scalar: -1
+                                        })
+                                    ]
+                                })
+                            )
+                        );
+
+                    else {
+
+                        if (element.scalar === 0) {
+
+                            console.log('ERRO em doOperation: divisão por zero.')
+                            return new ElementData({
+                                variables: [
+                                    'ERRO'
+                                ]
+                            });
+
+                        }
+
+                        multiplicationElements.push(
+                            new ElementData({
+                                scalar: 1 / element.scalar,
+                                variables: raiseVariablesExponent(element.variables, -1)
+                            })
+                        );
+
+                    }
+
                 }
-                    
+
+                first = false;
+                
             }
 
-            console.log(JSON.stringify({
-                scalar,
-                variables
-            }))
+            // console.log(JSON.stringify({batata: multiplicationElements}))
 
-            return new ElementData({
-                scalar,
-                variables
-            });
+            return doOperation(
+                new ExpressionData({
+                    operator: Operator.Multiply,
+                    elements: multiplicationElements
+                })
+            );
 
         case Operator.Multiply:
 
             let multipliers = [];
             let distributives = [];
+            let elevations = [];
 
-            for (let multiplierIndex = 0; multiplierIndex < expression.elements.length; multiplierIndex++) {
+            for (let multiplier of expression.elements) {
 
-                // Se expression.elements[multiplierIndex] for um ExpressionData:
-                if (expression.elements[multiplierIndex] instanceof ExpressionData) {
+                // Se multiplier for um ExpressionData:
+                if (multiplier instanceof ExpressionData) {
 
-                    if (expression.elements[multiplierIndex].operator === Operator.Add)
-                        distributives.push(expression.elements[multiplierIndex])
+                    if (multiplier.operator === Operator.Add)
+                        distributives.push(multiplier)
 
-                    else if (expression.elements[multiplierIndex].operator === Operator.Multiply)
-                        multipliers.concat(expression.elements[multiplierIndex].elements)
+                    else if (multiplier.operator === Operator.Multiply) {
+                        for (elem of multiplier.elements) {
+                            
+                            if (elem instanceof ElementData)
+                                multipliers.push(elem)
+
+                            else if (elem.operator === Operator.Elevate)
+                                elevations.push(elem)
+
+                            else if (elem.operator === Operator.Add)
+                                distributives.push(elem)
+
+                        }
+                    }
+                    
+                    else if (multiplier.operator === Operator.Elevate) 
+                        elevations.push(multiplier)
                     
                     else {
-                        console.log('ERRO em doOperation: um dos multiplicadores não é aceitável: ' + expression.elements[multiplierIndex].operator);
+                        console.log('ERRO em doOperation: um dos multiplicadores não é aceitável: ' + multiplier.operator);
                         multipliers.push(
                             new ElementData({
                                 variables: [
@@ -242,34 +404,192 @@ function doOperation(expression) {
 
                 } 
                 
-                // Se expression.elements[multiplierIndex] for um ElementData:
+                // Se multiplier for um ElementData:
                 else
-                    multipliers.push(expression.elements[multiplierIndex])
+                    multipliers.push(multiplier)
 
             }
 
+            console.log('ganso')
+            console.log(JSON.stringify({
+                multipliers: multipliers.map(a => a.stringify()), 
+                elevations: elevations.map(a => a.stringify()), 
+                distributives: distributives.map(a => a.stringify())
+            }));
+
             let multipliersResult = simpleMultiplication(multipliers);
 
-            if (distributives.length === 0)
+            if (
+                (distributives.length === 0 && elevations.length === 0)
+                || multipliersResult.scalar === 0
+            ) {
+                console.log(1)
                 return multipliersResult;
+            }
+
+            let simplifiedElevations = []
+
+            for (elevationElement of elevations) {
+
+                base = elevationElement.elements[0];
+                exponent = elevationElement.elements[1].scalar;
+
+                const distributivesCopyIndex = getIndexOfAddition(distributives, base);
+                const elevationsCopyIndex = getIndexOfAddition(
+                    simplifiedElevations.map(elem => elem.elements[0]), 
+                    base
+                );
+
+                console.log({distributivesCopyIndex, elevationsCopyIndex})
+
+                if (distributivesCopyIndex !== -1) {
+
+                    newElement = doOperation(
+                        new ExpressionData({
+                            operator: Operator.Elevate,
+                            elements: [
+                                distributives.splice(distributivesCopyIndex)[0],
+                                new ElementData({
+                                    scalar: exponent + 1
+                                }),
+                            ]
+                        })
+                    );
+
+                    if (newElement instanceof ElementData)
+                        multipliersResult = simpleMultiplication([
+                            multipliersResult,
+                            newElement
+                        ]);
+
+                    else
+                        simplifiedElevations.push(newElement);
+
+                }
+
+                if (elevationsCopyIndex !== -1) {
+
+                    elevationCopy = elevations.splice(elevationsCopyIndex)[0];
+
+                    newElement = doOperation(
+                        new ExpressionData({
+                            operator: Operator.Elevate,
+                            elements: [
+                                elevationCopy.elements[0],
+                                new ElementData({
+                                    scalar: exponent + 1
+                                }),
+                            ]
+                        })
+                    );
+
+                    if (newElement instanceof ElementData)
+                        multipliersResult = simpleMultiplication([
+                            multipliersResult,
+                            newElement
+                        ]);
+
+                    else
+                        simplifiedElevations.push(newElement);
+
+                }
+
+                if (distributivesCopyIndex === -1 && elevationsCopyIndex === -1)
+                    simplifiedElevations.push(elevationElement);
+
+            }
+
+            console.log('pesto')
+            console.log(JSON.stringify({
+                multipliers: multipliers.map(a => a.stringify()), 
+                elevations: elevations.map(a => a.stringify()), 
+                distributives: distributives.map(a => a.stringify())
+            }));
+
+            console.log(JSON.stringify({
+                simplifiedElevations: simplifiedElevations.map(a => a.stringify()), 
+                multipliersResult: multipliersResult.stringify()
+            }));
+            // console.log(JSON.stringify({simplifiedElevations}))
+
+            if (distributives.length === 0) {
+
+                if (simplifiedElevations.length === 0) {
+                    console.log(2)
+                    return multipliersResult;
+                }
+
+                if (!(multipliersResult.scalar === 1 && multipliersResult.variables.length === 0)) {
+                    console.log(3)
+                    return new ExpressionData({
+                        operator: Operator.Multiply,
+                        elements: [multipliersResult, ...simplifiedElevations],
+                        isSimplified: true
+                    });
+                }
+                
+                if (simplifiedElevations.length === 1) {
+                    console.log(4)
+                    return simplifiedElevations[0]
+                }
+                
+                console.log(5)
+                return new ExpressionData({
+                    operator: Operator.Multiply,
+                    elements: simplifiedElevations,
+                    isSimplified: true
+                });
+
+            }
 
             console.log(JSON.stringify({distributives}))
             
             let simplifiedDistributives = distributiveMultiplication(distributives);
 
-            console.log(simplifiedDistributives)
+            console.log(JSON.stringify({simplifiedDistributives: simplifiedDistributives.stringify()}))
 
+            // Se simplifiedDistributives for um ExpressionData, com operador Add:
             if (simplifiedDistributives instanceof ExpressionData) {
                 let finalResult = []
                 for (let distr of simplifiedDistributives.elements) {
-                    finalResult.push(
-                        simpleMultiplication([
-                            multipliersResult,
-                            distr
-                        ])
+
+                    console.log('ENTERING MULT MULTIPLICATION SUB-LOOP')
+                    console.log({
+                        multipliersResult: multipliersResult.stringify(),
+                        distr: distr.stringify()
+                    });
+                    const mult = doOperation(
+                        new ExpressionData({
+                            operator: Operator.Multiply,
+                            elements: [
+                                multipliersResult,
+                                distr
+                            ]
+                        })
                     );
+                    console.log('ENDED MULT MULTIPLICATION SUB-LOOP')
+                    console.log({
+                        mult: mult.stringify()
+                    });
+
+                    if (simplifiedElevations.length === 0)
+                        finalResult.push(mult);
+                    
+                    else
+                        finalResult.push(
+                            new ExpressionData({
+                                operator: Operator.Multiply,
+                                elements: [
+                                    mult,
+                                    ...simplifiedElevations
+                                ],
+                                isSimplified: true
+                            })
+                        );
+
                 }
 
+                console.log(6)
                 return new ExpressionData({
                     operator: Operator.Add,
                     elements: finalResult,
@@ -277,55 +597,83 @@ function doOperation(expression) {
                 });
             }
 
-            return simpleMultiplication([
+            multipliersResult = simpleMultiplication([
                 multipliersResult,
                 simplifiedDistributives
             ]);
 
-        case Operator.Add:
+            if (simplifiedElevations.length === 0) {
+                console.log(7)
+                return multipliersResult;
+            }
 
-            simplifiedElements = [];
+            if (multipliersResult === 1) {
 
-            scalar = 0;
-            variables = null;
-
-            for (element of expression.elements) {
-
-                if (element instanceof ExpressionData) {
-                    if (element.operator === expression.operator) {
-                        return doOperation(
-                            new ExpressionData({
-                                operator: expression.operator,
-                                elements: [...element.elements, ...expression.elements]
-                            })
-                        );
-                    }
-                    else {
-                        console.log('ERRO em doOperation: Expressão muito complicada.')
-                        // console.log(JSON.stringify(expression))
-                        expression.isSimplified = true;
-                        return expression;
-                    }
+                if (simplifiedElevations.length === 1) {
+                    console.log(8)
+                    return simplifiedElevations[0];
                 }
 
-                if (element.scalar !== 0) {
-                    const usedVariablesIndex = getIndexOfVariable(simplifiedElements, element.variables);
-
-                    console.log({usedVariablesIndex})
-
-                    if (usedVariablesIndex === -1)
-                        simplifiedElements.push(element);
-                    else {
-                        simplifiedElements[usedVariablesIndex] = new ElementData({
-                            scalar: Number.parseFloat(simplifiedElements[usedVariablesIndex].scalar)
-                                + Number.parseFloat(element.scalar),
-                            variables: element.variables,
-                        });
-                    }
-                    
-                }
+                console.log(9)
+                return new ExpressionData({
+                    operator: operator.Multiply,
+                    elements: simplifiedElevations,
+                    isSimplified: true
+                })
 
             }
+
+            console.log(10)
+            return new ExpressionData({
+                operator: operator.Multiply,
+                elements: [
+                    multipliersResult,
+                    ...simplifiedElevations
+                ],
+                isSimplified: true
+            })
+
+        case Operator.Add:
+
+            let adders = [];
+            let notAdders = [];
+
+            for (adderElement of expression.elements) {
+
+                // Se adderElement for um ExpressionData:
+                if (adderElement instanceof ExpressionData) {
+
+                    if (adderElement.operator === Operator.Add) {
+
+                        for (elem of adderElement.elements) {
+                            if (elem instanceof ElementData) 
+                                adders.push(elem)
+
+                            else
+                                notAdders.push(elem)
+                        }
+
+                    }
+                    
+                    else
+                        notAdders.push(adderElement)
+
+                } 
+                
+                // Se adderElement for um ElementData:
+                else
+                    adders.push(adderElement)
+
+            }
+
+            console.log({
+                adders: adders.map(a => a.stringify()),
+                notAdders: notAdders.map(a => a.stringify())
+            });
+
+            simplifiedElements = addNumbersWithSameVariables(
+                addNumbersWithSameVariables(adders)
+            );
 
             if (simplifiedElements.length === 0)
                 simplifiedElements = [
@@ -344,7 +692,10 @@ function doOperation(expression) {
             
             return new ExpressionData({
                 operator: expression.operator,
-                elements: simplifiedElements,
+                elements: [
+                    ...simplifiedElements,
+                    ...notAdders
+                ],
                 isSimplified: true
             });
 
@@ -367,7 +718,7 @@ function doOperation(expression) {
                 if (element.scalar !== 0) {
                     const usedVariablesIndex = getIndexOfVariable(simplifiedElements, element.variables);
 
-                    console.log({usedVariablesIndex})
+                    console.log({used: usedVariablesIndex})
 
                     if (usedVariablesIndex === -1)
                         simplifiedElements.push(element);
@@ -428,10 +779,10 @@ function simplifyExpressionAlgorithm(expression) {
 
         // Após isso, ou a expressão será uma ExpressionData simplificada, ou será uma ElementData:
         expression = doOperation(expression);
-    
-        console.log({ 
+
+        console.log(JSON.stringify({
             finalExpression: expression.stringify()
-        });
+        }))
 
     }
     

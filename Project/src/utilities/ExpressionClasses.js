@@ -28,16 +28,18 @@ export class ElementData {
     fixVariables() {
         let fixed = [];
 
+        // console.log(JSON.stringify({jaca: this.variables}))
+
         for (variableData of this.variables) {
             const index = fixed.map(vari => vari.variable).indexOf(variableData.variable)
+
+            // console.log(JSON.stringify({index, variableData, fixed}))
+
             if (index !== -1) {
-                if (fixed[index].exponent + variableData.exponent !== 0)
-                    fixed[index] = new VariableData({
-                        variable: variableData.variable,
-                        exponent: fixed[index].exponent + variableData.exponent
-                    });
-                else
-                    fixed.splice(index)
+                fixed[index] = new VariableData({
+                    variable: variableData.variable,
+                    exponent: fixed[index].exponent + variableData.exponent
+                });
             }
             else
                 fixed.push(variableData);
@@ -47,16 +49,16 @@ export class ElementData {
 
         // this.variables.length > 0 && console.log({fixed, v: this.variables})
 
-        this.variables = fixed;
+        this.variables = fixed.filter((elem => elem.exponent !== 0));
 
         // console.log({varrrrr: this.variables});
     }
 
-    stringify() {
+    stringify({ onlyVariables=false }={}) {
         const formatScalar = 
-            () => this.scalar === 1 && this.variables.length !== 0
+            () => (this.scalar === 1 && this.variables.length !== 0) || onlyVariables
                 ? ''
-                : this.scalar === -1
+                : this.scalar === -1 && this.variables.length !== 0
                     ? '-'
                     : findFraction(this.scalar)
         const formatExponent = 
