@@ -671,29 +671,29 @@ function doOperation(expression) {
                 notAdders: notAdders.map(a => a.stringify())
             });
 
-            simplifiedElements = addNumbersWithSameVariables(
+            simplifiedAdders = addNumbersWithSameVariables(
                 addNumbersWithSameVariables(adders)
             );
 
-            if (simplifiedElements.length === 0)
-                simplifiedElements = [
+            if (simplifiedAdders.length === 0)
+                simplifiedAdders = [
                     new ElementData({
                         scalar: 0
                     })
                 ];
 
-            if (simplifiedElements.length === 1) {
-                if (simplifiedElements[0].scalar === 0)
+            if (simplifiedAdders.length === 1 && notAdders.length === 0) {
+                if (simplifiedAdders[0].scalar === 0)
                     return new ElementData({
                         scalar: 0
                     })
-                return simplifiedElements[0];
+                return simplifiedAdders[0];
             }
             
             return new ExpressionData({
                 operator: expression.operator,
                 elements: [
-                    ...simplifiedElements,
+                    ...simplifiedAdders,
                     ...notAdders
                 ],
                 isSimplified: true

@@ -1,4 +1,4 @@
-import { smartToFixed, findFraction } from "./constants";
+import { smartToFixed, findFraction, Operator } from "./constants";
 import ScalarOperations from "./ScalarOperations";
 
 export class ExpressionData {
@@ -7,6 +7,21 @@ export class ExpressionData {
         this.operator = operator;
         this.elements = elements;
         this.isSimplified = isSimplified;
+    }
+
+    algebraicStringify() {
+        switch (this.operator) {
+            case Operator.Elevate:
+                return `(${this.elements[0].algebraicStringify()})^(${this.elements[1].algebraicStringify()})`;
+            case Operator.Divide:
+                return `(${this.elements[0].algebraicStringify()})/(${List.from(this.elements).splice(1, this.elements.length - 1).map(a => a.algebraicStringify()).join(')/(')})`;
+            case Operator.Multiply:
+                return `(${this.elements.map(a => a.algebraicStringify()).join(')x(')})`;
+            case Operator.Add:
+                return `(${this.elements.map(a => a.algebraicStringify()).join(')+(')})`;
+            case Operator.Subtract:
+                return `(${this.elements[0].algebraicStringify()})-(${List.from(this.elements).splice(1, this.elements.length - 1).map(a => a.algebraicStringify()).join(')-(')})`;
+        }
     }
 
     stringify() {
@@ -52,6 +67,10 @@ export class ElementData {
         this.variables = fixed.filter((elem => elem.exponent !== 0));
 
         // console.log({varrrrr: this.variables});
+    }
+
+    algebraicStringify() {
+        return this.stringify();
     }
 
     stringify({ onlyVariables=false }={}) {
