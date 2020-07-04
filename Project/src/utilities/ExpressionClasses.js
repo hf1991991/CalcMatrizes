@@ -1,4 +1,4 @@
-import { smartToFixed, findFraction, Operator } from "./constants";
+import { smartToFixed, findFraction, Operator, parenthesisEnglobe } from "./constants";
 import ScalarOperations from "./ScalarOperations";
 
 export class ExpressionData {
@@ -7,20 +7,46 @@ export class ExpressionData {
         this.operator = operator;
         this.elements = elements;
         this.isSimplified = isSimplified;
+
+        operator === Operator.Add && this.sortElements();
+    }
+
+    sortElements() {
+        this.elements.sort((a, b) => {
+            return a.stringify().replace(/-/g, '').localeCompare(b.stringify().replace(/-/g, ''))
+        });
+    }
+
+    simpleStringify() {
+        const string = this.algebraicStringify();
+        return parenthesisEnglobe(string)
+            ? string.substring(1, string.length - 1)
+            : string;
     }
 
     algebraicStringify() {
         switch (this.operator) {
             case Operator.Elevate:
-                return `(${this.elements[0].algebraicStringify()})^(${this.elements[1].algebraicStringify()})`;
+                const base = this.elements[0].algebraicStringify();
+                const exponent = this.elements[1].algebraicStringify();
+                return `(${
+                        parenthesisEnglobe(base)
+                            ? base.substring(1, base.length - 1)
+                            : base
+                    })^${
+                        exponent.startsWith('-')
+                            ? `(${exponent})`
+                            : exponent
+                    }`;
             case Operator.Divide:
-                return `(${this.elements[0].algebraicStringify()})/(${List.from(this.elements).splice(1, this.elements.length - 1).map(a => a.algebraicStringify()).join(')/(')})`;
+                return `${this.elements[0].algebraicStringify()}/(${List.from(this.elements).splice(1, this.elements.length - 1).map(a => a.algebraicStringify()).join(')/(')}`;
             case Operator.Multiply:
-                return `(${this.elements.map(a => a.algebraicStringify()).join(')x(')})`;
+                return `${this.elements.map(a => a.algebraicStringify()).join('×')}`;
             case Operator.Add:
-                return `(${this.elements.map(a => a.algebraicStringify()).join(')+(')})`;
+                const terms = this.elements.map(a => a.algebraicStringify()).map(a => a.startsWith('-') ? a : '+' + a).join('');
+                return `(${terms.startsWith('+') ? terms.substring(1, terms.length) : terms})`;
             case Operator.Subtract:
-                return `(${this.elements[0].algebraicStringify()})-(${List.from(this.elements).splice(1, this.elements.length - 1).map(a => a.algebraicStringify()).join(')-(')})`;
+                return `(${this.elements[0].algebraicStringify()}-${List.from(this.elements).splice(1, this.elements.length - 1).map(a => a.algebraicStringify()).join('-')})`;
         }
     }
 
@@ -67,6 +93,10 @@ export class ElementData {
         this.variables = fixed.filter((elem => elem.exponent !== 0));
 
         // console.log({varrrrr: this.variables});
+    }
+
+    simpleStringify() {
+        return this.stringify();
     }
 
     algebraicStringify() {

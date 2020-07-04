@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import { SafeAreaView, StatusBar } from 'react-native';
 import ButtonsArea from './components/ButtonsArea';
 import InfoArea from './components/InfoArea';
-import { MatrixState, count, SystemSolutionType } from './utilities/constants';
+import { MatrixState, count, SystemSolutionType, Operator } from './utilities/constants';
 import MatrixOperations from './utilities/MatrixOperations';
 import ScalarOperations from './utilities/ScalarOperations';
 import { simplifyExpression, varOperation } from './utilities/ExpressionSimplification';
-import { ElementData, VariableData } from './utilities/ExpressionClasses';
+import { ElementData, VariableData, ExpressionData } from './utilities/ExpressionClasses';
 
 const INITIAL_MATRIX = MatrixOperations.emptyMatrix({
     rows: 3,
@@ -282,8 +282,92 @@ export default function CalculatorScreen({ isPortrait }) {
                 changeReadyMatrix={changeReadyMatrix}
                 onPressBackground={
                     () => {
-                        // const result = simplifyExpression("((1*a)*(2+(((b*-1)/(a/a))*(d/a))))*((9+(((c*-1)/(a/a))*(g/a)))+((((f+(((c*-1)/(a/a))*(d/a)))*-1)/((2+(((b*-1)/(a/a))*(d/a)))/(2+(((b*-1)/(a/a))*(d/a)))))*((h+(((b*-1)/(a/a))*(g/a)))/(2+(((b*-1)/(a/a))*(d/a))))))");   
-                        // console.log({result});
+                        console.log({
+                            a: new ExpressionData({
+                                operator: Operator.Add,
+                                elements: [
+                                    new ElementData({
+                                        scalar: 1,
+                                        variables: [
+                                            new VariableData({
+                                                variable: 'c'
+                                            })
+                                        ]
+                                    }),
+                                    new ElementData({
+                                        scalar: -1,
+                                        variables: [
+                                            new VariableData({
+                                                variable: 'i'
+                                            })
+                                        ]
+                                    })
+                                ]
+                            }).stringify(),
+                            b: new ExpressionData({
+                                operator: Operator.Add,
+                                elements: [
+                                    new ElementData({
+                                        scalar: -1,
+                                        variables: [
+                                            new VariableData({
+                                                variable: 'c'
+                                            })
+                                        ]
+                                    }),
+                                    new ElementData({
+                                        scalar: 1,
+                                        variables: [
+                                            new VariableData({
+                                                variable: 'i'
+                                            })
+                                        ]
+                                    })
+                                ]
+                            }).stringify(),
+                            c: new ExpressionData({
+                                operator: Operator.Add,
+                                elements: [
+                                    new ElementData({
+                                        scalar: -1,
+                                        variables: [
+                                            new VariableData({
+                                                variable: 'i'
+                                            })
+                                        ]
+                                    }),
+                                    new ElementData({
+                                        scalar: 1,
+                                        variables: [
+                                            new VariableData({
+                                                variable: 'c'
+                                            })
+                                        ]
+                                    }),
+                                ]
+                            }).stringify(),
+                            d: new ExpressionData({
+                                operator: Operator.Add,
+                                elements: [
+                                    new ElementData({
+                                        scalar: 1,
+                                        variables: [
+                                            new VariableData({
+                                                variable: 'i'
+                                            })
+                                        ]
+                                    }),
+                                    new ElementData({
+                                        scalar: -1,
+                                        variables: [
+                                            new VariableData({
+                                                variable: 'c'
+                                            })
+                                        ]
+                                    }),
+                                ]
+                            }).stringify()
+                        })
                         if (matrixState !== MatrixState.LambdaxA) {
                             changeFullEquation(null);
                             exitEditingMode();

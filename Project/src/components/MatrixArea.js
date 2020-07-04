@@ -25,9 +25,9 @@ export default function MatrixArea({
     changeViewReduced,
     isPortrait,
 }) {
-
+ 
     let [matrixAreaWidth, changeMatrixAreaWidth] = useState(0);
-
+ 
     function formatNumberToFraction(number) {
         return number !== null 
             ? findFraction(toFixedOnZeroes(number))
@@ -36,7 +36,7 @@ export default function MatrixArea({
 
     function formatDeterminant(determinant) {
         if (determinant === null) return null
-        stringDeterminant = determinant.algebraicStringify();
+        stringDeterminant = determinant.simpleStringify();
         if (stringDeterminant && !ScalarOperations.isNumber(stringDeterminant)) return `det: ${stringDeterminant}`;
         const formatted = formatNumberToFraction(stringDeterminant);
         return formatted !== null 

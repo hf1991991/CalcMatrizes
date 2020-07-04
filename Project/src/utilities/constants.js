@@ -163,3 +163,23 @@ export function toFixedWithThreeDots(number) {
     ) return Number.parseFloat(number).toFixed(PRECISION) + '...';
     return number;
 }
+
+export function parenthesisEnglobe(string) {
+
+    // console.log({string})
+    if (!string.startsWith('(') || !string.endsWith(')'))
+        return false;
+
+    let openParenthesis = 0
+
+    for (let index = 0; index < string.length; index++) {
+        if (string.substring(index, index + 1) === '(')
+            openParenthesis++;
+        else if (string.substring(index, index + 1) === '(')
+            openParenthesis--;
+        if (openParenthesis === 0 && index < string.length - 1)
+            return false;
+    }
+
+    return true;
+}
