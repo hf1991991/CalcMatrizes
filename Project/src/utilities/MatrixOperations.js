@@ -386,7 +386,7 @@ export default class MatrixOperations {
         ) {
             let pivot = _matrixA.data[pivotColumn][pivotColumn];
 
-            if (pivot.scalar === 0.0) {
+            if (pivot.scalar === 0) {
 
                 let testRow = pivotColumn + 1;
                 while (true) {
@@ -398,7 +398,7 @@ export default class MatrixOperations {
 
                     let possibleNewPivot = _matrixA.data[testRow][pivotColumn];
 
-                    if (possibleNewPivot instanceof ElementData && possibleNewPivot.scalar !== 0.0 && possibleNewPivot.variables.length === 0) break;
+                    if (possibleNewPivot instanceof ElementData && possibleNewPivot.scalar !== 0.0) break;
 
                     testRow++;
                 }
