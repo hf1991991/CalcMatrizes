@@ -369,7 +369,7 @@ function symplifyDenominators(addition) {
 
     }
 
-    function inverseDistributive(numerator1, numerator2) {
+    function inverseDistributive(numerator1, numerator2, denominator) {
 
         function addToExponent(variableData, add) {
             return new VariableData({
@@ -378,81 +378,182 @@ function symplifyDenominators(addition) {
                 });
         }
 
+        function insertNotExistingVariables(element, allVariables) {
+            return {
+                scalar: element.scalar,
+                variables: allVariables.map(
+                    v => ({
+                        variable: v,
+                        exponent: getVariableFromElement(
+                                v,
+                                element
+                            ) !== null
+                                ? getVariableFromElement(
+                                        v,
+                                        element
+                                    ).exponent
+                                : 0
+                    })
+                )
+            };
+        }
+
+        function getVariableFromElement(variable, element) {
+            const list = element.variables.filter(
+                vari => vari.variable === variable
+            );
+            return list.length !== 0
+                ? list[0]
+                : null;
+        }
+
+        function getVariableIndex(search, variables) {
+            return variables.map(v => v.variable).indexOf(search);
+        }
+
         console.log('STARTED INVERSE DISTRIBUTIVE')
+
+        const denominatorBase = denominator.elements[0];
+        const denominatorExponent = denominator.elements[1].scalar;
+
         console.log({
             numerator1: numerator1.stringify(),
-            numerator2: numerator2.stringify()
+            numerator2: numerator2.stringify(),
+            denominatorBase: denominatorBase.stringify()
         });
 
-        common = [];
+        let allVariables = [
+            ...numerator1.variables,
+            ...numerator2.variables,
+            ...denominatorBase.elements[0].variables,
+            ...denominatorBase.elements[1].variables
+        ].map(v => v.variable);
 
-        let variables1 = [...numerator1.variables];
-        let variables2 = [...numerator2.variables];
+        allVariables = allVariables.filter(
+            (v, index) => allVariables.indexOf(v) === index
+        );
 
-        for (i = 0; i < variables1.length; i++) {
-            for (j = 0; j < variables2.length; j++) {
+        let denominatorBaseElementsCopy = denominatorBase.elements.map(
+            e => insertNotExistingVariables(e, allVariables)
+        );
 
-                while (
-                    variables1[i].variable === variables2[j].variable
-                    && !(
-                        variables1[i].exponent === 0
-                        || variables2[j].exponent === 0
-                    )
-                ) {
+        for (let denominatorElement of denominatorBaseElementsCopy) {
 
-                    const numberToAdd = (
-                            variables1[i].exponent > 0
-                            || variables2[j].exponent > 0 
-                        )
-                            ? -1
-                            : 1;
-
-                    variables1[i] = addToExponent(variables1[i], numberToAdd);
-                    variables2[j] = addToExponent(variables2[j], numberToAdd);
+            let numerator1Copy = insertNotExistingVariables(numerator1, allVariables);
+            let numerator2Copy = insertNotExistingVariables(numerator2, allVariables);
     
-                    common.push(new VariableData({
-                        variable: variables1[i].variable,
+            console.log(JSON.stringify({
+                numerator1Copy: new ElementData(numerator1Copy).stringify(),
+                numerator2Copy: new ElementData(numerator2Copy).stringify(),
+                denominatorBaseElementsCopy: denominatorBaseElementsCopy.map(
+                    e => new ElementData(e).stringify()
+                ),
+                allVariables
+            }));
+
+            let common = {
+                scalar: numerator1Copy.scalar / denominatorElement.scalar,
+                variables: []
+            };
+
+            numerator1Copy.scalar = numerator1Copy.scalar * Math.pow(common.scalar, -1);
+            numerator2Copy.scalar = numerator2Copy.scalar * Math.pow(common.scalar, -1);
+
+            for (let variable of allVariables) {
+                
+                let denominatorVariable = getVariableFromElement(variable, denominatorElement);
+
+                let i = getVariableIndex(variable, numerator1Copy.variables);
+                let j = getVariableIndex(variable, numerator2Copy.variables);
+
+                if (i === -1 || j === -1) {
+                    console.log('ERRO em inverseDistributive: índice não existe.')
+                    console.log({ i, j });
+                }
+
+                while (numerator1Copy.variables[i].exponent !== denominatorVariable.exponent) {
+
+                    const numberToAdd = numerator1Copy.variables[i].exponent < denominatorVariable.exponent
+                        ? 1
+                        : -1;
+
+                    numerator1Copy.variables[i] = addToExponent(numerator1Copy.variables[i], numberToAdd);
+                    numerator2Copy.variables[j] = addToExponent(numerator2Copy.variables[j], numberToAdd);
+    
+                    common.variables.push(new VariableData({
+                        variable,
                         exponent: -1 * numberToAdd
                     }));
 
                 }
 
             }
+
+            console.log(JSON.stringify({
+                numerator1Copy: new ElementData(numerator1Copy).stringify(),
+                numerator2Copy: new ElementData(numerator2Copy).stringify(),
+                denominatorBaseElementsCopy: denominatorBaseElementsCopy.map(
+                    e => new ElementData(e).stringify()
+                ),
+                common: new ElementData(common).stringify()
+            }));
+
+            const newNumerator = new ExpressionData({
+                operator: Operator.Add,
+                elements: [
+                    new ElementData(numerator1Copy),
+                    new ElementData(numerator2Copy)
+                ]
+            });
+
+            // Se for verdade, foi encontrado o resultado da divisão entre o numerador e denominador:
+            if (additionMatches(newNumerator, denominatorBase)) {
+
+                console.log('ENCONTRADO!')
+
+                const commonElement = new ElementData(common);
+
+                const finalDenominator = doOperation(
+                    new ExpressionData({
+                        operator: Operator.Elevate,
+                        elements: [
+                            denominatorBase,
+                            new ElementData({
+                                scalar: 1 + denominatorExponent
+                            })
+                        ]
+                    })
+                );
+
+                console.log({
+                    commonElement: commonElement.stringify(),
+                    finalDenominator: finalDenominator.stringify()
+                })
+
+                console.log('ENDED INVERSE DISTRIBUTIVE')
+
+                if (1 + denominatorExponent === 0)
+                    return commonElement;
+
+                if (commonElement.scalar === 1 && commonElement.variables.length === 0)
+                    return finalDenominator;
+                
+                return new ExpressionData({
+                    operator: Operator.Multiply,
+                    elements: [
+                        commonElement,
+                        finalDenominator
+                    ]
+                });
+
+            } else
+                console.log('NÃO ENCONTRADO...')
+
         }
 
-        commonFactor = new ElementData({
-            variables: common,
-        });
-
-        // console.log('STARTING ADDITION LEFT ADD SUB-LOOP')
-        additionLeft = new ExpressionData({
-            operator: Operator.Add,
-            elements: [
-                new ElementData({
-                    scalar: numerator1.scalar,
-                    variables: variables1,
-                }),
-                new ElementData({
-                    scalar: numerator2.scalar,
-                    variables: variables2,
-                })
-            ]
-        });
-        // console.log('ENDED ADDITION LEFT ADD SUB-LOOP')
-        // console.log(JSON.stringify({
-        //     additionLeft: additionLeft.stringify()
-        // }))
-
         console.log('ENDED INVERSE DISTRIBUTIVE')
-        console.log(JSON.stringify({
-            commonFactor: commonFactor.stringify(),
-            additionLeft: additionLeft.stringify()
-        }))
 
-        return {
-            commonFactor,
-            additionLeft
-        };
+        return null;
 
     }
 
@@ -470,14 +571,6 @@ function symplifyDenominators(addition) {
 
         // Testa todos os elementos de newElements antes e depois do índice i:
         for (let j = i + 1; j < addition.elements.length; j++) {
-            console.log({
-                i,
-                j
-            })
-            console.log(JSON.stringify({
-                one: addition.elements[i].stringify(),
-                two: addition.elements[j].stringify()
-            }))
 
             if (!addedIndexes.includes(i) && !addedIndexes.includes(j)) {
 
@@ -489,53 +582,19 @@ function symplifyDenominators(addition) {
                     && fraction1.denominators.length > 0
                     && fraction2.denominators.length > 0
                 ) {
+
+                    if (fraction1.denominators.length > 1) {
+                        console.log('ERRO em inverseDistributive: fraction1.denominators muito longo: ' + fraction1.denominators)
+                    }
                         
-                    const { commonFactor, additionLeft } = inverseDistributive(fraction1.numerator, fraction2.numerator)
-    
-                    console.log('STARTING DENOMINATOR MULTIPLICATION SUB-LOOP')
-                    console.log(JSON.stringify({
-                        additionLeft: additionLeft.stringify(),
-                        denominators: fraction1.denominators.map(a => a.stringify())
-                    }))
-                    possibleDenominatorElimination = doOperation(
-                        new ExpressionData({
-                            operator: Operator.Multiply,
-                            elements: [
-                                additionLeft,
-                                ...fraction1.denominators
-                            ]
-                        })
-                    );
-                    console.log('ENDED DENOMINATOR MULTIPLICATION SUB-LOOP')
-                    console.log(JSON.stringify({
-                        possibleDenominatorElimination: possibleDenominatorElimination.stringify()
-                    }))
-    
-                    if (possibleDenominatorElimination instanceof ElementData) {
-    
-                        console.log('STARTING SIMPLIFYING MULTIPLICATION SUB-LOOP')
-                        console.log(JSON.stringify({
-                            possibleDenominatorElimination: possibleDenominatorElimination.stringify(),
-                            commonFactor: commonFactor.stringify()
-                        }))
-                        simplifiedElement = doOperation(
-                            new ExpressionData({
-                                operator: Operator.Multiply,
-                                elements: [
-                                    possibleDenominatorElimination,
-                                    commonFactor
-                                ]
-                            })
-                        )
-                        console.log('ENDED SIMPLIFYING MULTIPLICATION SUB-LOOP')
-                        console.log(JSON.stringify({
-                            simplifiedElement: simplifiedElement.stringify()
-                        }))
-    
-                        newElements.push(simplifiedElement);
+                    const divisionResult = inverseDistributive(fraction1.numerator, fraction2.numerator, fraction1.denominators[0])
+
+                    if (divisionResult !== null) {
+                    
+                        newElements.push(divisionResult);
                         addedIndexes.push(i);
                         addedIndexes.push(j);
-    
+
                     }
     
                 }
