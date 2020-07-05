@@ -113,7 +113,9 @@ export class ElementData {
         const formatExponent = 
             (exponent) => exponent === 1
                 ? ''
-                : `^(${findFraction(exponent)})`
+                : findFraction(exponent).toString().indexOf('/') !== -1
+                    ? `^(${findFraction(exponent)})`
+                    : `^${findFraction(exponent)}`
         const formatVariables = 
             () => this.variables.map(
                     vari => `${vari.variable}${formatExponent(vari.exponent)}`
