@@ -28,8 +28,6 @@ export default function ButtonsArea(props) {
             marginHorizontal: 6,
         },
     });
-
-    console.log({numberWritten})
     
     return (
         <View
@@ -46,7 +44,7 @@ export default function ButtonsArea(props) {
                 <CalculatorButton
                     {...props}
                     buttonType={
-                        (numberWritten instanceof ElementData && numberWritten.simpleStringify() === '0') || matrixState === MatrixState.ready
+                        (numberWritten !== null && numberWritten.simpleStringify() === '0') || matrixState === MatrixState.ready
                             ? ButtonType.AC
                             : ButtonType.CE
                     }

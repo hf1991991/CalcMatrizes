@@ -175,7 +175,7 @@ export function parenthesisEnglobe(string) {
     for (let index = 0; index < string.length; index++) {
         if (string.substring(index, index + 1) === '(')
             openParenthesis++;
-        else if (string.substring(index, index + 1) === '(')
+        else if (string.substring(index, index + 1) === ')')
             openParenthesis--;
         if (openParenthesis === 0 && index < string.length - 1)
             return false;

@@ -113,22 +113,33 @@ export default function CalculatorScreen({ isPortrait }) {
 
     function getNumberWritten({ forceNotOperatorNumber=false, doNotStringify=false }={}) {
         if (operationHappening && !forceNotOperatorNumber) 
-            return editableOperatorNumber === null
+            return editableOperatorNumber === null && !doNotStringify
                 ? ''
                 : editableOperatorNumber;
-
-        if (shouldUserInputOverwriteElement && !forceNotOperatorNumber) return '';
-        
-        if (matrixState === MatrixState.LambdaxA) 
-            return editableScalar === null
-                ? ''
-                : editableScalar;
 
         const { row, column } = selectedMatrixElement || {};
         const matrixNumber = editableMatrix 
             && editableMatrix.data 
             && editableMatrix.data[row] 
             && editableMatrix.data[row][column];
+
+        if (
+            (
+                shouldUserInputOverwriteElement 
+                || (
+                    matrixNumber instanceof ElementData
+                    && matrixNumber.scalar === 0
+                )
+            ) && !forceNotOperatorNumber
+        ) 
+            return doNotStringify
+                ? null
+                : '';
+        
+        if (matrixState === MatrixState.LambdaxA) 
+            return editableScalar === null && !doNotStringify
+                ? ''
+                : editableScalar;
             
         return doNotStringify
             ? matrixNumber
@@ -186,7 +197,7 @@ export default function CalculatorScreen({ isPortrait }) {
 
         changeNumberWritten({
             newNumber: varOperation(
-                getNumberWritten({ forceNotOperatorNumber: true }),
+                getNumberWritten({ forceNotOperatorNumber: true, doNotStringify: true }),
                 selectedOperator,
                 editableOperatorNumber
             ),
@@ -400,12 +411,14 @@ export default function CalculatorScreen({ isPortrait }) {
                         if (element.toString().match(letters))
                             changeNumberWritten({ 
                                 newNumber: new ElementData({
-                                    scalar: originalValue.scalar,
+                                    scalar: originalValue !== null
+                                        ? originalValue.scalar
+                                        : 1,
                                     variables: [
                                         new VariableData({
                                             variable: element
                                         }),
-                                        ...(originalValue.variables || [])
+                                        ...((originalValue !== null && originalValue.variables) || [])
                                     ]
                                 })
                             });
@@ -420,10 +433,10 @@ export default function CalculatorScreen({ isPortrait }) {
                         else if (count(getNumberWritten(), /\./, true) === 0 || element !== '.')
                             changeNumberWritten({
                                 newNumber: new ElementData({
-                                    scalar: originalValue.scalar === undefined
+                                    scalar: originalValue === null
                                         ? element
                                         : originalValue.scalar.toString() + element,
-                                    variables: originalValue.variables || []
+                                    variables: (originalValue !== null && originalValue.variables) || []
                                 })
                             });
                         
@@ -533,22 +546,28 @@ export default function CalculatorScreen({ isPortrait }) {
                     
                 }}
                 onInvert={() => {
+
+                    try {
                     
-                    if (matrixState === MatrixState.ready) {
-                        changeReadyMatrix(
-                            MatrixOperations.invert(readyMatrix)
-                        );
+                        if (matrixState === MatrixState.ready) {
+                            changeReadyMatrix(
+                                MatrixOperations.invert(readyMatrix)
+                            );
+                        }
+    
+                        else {
+                            changeReadyMatrix(
+                                MatrixOperations.invert(editableMatrix)
+                            );
+                            changeSettingsOfSelectedMatrixElement(null);
+                            exitEditingMode();
+                        }
+    
+                        singleInputFullEquationSetup(MatrixState.invert);
+                    
+                    } catch (e) {
+                        console.log(e);
                     }
-
-                    else {
-                        changeReadyMatrix(
-                            MatrixOperations.invert(editableMatrix)
-                        );
-                        changeSettingsOfSelectedMatrixElement(null);
-                        exitEditingMode();
-                    }
-
-                    singleInputFullEquationSetup(MatrixState.invert);
                     
                 }}
                 onEnter={() => {
