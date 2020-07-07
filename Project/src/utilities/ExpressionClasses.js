@@ -17,18 +17,18 @@ export class ExpressionData {
         });
     }
 
-    simpleStringify() {
-        const string = this.algebraicStringify();
+    simpleStringify({ dontFindFraction=false }={}) {
+        const string = this.algebraicStringify({ dontFindFraction });
         return parenthesisEnglobe(string)
             ? string.substring(1, string.length - 1)
             : string;
     }
 
-    algebraicStringify() {
+    algebraicStringify({ dontFindFraction=false }={}) {
         switch (this.operator) {
             case Operator.Elevate:
-                const base = this.elements[0].algebraicStringify();
-                const exponent = this.elements[1].algebraicStringify();
+                const base = this.elements[0].algebraicStringify({ dontFindFraction });
+                const exponent = this.elements[1].algebraicStringify({ dontFindFraction });
                 return `(${
                         parenthesisEnglobe(base)
                             ? base.substring(1, base.length - 1)
@@ -39,14 +39,14 @@ export class ExpressionData {
                             : exponent
                     }`;
             case Operator.Divide:
-                return `${this.elements[0].algebraicStringify()}/(${List.from(this.elements).splice(1, this.elements.length - 1).map(a => a.algebraicStringify()).join(')/(')}`;
+                return `${this.elements[0].algebraicStringify({ dontFindFraction })}/(${List.from(this.elements).splice(1, this.elements.length - 1).map(a => a.algebraicStringify({ dontFindFraction })).join(')/(')}`;
             case Operator.Multiply:
-                return `${this.elements.map(a => a.algebraicStringify()).join('×')}`;
+                return `${this.elements.map(a => a.algebraicStringify({ dontFindFraction })).join('×')}`;
             case Operator.Add:
-                const terms = this.elements.map(a => a.algebraicStringify()).map(a => a.startsWith('-') ? a : '+' + a).join('');
+                const terms = this.elements.map(a => a.algebraicStringify({ dontFindFraction })).map(a => a.startsWith('-') ? a : '+' + a).join('');
                 return `(${terms.startsWith('+') ? terms.substring(1, terms.length) : terms})`;
             case Operator.Subtract:
-                return `(${this.elements[0].algebraicStringify()}-${List.from(this.elements).splice(1, this.elements.length - 1).map(a => a.algebraicStringify()).join('-')})`;
+                return `(${this.elements[0].algebraicStringify({ dontFindFraction })}-${List.from(this.elements).splice(1, this.elements.length - 1).map(a => a.algebraicStringify({ dontFindFraction })).join('-')})`;
         }
     }
 
@@ -95,27 +95,33 @@ export class ElementData {
         // console.log({varrrrr: this.variables});
     }
 
-    simpleStringify() {
-        return this.stringify();
+    simpleStringify({ dontFindFraction=false }={}) {
+        return this.stringify({ dontFindFraction });
     }
 
-    algebraicStringify() {
-        return this.stringify();
+    algebraicStringify({ dontFindFraction=false }={}) {
+        return this.stringify({ dontFindFraction });
     }
 
-    stringify({ onlyVariables=false }={}) {
+    stringify({ onlyVariables=false, dontFindFraction=false }={}) {
+
+        const findPossibleFraction =
+            (number) => dontFindFraction
+                ? number
+                : findFraction(number);
+
         const formatScalar = 
             () => (this.scalar === 1 && this.variables.length !== 0) || onlyVariables
                 ? ''
                 : this.scalar === -1 && this.variables.length !== 0
                     ? '-'
-                    : findFraction(this.scalar)
+                    : findPossibleFraction(this.scalar)
         const formatExponent = 
             (exponent) => exponent === 1
                 ? ''
-                : findFraction(exponent).toString().indexOf('/') !== -1
-                    ? `^(${findFraction(exponent)})`
-                    : `^${findFraction(exponent)}`
+                : findPossibleFraction(exponent).toString().indexOf('/') !== -1 || findPossibleFraction(exponent).toString().indexOf('-') !== -1
+                    ? `^(${findPossibleFraction(exponent)})`
+                    : `^${findPossibleFraction(exponent)}`
         const formatVariables = 
             () => this.variables.map(
                     vari => `${vari.variable}${formatExponent(vari.exponent)}`

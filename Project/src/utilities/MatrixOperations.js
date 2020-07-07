@@ -137,7 +137,7 @@ export default class MatrixOperations {
 
         for (let row = 0; row < matrix.dimensions().rows; row++) {
             for (let column = 0; column < matrix.dimensions().columns; column++) {
-                if (!Number.isNaN(matrix.data[row][column])) return false;
+                if (matrix.data[row][column].simpleStringify() !== '0') return false;
             }
         }
         return true;
@@ -158,19 +158,19 @@ export default class MatrixOperations {
         console.log('\n');
     }
 
-    static smartToFixedOnMatrix(matrixData) {
-        let fixed = [];
+    // static smartToFixedOnMatrix(matrixData) {
+    //     let fixed = [];
 
-        for (let row = 0; row < matrixData.length; row++) {
-            let fixedRow = [];
-            for (let column = 0; column < matrixData[0].length; column++) {
-                fixedRow.push(smartToFixed(matrixData[row][column]));
-            }
-            fixed.push(fixedRow);
-        }
+    //     for (let row = 0; row < matrixData.length; row++) {
+    //         let fixedRow = [];
+    //         for (let column = 0; column < matrixData[0].length; column++) {
+    //             fixedRow.push(smartToFixed(matrixData[row][column]));
+    //         }
+    //         fixed.push(fixedRow);
+    //     }
 
-        return fixed;
-    }
+    //     return fixed;
+    // }
 
     static parseFloatPreservingDotAndVariables(string) {
         if (ExpressionSimplification.getVariables(string)) return string;
@@ -189,7 +189,7 @@ export default class MatrixOperations {
             for (let column = 0; column < matrixData[0].length; column++) {
                 let element = matrixData[row][column];
 
-                if (!(element instanceof ElementData)) {
+                if (!(element instanceof ElementData) && !(element instanceof ExpressionData)) {
                     // console.log('applyFrescuresToMatrixData: elemento não é um ElementData: ' + element);
                     element = new ElementData({
                         scalar: element
@@ -246,8 +246,11 @@ export default class MatrixOperations {
             let matrixRow = [];
             for (let column = 0; column < matrixA.dimensions().columns; column++) {
                 matrixRow.push(
-                    Number.parseFloat(matrixA.data[row][column])
-                    + Number.parseFloat(matrixB.data[row][column])
+                    ExpressionSimplification.varOperation(
+                        matrixA.data[row][column],
+                        Operator.Add,
+                        matrixB.data[row][column]
+                    )
                 );
             }
             matrix.push(matrixRow);
@@ -265,8 +268,11 @@ export default class MatrixOperations {
             let matrixRow = [];
             for (let column = 0; column < matrixA.dimensions().columns; column++) {
                 matrixRow.push(
-                    Number.parseFloat(matrixA.data[row][column])
-                    - Number.parseFloat(matrixB.data[row][column])
+                    ExpressionSimplification.varOperation(
+                        matrixA.data[row][column],
+                        Operator.Subtract,
+                        matrixB.data[row][column]
+                    )
                 );
             }
             matrix.push(matrixRow);
@@ -283,9 +289,21 @@ export default class MatrixOperations {
         for (let row = 0; row < matrixA.dimensions().rows; row++) {
             let matrixRow = [];
             for (let column = 0; column < matrixB.dimensions().columns; column++) {
-                let newElement = 0;
+                let newElement = new ElementData({
+                    scalar: 0,
+                });
                 for (let index = 0; index < matrixA.dimensions().columns; index++) {
-                    newElement += matrixA.data[row][index] * matrixB.data[index][column];
+
+                    newElement = ExpressionSimplification.varOperation(
+                        ExpressionSimplification.varOperation(
+                            matrixA.data[row][index],
+                            Operator.Multiply,
+                            matrixB.data[index][column]
+                        ),
+                        Operator.Add,
+                        newElement
+                    );
+
                 }
                 matrixRow.push(newElement);
             }
@@ -303,7 +321,13 @@ export default class MatrixOperations {
         for (let row = 0; row < matrixA.dimensions().rows; row++) {
             let matrixRow = [];
             for (let column = 0; column < matrixA.dimensions().columns; column++) {
-                matrixRow.push(matrixA.data[row][column] * scalar);
+                matrixRow.push(
+                    ExpressionSimplification.varOperation(
+                        matrixA.data[row][column],
+                        Operator.Multiply,
+                        new ElementData({ scalar })
+                    )
+                );
             }
             matrix.push(matrixRow);
         }
@@ -330,16 +354,23 @@ export default class MatrixOperations {
     }
 
     static invert(matrix) {
+        console.log('STARTING BELOW MAIN DIAGONAL')
         let firstElimination = MatrixOperations.partialGaussianElimination({
             matrixA: matrix,
             matrixB: MatrixOperations.identity(matrix.dimensions().rows),
             eliminateBelowMainDiagonal: true,
         });
+        console.log('ENDED BELOW MAIN DIAGONAL')
 
+        MatrixOperations.printMatrix(firstElimination.matrixA)
+        MatrixOperations.printMatrix(firstElimination.matrixB)
+
+        console.log('STARTING ABOVE MAIN DIAGONAL')
         let secondElimination = MatrixOperations.partialGaussianElimination({
             ...firstElimination,
             eliminateBelowMainDiagonal: false,
         });
+        console.log('ENDED ABOVE MAIN DIAGONAL')
 
         return MatrixOperations.copyMatrixData(secondElimination.matrixB);
     }
@@ -431,9 +462,12 @@ export default class MatrixOperations {
                     for (let index = 0; index < dimensionsA.columns; index++)
                         _matrixA.data[pivotColumn][index] = 
                             ExpressionSimplification.varOperation(_matrixA.data[pivotColumn][index], Operator.Divide, pivot);
+
+                    console.log('STARTING MATRIX B DIVISION BY PIVOT')
                     for (let index = 0; index < dimensionsB.columns; index++)
                         _matrixB.data[pivotColumn][index] =
                             ExpressionSimplification.varOperation(_matrixB.data[pivotColumn][index], Operator.Divide, pivot);
+                    console.log('ENDED MATRIX B DIVISION BY PIVOT')
 
                     determinant = ExpressionSimplification.varOperation(determinant, Operator.Multiply, pivot);
 
@@ -489,6 +523,7 @@ export default class MatrixOperations {
                         );
                     }
 
+                    console.log('STARTING MATRIX B MERGE ROWS')
                     for (let horizontalIndex = 0; horizontalIndex < dimensionsB.columns; horizontalIndex++)
                         _matrixB.data[verticalIndex][horizontalIndex] = ExpressionSimplification.varOperation(
                             _matrixB.data[verticalIndex][horizontalIndex],
@@ -499,6 +534,7 @@ export default class MatrixOperations {
                                 _matrixB.data[pivotColumn][horizontalIndex]
                             ),
                         );
+                    console.log('ENDED MATRIX B MERGE ROWS')
 
                     //if (showSteps)
                     //    exibicao_passos_resolver_equacao_matricial(_matrixA, _matrixB, eliminationFactor, pivotColumn+1, verticalIndex+1, verticalElimination, None)

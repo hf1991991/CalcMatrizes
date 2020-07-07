@@ -379,6 +379,7 @@ function symplifyDenominators(addition) {
         }
 
         function insertNotExistingVariables(element, allVariables) {
+            console.log({element: element.stringify(), allVariables})
             return {
                 scalar: element.scalar,
                 variables: allVariables.map(
@@ -519,7 +520,7 @@ function symplifyDenominators(addition) {
                         elements: [
                             denominatorBase,
                             new ElementData({
-                                scalar: 1 + denominatorExponent
+                                scalar: 1 + Number.parseFloat(denominatorExponent)
                             })
                         ]
                     })
@@ -532,7 +533,7 @@ function symplifyDenominators(addition) {
 
                 console.log('ENDED INVERSE DISTRIBUTIVE')
 
-                if (1 + denominatorExponent === 0)
+                if (1 + Number.parseFloat(denominatorExponent) === 0)
                     return commonElement;
 
                 if (commonElement.scalar === 1 && commonElement.variables.length === 0)
@@ -673,7 +674,7 @@ function doOperation(expression) {
 
             multiplicationElements = []
 
-            let first = true;
+            first = true;
 
             for (element of expression.elements) {
 
@@ -795,7 +796,7 @@ function doOperation(expression) {
 
             console.log('ganso')
             console.log(JSON.stringify({
-                multipliers: multipliers, 
+                multipliers: multipliers.map(a => a.stringify()), 
                 elevations: elevations.map(a => a.stringify()), 
                 distributives: distributives.map(a => a.stringify())
             }));
@@ -960,6 +961,71 @@ function doOperation(expression) {
 
             }
 
+            // let elevationExponentDict = {};
+
+            // const time = new Date();
+
+            // console.log('STARTING ELEVATION EXPONENT ' + time);
+            // console.log(JSON.stringify({
+            //     simplifiedElevations: simplifiedElevations.map(a => a.stringify()), 
+            // }));
+
+            // for (elevationElement of simplifiedElevations) {
+            //     elevationExponentDict[elevationElement.elements[1].scalar] = [
+            //         ...(elevationExponentDict[elevationElement.elements[1].scalar] || []), 
+            //         elevationElement.elements[0]
+            //     ];
+            //     console.log({
+            //         bases: elevationExponentDict[elevationElement.elements[1].scalar].map(e => e.stringify()),
+            //         elevation: elevationElement.elements[1].scalar
+            //     })
+            // }
+
+            // simplifiedElevations = [];
+
+            // for (elevationExponent of Object.keys(elevationExponentDict)) {
+            //     if (elevationExponentDict[elevationExponent].length > 1) {
+
+            //         console.log('STARTING ELEVATION EXPONENT MULT SUB-LOOP ' + time);
+            //         console.log({
+            //             elevationExponent,
+            //             elements: elevationExponentDict[elevationExponent].map(
+            //                 e => e.stringify()
+            //             )
+            //         })
+            //         elevationExponentDict[elevationExponent] = [
+            //             doOperation(
+            //                 new ExpressionData({
+            //                     operator: Operator.Multiply,
+            //                     elements: elevationExponentDict[elevationExponent]
+            //                 })
+            //             )
+            //         ];
+            //         console.log('ENDED ELEVATION EXPONENT MULT SUB-LOOP ' + time);
+            //         console.log({
+            //             elevationExponent,
+            //             elements: elevationExponentDict[elevationExponent]
+            //         })
+            //     }
+
+            //     for (elevationBase of elevationExponentDict[elevationExponent])
+            //         simplifiedElevations.push(new ExpressionData({
+            //             operator: Operator.Elevate,
+            //             elements: [
+            //                 elevationBase,
+            //                 new ElementData({
+            //                     scalar: elevationExponent
+            //                 })
+            //             ]
+            //         }));
+                
+            // }
+
+            // console.log('ENDED ELEVATION EXPONENT ' + time);
+            // console.log(JSON.stringify({
+            //     simplifiedElevations: simplifiedElevations.map(a => a.stringify()), 
+            // }));
+
             console.log('pesto')
             console.log(JSON.stringify({
                 multipliers: multipliers.map(a => a.stringify()), 
@@ -1045,7 +1111,7 @@ function doOperation(expression) {
 
                         else if (mult.scalar === 1 && mult.variables.length === 0) {
                             if (simplifiedElevations.length === 1)
-                                finalResult.push(simplifiedElevations[0]);
+                                return simplifiedElevations[0];
 
                             else
                                 finalResult.push(
@@ -1174,6 +1240,9 @@ function doOperation(expression) {
                     })
                 return simplifiedAdders[0];
             }
+
+            if (simplifiedAdders.length === 0 && notAdders.length === 1)
+                return notAdders[0];
             
             return symplifyDenominators(
                 new ExpressionData({
@@ -1188,54 +1257,59 @@ function doOperation(expression) {
 
         case Operator.Subtract:
 
-            simplifiedElements = [];
+            elements = []
 
-            scalar = 0;
-            variables = null;
+            first = true;
 
             for (element of expression.elements) {
 
-                if (element instanceof ExpressionData) {
-                    console.log('ERRO em doOperation: Expressão muito complicada.')
-                    // console.log(JSON.stringify(expression))
-                    expression.isSimplified = true;
-                    return expression;
-                }
+                if (first)
+                    elements.push(element);
 
-                if (element.scalar !== 0) {
-                    const usedVariablesIndex = getIndexOfVariable(simplifiedElements, element.variables);
+                else {
 
-                    console.log({used: usedVariablesIndex})
+                    if (element instanceof ExpressionData) 
+                        elements.push(
+                            doOperation(
+                                new ExpressionData({
+                                    operator: Operator.Multiply,
+                                    elements: [
+                                        element,
+                                        new ElementData({
+                                            scalar: -1
+                                        })
+                                    ]
+                                })
+                            )
+                        );
 
-                    if (usedVariablesIndex === -1)
-                        simplifiedElements.push(element);
                     else {
-                        simplifiedElements[usedVariablesIndex] = new ElementData({
-                            scalar: Number.parseFloat(simplifiedElements[usedVariablesIndex].scalar)
-                                - Number.parseFloat(element.scalar),
-                            variables: element.variables,
-                        });
+
+                        if (element.scalar !== 0) {
+
+                            elements.push(
+                                new ElementData({
+                                    scalar: -1 * element.scalar,
+                                    variables: element.variables
+                                })
+                            );
+
+                        }
+
                     }
-                    
+
                 }
 
+                first = false;
+                
             }
 
-            if (simplifiedElements.length === 0)
-                simplifiedElements = [
-                    new ElementData({
-                        scalar: 0
-                    })
-                ];
-
-            if (simplifiedElements.length === 1)
-                return simplifiedElements[0];
-            
-            return new ExpressionData({
-                operator: expression.operator,
-                elements: simplifiedElements,
-                isSimplified: true
-            });
+            return doOperation(
+                new ExpressionData({
+                    operator: Operator.Add,
+                    elements,
+                })
+            );
 
         default:
             console.log('ERRO em doOperation: não foi selecionado um operador: ' + expression.operator)

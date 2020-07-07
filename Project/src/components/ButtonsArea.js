@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import CalculatorButton from './CalculatorButton';
 import { MatrixState, ButtonType } from '../utilities/constants';
+import { ElementData } from '../utilities/ExpressionClasses';
 
 export default function ButtonsArea(props) {
     const { 
@@ -27,6 +28,8 @@ export default function ButtonsArea(props) {
             marginHorizontal: 6,
         },
     });
+
+    console.log({numberWritten})
     
     return (
         <View
@@ -43,7 +46,7 @@ export default function ButtonsArea(props) {
                 <CalculatorButton
                     {...props}
                     buttonType={
-                        numberWritten === 0 || matrixState === MatrixState.ready
+                        (numberWritten instanceof ElementData && numberWritten.simpleStringify() === '0') || matrixState === MatrixState.ready
                             ? ButtonType.AC
                             : ButtonType.CE
                     }

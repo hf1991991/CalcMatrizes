@@ -42,8 +42,8 @@ export default function MatrixColumn({
         // console.log({number})
         let numberToFormat = isElementSelected({ row, column })
             && editableOperatorNumber 
-                ? editableOperatorNumber.stringify() 
-                : number.stringify();
+                ? editableOperatorNumber.simpleStringify({ dontFindFraction: isElementSelected({ row, column })}) 
+                : number.simpleStringify({ dontFindFraction: isElementSelected({ row, column })});
 
         if (numberToFormat === null 
             || numberToFormat === undefined 

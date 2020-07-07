@@ -111,7 +111,7 @@ export default function CalculatorScreen({ isPortrait }) {
         } 
     }
 
-    function getNumberWritten({ forceNotOperatorNumber=false }={}) {
+    function getNumberWritten({ forceNotOperatorNumber=false, doNotStringify=false }={}) {
         if (operationHappening && !forceNotOperatorNumber) 
             return editableOperatorNumber === null
                 ? ''
@@ -130,11 +130,9 @@ export default function CalculatorScreen({ isPortrait }) {
             && editableMatrix.data[row] 
             && editableMatrix.data[row][column];
             
-        return (
-            (matrixNumber === null || matrixNumber === undefined)
-                ? ''
-                : `${matrixNumber.scalar}${matrixNumber.variables.join('')}`
-        ).toString();
+        return doNotStringify
+            ? matrixNumber
+            : matrixNumber.simpleStringify({ dontFindFraction: true });
     }
 
     function nextElement() {
@@ -174,7 +172,7 @@ export default function CalculatorScreen({ isPortrait }) {
     }
 
     function isEditableScalarReady() {
-        return editableScalar !== null && !editableScalar.toString().endsWith('.');
+        return editableScalar !== null && !editableScalar.stringify().toString().endsWith('.');
     }
 
     function resetScalarOperations() {
@@ -330,12 +328,7 @@ export default function CalculatorScreen({ isPortrait }) {
                 matrixOnScreen={matrixOnScreen}
                 readyMatrix={readyMatrix}
                 changeReadyMatrix={changeReadyMatrix}
-                numberWritten={
-                    editableMatrix
-                    && editableMatrix.data
-                    && editableMatrix.data[selectedMatrixElement?.row]
-                    && editableMatrix.data[selectedMatrixElement?.row][selectedMatrixElement?.column]
-                }
+                numberWritten={getNumberWritten({ doNotStringify: true })}
                 secondSetOfKeysActive={secondSetOfKeysActive}
                 changeSecondSetOfKeysActive={
                     () => changeSecondSetOfKeysActive(!secondSetOfKeysActive)
@@ -399,27 +392,38 @@ export default function CalculatorScreen({ isPortrait }) {
                 }
                 numberButtonPressed={
                     (element) => {
+
+                        const originalValue = getNumberWritten({ doNotStringify: true });
+
                         const letters = /^[a-i]+$/;
+
                         if (element.toString().match(letters))
                             changeNumberWritten({ 
                                 newNumber: new ElementData({
+                                    scalar: originalValue.scalar,
                                     variables: [
                                         new VariableData({
                                             variable: element
-                                        })
+                                        }),
+                                        ...(originalValue.variables || [])
                                     ]
                                 })
                             });
+
                         else if (getNumberWritten().length === 0 && element === '.')
                             changeNumberWritten({
                                 newNumber: new ElementData({
-                                    unfilteredString: '0.'
+                                    scalar: '0.'
                                 })
                             });
+                        
                         else if (count(getNumberWritten(), /\./, true) === 0 || element !== '.')
                             changeNumberWritten({
                                 newNumber: new ElementData({
-                                    scalar: getNumberWritten() + element,
+                                    scalar: originalValue.scalar === undefined
+                                        ? element
+                                        : originalValue.scalar.toString() + element,
+                                    variables: originalValue.variables || []
                                 })
                             });
                         
