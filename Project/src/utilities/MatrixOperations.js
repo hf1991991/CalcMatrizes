@@ -137,7 +137,7 @@ export default class MatrixOperations {
 
         for (let row = 0; row < matrix.dimensions().rows; row++) {
             for (let column = 0; column < matrix.dimensions().columns; column++) {
-                if (matrix.data[row][column].simpleStringify() !== '0') return false;
+                if (matrix.data[row][column].commaStringify() !== '0') return false;
             }
         }
         return true;

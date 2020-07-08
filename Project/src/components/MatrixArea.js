@@ -36,7 +36,7 @@ export default function MatrixArea({
 
     function formatDeterminant(determinant) {
         if (determinant === null) return null
-        stringDeterminant = determinant.simpleStringify();
+        stringDeterminant = determinant.commaStringify();
         if (stringDeterminant && !ScalarOperations.isNumber(stringDeterminant)) return `det: ${stringDeterminant}`;
         const formatted = formatNumberToFraction(stringDeterminant);
         return formatted !== null 

@@ -113,7 +113,7 @@ function normalizeAddition(addition) {
 
 function getIndexOfMultipliableAddition(additionElements, additionSearch) {
 
-    console.log(JSON.stringify({previousAdditionSearch: additionSearch.stringify(), previousAdditionElements: additionElements.map(e => e.stringify())}));
+    // console.log(JSON.stringify({previousAdditionSearch: additionSearch.stringify(), previousAdditionElements: additionElements.map(e => e.stringify())}));
 
     const normalizedSearchData = normalizeAddition(additionSearch);
     
@@ -138,7 +138,7 @@ function getIndexOfMultipliableAddition(additionElements, additionSearch) {
 
 function getIndexOfAddition(additionElements, additionSearch) {
 
-    console.log(JSON.stringify({additionSearch: additionSearch.stringify(), additionElements: additionElements.map(e => e.stringify())}));
+    // console.log(JSON.stringify({additionSearch: additionSearch.stringify(), additionElements: additionElements.map(e => e.stringify())}));
 
     for (let index = 0; index < additionElements.length; index++) {
 
@@ -207,8 +207,8 @@ function distributiveMultiplication(distributives) {
     
         for (distElement1 of distrib1) {
             for (distElement2 of distrib2) {
-                console.log('ENTERING MULTIPLICATION SUB-LOOP')
-                console.log({distElement1: distElement1.stringify(), distElement2: distElement2.stringify()})
+                // console.log('ENTERING MULTIPLICATION SUB-LOOP')
+                // console.log({distElement1: distElement1.stringify(), distElement2: distElement2.stringify()})
                 biDistribution.push(
                     doOperation(
                         new ExpressionData({
@@ -220,12 +220,12 @@ function distributiveMultiplication(distributives) {
                         })
                     )
                 );
-                console.log('ENDED MULTIPLICATION SUB-LOOP')
-                console.log({biDistribution: biDistribution.map(a => a.stringify())})
+                // console.log('ENDED MULTIPLICATION SUB-LOOP')
+                // console.log({biDistribution: biDistribution.map(a => a.stringify())})
             }
         }
 
-        console.log('ENTERING ADDITION SUB-LOOP')
+        // console.log('ENTERING ADDITION SUB-LOOP')
 
         distributives.splice(0, 0, doOperation(
             new ExpressionData({
@@ -234,8 +234,8 @@ function distributiveMultiplication(distributives) {
             })
         ));
 
-        console.log('ENDED ADDITION SUB-LOOP')
-        console.log({distributives: distributives.map(a => a.stringify())})
+        // console.log('ENDED ADDITION SUB-LOOP')
+        // console.log({distributives: distributives.map(a => a.stringify())})
 
 
     }
@@ -246,7 +246,7 @@ function distributiveMultiplication(distributives) {
 
 function simpleMultiplication(multipliers) {
 
-    console.log(JSON.stringify({multipliers}))
+    // console.log(JSON.stringify({multipliers}))
 
     scalar = 1;
     variables = []
@@ -261,8 +261,8 @@ function simpleMultiplication(multipliers) {
         scalar *= element.scalar;
         variables = variables.concat(element.variables)
 
-        console.log('abacate')
-        console.log(JSON.stringify({scalar, variables}))
+        // console.log('abacate')
+        // console.log(JSON.stringify({scalar, variables}))
 
     }
 
@@ -273,7 +273,7 @@ function simpleMultiplication(multipliers) {
 }
 
 function addNumbersWithSameVariables(adders) {
-    console.log('start')
+    // console.log('start')
 
     simplifiedElements = [];
 
@@ -298,7 +298,7 @@ function addNumbersWithSameVariables(adders) {
         }
 
     }
-    console.log('finish')
+    // console.log('finish')
 
     return simplifiedElements;
 
@@ -379,7 +379,7 @@ function symplifyDenominators(addition) {
         }
 
         function insertNotExistingVariables(element, allVariables) {
-            console.log({element: element.stringify(), allVariables})
+            // console.log({element: element.stringify(), allVariables})
             return {
                 scalar: element.scalar,
                 variables: allVariables.map(
@@ -412,16 +412,16 @@ function symplifyDenominators(addition) {
             return variables.map(v => v.variable).indexOf(search);
         }
 
-        console.log('STARTED INVERSE DISTRIBUTIVE')
+        // console.log('STARTED INVERSE DISTRIBUTIVE')
 
         const denominatorBase = denominator.elements[0];
         const denominatorExponent = denominator.elements[1].scalar;
 
-        console.log({
-            numerator1: numerator1.stringify(),
-            numerator2: numerator2.stringify(),
-            denominatorBase: denominatorBase.stringify()
-        });
+        // console.log({
+        //     numerator1: numerator1.stringify(),
+        //     numerator2: numerator2.stringify(),
+        //     denominatorBase: denominatorBase.stringify()
+        // });
 
         let allVariables = [
             ...numerator1.variables,
@@ -443,14 +443,14 @@ function symplifyDenominators(addition) {
             let numerator1Copy = insertNotExistingVariables(numerator1, allVariables);
             let numerator2Copy = insertNotExistingVariables(numerator2, allVariables);
     
-            console.log(JSON.stringify({
-                numerator1Copy: new ElementData(numerator1Copy).stringify(),
-                numerator2Copy: new ElementData(numerator2Copy).stringify(),
-                denominatorBaseElementsCopy: denominatorBaseElementsCopy.map(
-                    e => new ElementData(e).stringify()
-                ),
-                allVariables
-            }));
+            // console.log(JSON.stringify({
+            //     numerator1Copy: new ElementData(numerator1Copy).stringify(),
+            //     numerator2Copy: new ElementData(numerator2Copy).stringify(),
+            //     denominatorBaseElementsCopy: denominatorBaseElementsCopy.map(
+            //         e => new ElementData(e).stringify()
+            //     ),
+            //     allVariables
+            // }));
 
             let common = {
                 scalar: numerator1Copy.scalar / denominatorElement.scalar,
@@ -490,14 +490,14 @@ function symplifyDenominators(addition) {
 
             }
 
-            console.log(JSON.stringify({
-                numerator1Copy: new ElementData(numerator1Copy).stringify(),
-                numerator2Copy: new ElementData(numerator2Copy).stringify(),
-                denominatorBaseElementsCopy: denominatorBaseElementsCopy.map(
-                    e => new ElementData(e).stringify()
-                ),
-                common: new ElementData(common).stringify()
-            }));
+            // console.log(JSON.stringify({
+            //     numerator1Copy: new ElementData(numerator1Copy).stringify(),
+            //     numerator2Copy: new ElementData(numerator2Copy).stringify(),
+            //     denominatorBaseElementsCopy: denominatorBaseElementsCopy.map(
+            //         e => new ElementData(e).stringify()
+            //     ),
+            //     common: new ElementData(common).stringify()
+            // }));
 
             const newNumerator = new ExpressionData({
                 operator: Operator.Add,
@@ -510,7 +510,7 @@ function symplifyDenominators(addition) {
             // Se for verdade, foi encontrado o resultado da divisão entre o numerador e denominador:
             if (additionMatches(newNumerator, denominatorBase)) {
 
-                console.log('ENCONTRADO!')
+                // console.log('ENCONTRADO!')
 
                 const commonElement = new ElementData(common);
 
@@ -526,12 +526,12 @@ function symplifyDenominators(addition) {
                     })
                 );
 
-                console.log({
-                    commonElement: commonElement.stringify(),
-                    finalDenominator: finalDenominator.stringify()
-                })
+                // console.log({
+                //     commonElement: commonElement.stringify(),
+                //     finalDenominator: finalDenominator.stringify()
+                // })
 
-                console.log('ENDED INVERSE DISTRIBUTIVE')
+                // console.log('ENDED INVERSE DISTRIBUTIVE')
 
                 if (1 + Number.parseFloat(denominatorExponent) === 0)
                     return commonElement;
@@ -547,12 +547,13 @@ function symplifyDenominators(addition) {
                     ]
                 });
 
-            } else
-                console.log('NÃO ENCONTRADO...')
+            }
+            // else
+                // console.log('NÃO ENCONTRADO...')
 
         }
 
-        console.log('ENDED INVERSE DISTRIBUTIVE')
+        // console.log('ENDED INVERSE DISTRIBUTIVE')
 
         return null;
 
@@ -561,10 +562,10 @@ function symplifyDenominators(addition) {
     let newElements = [];
     let addedIndexes = [];
 
-    console.log('STARTING SYMPLIFYDENOMINATORS')
-    console.log(JSON.stringify({
-        elementsss: addition.elements.map(a => a.stringify())
-    }));
+    // console.log('STARTING SYMPLIFYDENOMINATORS')
+    // console.log(JSON.stringify({
+    //     elementsss: addition.elements.map(a => a.stringify())
+    // }));
 
     for (let i = 0; i < addition.elements.length; i++) {
             
@@ -611,10 +612,10 @@ function symplifyDenominators(addition) {
 
     newElements = addNumbersWithSameVariables(newElements).filter(e => !(e.scalar === 0 && e.variables.length === 0));
 
-    console.log('ENDED SYMPLIFYDENOMINATORS')
-    console.log(JSON.stringify({
-        newElements: newElements.map(a => a.stringify())
-    }));
+    // console.log('ENDED SYMPLIFYDENOMINATORS')
+    // console.log(JSON.stringify({
+    //     newElements: newElements.map(a => a.stringify())
+    // }));
 
     return new ExpressionData({
         operator: Operator.Add,
@@ -794,12 +795,12 @@ function doOperation(expression) {
 
             }
 
-            console.log('ganso')
-            console.log(JSON.stringify({
-                multipliers: multipliers.map(a => a.stringify()), 
-                elevations: elevations.map(a => a.stringify()), 
-                distributives: distributives.map(a => a.stringify())
-            }));
+            // console.log('ganso')
+            // console.log(JSON.stringify({
+            //     multipliers: multipliers.map(a => a.stringify()), 
+            //     elevations: elevations.map(a => a.stringify()), 
+            //     distributives: distributives.map(a => a.stringify())
+            // }));
 
             let multipliersResult = simpleMultiplication(multipliers);
 
@@ -807,7 +808,7 @@ function doOperation(expression) {
                 (distributives.length === 0 && elevations.length === 0)
                 || multipliersResult.scalar === 0
             ) {
-                console.log(1)
+                // console.log(1)
                 return multipliersResult;
             }
 
@@ -824,7 +825,7 @@ function doOperation(expression) {
                     base
                 );
 
-                console.log({distributivesCopyData, elevationsCopyData})
+                // console.log({distributivesCopyData, elevationsCopyData})
 
                 if (distributivesCopyData.index !== -1) {
 
@@ -837,7 +838,7 @@ function doOperation(expression) {
                             distributives.splice(distributivesCopyData.index)[0]
                         ).normalizedAddition
 
-                    console.log({normalizedDistributive: normalizedDistributive.stringify()})
+                    // console.log({normalizedDistributive: normalizedDistributive.stringify()})
 
                     const normalizedMultipliedBase = doOperation(
                         new ExpressionData({
@@ -855,7 +856,7 @@ function doOperation(expression) {
 
                         newElement = normalizedMultipliedBase; 
 
-                        console.log({newElement: newElement.stringify()})
+                        // console.log({newElement: newElement.stringify()})
 
                         if (newElement instanceof ElementData)
                             multipliersResult = simpleMultiplication([
@@ -1026,28 +1027,28 @@ function doOperation(expression) {
             //     simplifiedElevations: simplifiedElevations.map(a => a.stringify()), 
             // }));
 
-            console.log('pesto')
-            console.log(JSON.stringify({
-                multipliers: multipliers.map(a => a.stringify()), 
-                elevations: elevations.map(a => a.stringify()), 
-                distributives: distributives.map(a => a.stringify())
-            }));
+            // console.log('pesto')
+            // console.log(JSON.stringify({
+            //     multipliers: multipliers.map(a => a.stringify()), 
+            //     elevations: elevations.map(a => a.stringify()), 
+            //     distributives: distributives.map(a => a.stringify())
+            // }));
 
-            console.log(JSON.stringify({
-                simplifiedElevations: simplifiedElevations.map(a => a.stringify()), 
-                multipliersResult: multipliersResult.stringify()
-            }));
+            // console.log(JSON.stringify({
+            //     simplifiedElevations: simplifiedElevations.map(a => a.stringify()), 
+            //     multipliersResult: multipliersResult.stringify()
+            // }));
             // console.log(JSON.stringify({simplifiedElevations}))
 
             if (distributives.length === 0) {
 
                 if (simplifiedElevations.length === 0) {
-                    console.log(2)
+                    // console.log(2)
                     return multipliersResult;
                 }
 
                 if (!(multipliersResult.scalar === 1 && multipliersResult.variables.length === 0)) {
-                    console.log(3)
+                    // console.log(3)
                     return new ExpressionData({
                         operator: Operator.Multiply,
                         elements: [multipliersResult, ...simplifiedElevations],
@@ -1056,11 +1057,11 @@ function doOperation(expression) {
                 }
                 
                 if (simplifiedElevations.length === 1) {
-                    console.log(4)
+                    // console.log(4)
                     return simplifiedElevations[0]
                 }
                 
-                console.log(5)
+                // console.log(5)
                 return new ExpressionData({
                     operator: Operator.Multiply,
                     elements: simplifiedElevations,
@@ -1069,22 +1070,22 @@ function doOperation(expression) {
 
             }
 
-            console.log(JSON.stringify({distributives}))
+            // console.log(JSON.stringify({distributives}))
             
             let simplifiedDistributives = distributiveMultiplication(distributives);
 
-            console.log(JSON.stringify({simplifiedDistributives: simplifiedDistributives.stringify()}))
+            // console.log(JSON.stringify({simplifiedDistributives: simplifiedDistributives.stringify()}))
 
             // Se simplifiedDistributives for um ExpressionData, com operador Add:
             if (simplifiedDistributives instanceof ExpressionData) {
                 let finalResult = []
                 for (let distr of simplifiedDistributives.elements) {
 
-                    console.log('ENTERING MULT MULTIPLICATION SUB-LOOP')
-                    console.log({
-                        multipliersResult: multipliersResult.stringify(),
-                        distr: distr.stringify()
-                    });
+                    // console.log('ENTERING MULT MULTIPLICATION SUB-LOOP')
+                    // console.log({
+                    //     multipliersResult: multipliersResult.stringify(),
+                    //     distr: distr.stringify()
+                    // });
                     const mult = doOperation(
                         new ExpressionData({
                             operator: Operator.Multiply,
@@ -1094,10 +1095,10 @@ function doOperation(expression) {
                             ]
                         })
                     );
-                    console.log('ENDED MULT MULTIPLICATION SUB-LOOP')
-                    console.log({
-                        mult: mult.stringify()
-                    });
+                    // console.log('ENDED MULT MULTIPLICATION SUB-LOOP')
+                    // console.log({
+                    //     mult: mult.stringify()
+                    // });
 
                     if (simplifiedElevations.length === 0)
                         finalResult.push(mult);
@@ -1140,7 +1141,7 @@ function doOperation(expression) {
 
                 }
 
-                console.log(6)
+                // console.log(6)
                 return new ExpressionData({
                     operator: Operator.Add,
                     elements: finalResult,
@@ -1154,18 +1155,18 @@ function doOperation(expression) {
             ]);
 
             if (simplifiedElevations.length === 0) {
-                console.log(7)
+                // console.log(7)
                 return multipliersResult;
             }
 
             if (multipliersResult === 1) {
 
                 if (simplifiedElevations.length === 1) {
-                    console.log(8)
+                    // console.log(8)
                     return simplifiedElevations[0];
                 }
 
-                console.log(9)
+                // console.log(9)
                 return new ExpressionData({
                     operator: operator.Multiply,
                     elements: simplifiedElevations,
@@ -1174,7 +1175,7 @@ function doOperation(expression) {
 
             }
 
-            console.log(10)
+            // console.log(10)
             return new ExpressionData({
                 operator: operator.Multiply,
                 elements: [
@@ -1217,10 +1218,10 @@ function doOperation(expression) {
 
             }
 
-            console.log({
-                adders: adders.map(a => a.stringify()),
-                notAdders: notAdders.map(a => a.stringify())
-            });
+            // console.log({
+            //     adders: adders.map(a => a.stringify()),
+            //     notAdders: notAdders.map(a => a.stringify())
+            // });
 
             simplifiedAdders = addNumbersWithSameVariables(
                 addNumbersWithSameVariables(adders)
@@ -1328,10 +1329,10 @@ function simplifyExpressionAlgorithm(expression) {
 
     if (isExpressionInstance(expression) && !expression.isSimplified) {
     
-        console.log({
-            expression: expression.stringify(),
-            simplified: expression.isSimplified,
-        });
+        // console.log({
+        //     expression: expression.stringify(),
+        //     simplified: expression.isSimplified,
+        // });
 
         // Realiza, recursivamente, a simplificação da expressão:
         for (let index = 0; index < expression.elements.length; index++) {
@@ -1341,9 +1342,9 @@ function simplifyExpressionAlgorithm(expression) {
         // Após isso, ou a expressão será uma ExpressionData simplificada, ou será uma ElementData:
         expression = doOperation(expression);
 
-        console.log(JSON.stringify({
-            finalExpression: expression.stringify()
-        }))
+        // console.log(JSON.stringify({
+        //     finalExpression: expression.stringify()
+        // }))
 
     }
     

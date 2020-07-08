@@ -40,23 +40,12 @@ export default function MatrixColumn({
 
     function formatElement({ number, row, column }) {
         // console.log({number})
-        let numberToFormat = isElementSelected({ row, column })
+        return (
+            isElementSelected({ row, column })
             && editableOperatorNumber 
-                ? editableOperatorNumber.simpleStringify({ dontFindFraction: isElementSelected({ row, column })}) 
-                : number.simpleStringify({ dontFindFraction: isElementSelected({ row, column })});
-
-        if (numberToFormat === null 
-            || numberToFormat === undefined 
-            || numberToFormat.toString().length === 0
-        ) return '';
-
-        const possibleFraction = numberToFormat.toString().endsWith('.')
-            ? numberToFormat
-            : isElementSelected({ row, column })
-                ? toFixedWithThreeDots(numberToFormat)
-                : findFraction(numberToFormat);
-        
-        return possibleFraction.toString().replace('.', ',');
+                ? editableOperatorNumber
+                : number
+        ).commaStringify({ dontFindFraction: isElementSelected({ row, column })});
     }
 
     return (

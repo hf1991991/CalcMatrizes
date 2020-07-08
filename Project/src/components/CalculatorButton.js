@@ -136,13 +136,6 @@ export default function CalculatorButton(props) {
                     active: props.isVariableKeyboardActive,
                     onPress: () => props.changeIsVariableKeyboardActive(!props.isVariableKeyboardActive),
                 });
-            case ButtonType.Operators:
-                return new ButtonData({
-                    source: require('../../assets/buttons/InactiveOperators.png'), 
-                    sourceActive: require('../../assets/buttons/ActiveOperators.png'), 
-                    active: props.operatorsActive,
-                    onPress: props.changeOperatorsButtonActive,
-                });
             case ButtonType.Save:
                 return new ButtonData({
                     source: require('../../assets/buttons/Save.png'), 

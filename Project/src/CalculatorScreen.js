@@ -29,7 +29,6 @@ export default function CalculatorScreen({ isPortrait }) {
     let [solutionType, changeSolutionType] = useState(null);
     let [fullEquation, changeFullEquation] = useState(null);
     let [viewReduced, changeViewReduced] = useState(false);
-    let [operatorsActive, changeOperatorsButtonActive] = useState(true);
     let [selectedOperator, changeSelectedOperator] = useState(null);
     let [operationHappening, changeOperationHappening] = useState(false);
     let [editableOperatorNumber, changeEditableOperatorNumber] = useState(null);
@@ -48,7 +47,6 @@ export default function CalculatorScreen({ isPortrait }) {
             secondSetOfKeysActive,
             columnDirectionActive,
             numberWritten: getNumberWritten(),
-            operatorsActive,
             selectedOperator,
             operationHappening,
             editableOperatorNumber,
@@ -68,11 +66,12 @@ export default function CalculatorScreen({ isPortrait }) {
         changeMatrixState(matrixState);
         changeFullEquation(null);
         changeSolutionType(null);
+
         /*
         changeSecondSetOfKeysActive(false);
         changeIsRActive(false);
         */
-        editableMatrix !== null && changeOperatorsButtonActive(true);
+       
         changeEditableMatrix(editableMatrix);
         changeEditableDimensions(
             editableMatrix 
@@ -84,7 +83,6 @@ export default function CalculatorScreen({ isPortrait }) {
     }
 
     function exitEditingMode() {
-        changeOperatorsButtonActive(false);
         changeMatrixState(MatrixState.ready);
     }
 
@@ -143,7 +141,7 @@ export default function CalculatorScreen({ isPortrait }) {
             
         return doNotStringify
             ? matrixNumber
-            : matrixNumber.simpleStringify({ dontFindFraction: true });
+            : matrixNumber.commaStringify({ dontFindFraction: true });
     }
 
     function nextElement() {
@@ -176,8 +174,6 @@ export default function CalculatorScreen({ isPortrait }) {
                 }
             }
         } else selectedElement = null;
-
-        if (selectedElement === null) changeOperatorsButtonActive(false);
 
         changeSettingsOfSelectedMatrixElement(selectedElement);
     }
@@ -373,10 +369,6 @@ export default function CalculatorScreen({ isPortrait }) {
                 changeIsVariableKeyboardActive={changeIsVariableKeyboardActive}
                 isRActive={isRActive}
                 operatorsActive={matrixState === MatrixState.editing}
-                changeOperatorsButtonActive={() => {
-                    changeOperatorsButtonActive(!operatorsActive);
-                    operatorsActive && resetScalarOperations();
-                }}
                 selectedOperator={selectedOperator}
                 editableOperatorNumber={editableOperatorNumber}
                 onPressAC={
@@ -486,13 +478,14 @@ export default function CalculatorScreen({ isPortrait }) {
                 }}
                 onPressLambdaxA={() => {
                     matrixState !== MatrixState.ready && changeReadyMatrix(editableMatrix);
-                    changeOperatorsButtonActive(true);
+                    
                     enterEditingMode({
                         matrixState: MatrixState.LambdaxA,
                         editableMatrix: null,
                         selectedElement: null,
                         scalar: 0,
                     });
+
                 }}
                 onPressAddMatrix={() => {
                     matrixState !== MatrixState.ready && changeReadyMatrix(editableMatrix);

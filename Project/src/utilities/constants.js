@@ -157,6 +157,7 @@ export const SystemSolutionType = {
 };
 
 export function toFixedWithThreeDots(number) {
+    if (number.toString().endsWith('.')) return number.toString();
     number = toFixedOnZeroes(number);
     if (decimalPlaces(number) > PRECISION 
         && count(number.toString(), /\./, true) !== 0

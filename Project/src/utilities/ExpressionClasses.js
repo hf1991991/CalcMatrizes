@@ -1,4 +1,4 @@
-import { smartToFixed, findFraction, Operator, parenthesisEnglobe } from "./constants";
+import { smartToFixed, findFraction, Operator, parenthesisEnglobe, toFixedWithThreeDots } from "./constants";
 import ScalarOperations from "./ScalarOperations";
 
 export class ExpressionData {
@@ -17,8 +17,8 @@ export class ExpressionData {
         });
     }
 
-    simpleStringify({ dontFindFraction=false }={}) {
-        const string = this.algebraicStringify({ dontFindFraction });
+    commaStringify({ dontFindFraction=false }={}) {
+        const string = this.algebraicStringify({ dontFindFraction }).replace('.', ',');
         return parenthesisEnglobe(string)
             ? string.substring(1, string.length - 1)
             : string;
@@ -95,8 +95,8 @@ export class ElementData {
         // console.log({varrrrr: this.variables});
     }
 
-    simpleStringify({ dontFindFraction=false }={}) {
-        return this.stringify({ dontFindFraction });
+    commaStringify({ dontFindFraction=false }={}) {
+        return this.stringify({ dontFindFraction }).replace('.', ',');
     }
 
     algebraicStringify({ dontFindFraction=false }={}) {
@@ -107,7 +107,7 @@ export class ElementData {
 
         const findPossibleFraction =
             (number) => dontFindFraction
-                ? number
+                ? toFixedWithThreeDots(number)
                 : findFraction(number);
 
         const formatScalar = 

@@ -44,7 +44,7 @@ export default function ButtonsArea(props) {
                 <CalculatorButton
                     {...props}
                     buttonType={
-                        (numberWritten !== null && numberWritten.simpleStringify() === '0') || matrixState === MatrixState.ready
+                        (numberWritten !== null && numberWritten.commaStringify() === '0') || matrixState === MatrixState.ready
                             ? ButtonType.AC
                             : ButtonType.CE
                     }
