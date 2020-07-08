@@ -657,6 +657,19 @@ function doOperation(expression) {
                     variables: raiseVariablesExponent(base.variables, exponent)
                 })
 
+            if (base.operator === Operator.Elevate)
+                return doOperation(
+                    new ExpressionData({
+                        operator: Operator.Elevate,
+                        elements: [
+                            base.elements[0],
+                            new ElementData({
+                                scalar: base.elements[1].scalar * exponent
+                            })
+                        ]
+                    })
+                );
+
             if (exponent === 0)
                 return new ElementData({
                     scalar: 1
