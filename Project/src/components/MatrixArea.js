@@ -45,16 +45,7 @@ export default function MatrixArea({
     }
 
     function formatScalar(scalar) {
-        const parsed = MatrixOperations.parseFloatPreservingDotAndVariables(scalar);
-        console.log(parsed);
-        console.log(parsed.toString().endsWith('.'));
-        return scalar !== null 
-            ? toFixedOnZeroes(
-                !parsed.toString().endsWith('.') 
-                    ? parsed.toFixed(6)
-                    : parsed
-            ).toString().replace('.', ',')
-            : null;
+        return scalar.commaStringify({ dontFindFraction: true });
     }
 
     function getEquationTypeString(equationType) {

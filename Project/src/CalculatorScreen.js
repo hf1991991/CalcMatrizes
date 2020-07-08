@@ -87,9 +87,7 @@ export default function CalculatorScreen({ isPortrait }) {
     }
 
     function changeNumberWritten({ newNumber, forceNotOperatorNumber=false }) {
-        console.log({
-            operationHappening, forceNotOperatorNumber
-        });
+
         if (operationHappening && !forceNotOperatorNumber) {
             changeEditableOperatorNumber(newNumber);
         }
@@ -116,10 +114,12 @@ export default function CalculatorScreen({ isPortrait }) {
                 : editableOperatorNumber;
 
         const { row, column } = selectedMatrixElement || {};
-        const matrixNumber = editableMatrix 
-            && editableMatrix.data 
-            && editableMatrix.data[row] 
-            && editableMatrix.data[row][column];
+        const matrixNumber = matrixState === MatrixState.LambdaxA
+            ? editableScalar
+            : editableMatrix 
+                && editableMatrix.data 
+                && editableMatrix.data[row] 
+                && editableMatrix.data[row][column];
 
         if (
             (
@@ -133,11 +133,6 @@ export default function CalculatorScreen({ isPortrait }) {
             return doNotStringify
                 ? null
                 : '';
-        
-        if (matrixState === MatrixState.LambdaxA) 
-            return editableScalar === null && !doNotStringify
-                ? ''
-                : editableScalar;
             
         return doNotStringify
             ? matrixNumber
@@ -368,7 +363,10 @@ export default function CalculatorScreen({ isPortrait }) {
                 isVariableKeyboardActive={isVariableKeyboardActive}
                 changeIsVariableKeyboardActive={changeIsVariableKeyboardActive}
                 isRActive={isRActive}
-                operatorsActive={matrixState === MatrixState.editing}
+                operatorsActive={
+                    matrixState === MatrixState.editing
+                    || matrixState === MatrixState.LambdaxA
+                }
                 selectedOperator={selectedOperator}
                 editableOperatorNumber={editableOperatorNumber}
                 onPressAC={
@@ -483,7 +481,9 @@ export default function CalculatorScreen({ isPortrait }) {
                         matrixState: MatrixState.LambdaxA,
                         editableMatrix: null,
                         selectedElement: null,
-                        scalar: 0,
+                        scalar: new ElementData({
+                            scalar: 0
+                        }),
                     });
 
                 }}

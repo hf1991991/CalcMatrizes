@@ -325,7 +325,7 @@ export default class MatrixOperations {
                     ExpressionSimplification.varOperation(
                         matrixA.data[row][column],
                         Operator.Multiply,
-                        new ElementData({ scalar })
+                        scalar
                     )
                 );
             }
