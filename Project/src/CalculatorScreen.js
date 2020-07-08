@@ -195,14 +195,15 @@ export default function CalculatorScreen({ isPortrait }) {
     function applyOperation() {
         resetScalarOperations();
 
-        changeNumberWritten({
-            newNumber: varOperation(
-                getNumberWritten({ forceNotOperatorNumber: true, doNotStringify: true }),
-                selectedOperator,
-                editableOperatorNumber
-            ),
-            forceNotOperatorNumber: true,
-        });
+        if (editableOperatorNumber !== null) 
+            changeNumberWritten({
+                newNumber: varOperation(
+                    getNumberWritten({ forceNotOperatorNumber: true, doNotStringify: true }),
+                    selectedOperator,
+                    editableOperatorNumber
+                ),
+                forceNotOperatorNumber: true,
+            });
     }
 
     function isAFirst() {
@@ -291,6 +292,9 @@ export default function CalculatorScreen({ isPortrait }) {
                 changeReadyMatrix={changeReadyMatrix}
                 onPressBackground={
                     () => {
+                        
+                        operationHappening && applyOperation();
+
                         if (matrixState !== MatrixState.LambdaxA) {
                             changeFullEquation(null);
                             exitEditingMode();
@@ -305,6 +309,9 @@ export default function CalculatorScreen({ isPortrait }) {
                 selectedMatrixElement={selectedMatrixElement}
                 changeSelectedMatrixElement={
                     (selection) => {
+
+                        operationHappening && applyOperation();
+
                         changeSettingsOfSelectedMatrixElement(
                             selection === null 
                                 ? null 
@@ -365,7 +372,7 @@ export default function CalculatorScreen({ isPortrait }) {
                 isVariableKeyboardActive={isVariableKeyboardActive}
                 changeIsVariableKeyboardActive={changeIsVariableKeyboardActive}
                 isRActive={isRActive}
-                operatorsActive={operatorsActive}
+                operatorsActive={matrixState === MatrixState.editing}
                 changeOperatorsButtonActive={() => {
                     changeOperatorsButtonActive(!operatorsActive);
                     operatorsActive && resetScalarOperations();
@@ -397,7 +404,9 @@ export default function CalculatorScreen({ isPortrait }) {
                 onPressCE={
                     () => {
                         changeNumberWritten({
-                            newNumber: 0,
+                            newNumber: new ElementData({
+                                scalar: 0
+                            })
                         })
                     }
                 }
