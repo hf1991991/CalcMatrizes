@@ -117,7 +117,7 @@ export default class EquationData {
                 this.matrix3 = fullEquation.matrixC;
                 break;
             case MatrixState.LambdaxA:
-                this.scalar = fullEquation.scalar;
+                this.scalar = fullEquation.scalar.commaStringify();
                 this.firstOperator = '×';
                 this.matrix2 = fullEquation.matrixB;
                 this.secondOperator = '=';
