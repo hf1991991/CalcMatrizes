@@ -26,7 +26,6 @@ export default function FullEquation({
                     textAlign: 'center',
                     fontSize: 30,
                     top: 2,
-                    width: OPERATORS_WIDTH,
                 }}
             >
                 {scalar}

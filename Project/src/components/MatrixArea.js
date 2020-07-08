@@ -116,6 +116,7 @@ export default function MatrixArea({
                                     style={{
                                         color: '#fff',
                                         fontSize: 60,
+                                        textAlign: 'right'
                                     }}
                                 >
                                     {formatScalar(

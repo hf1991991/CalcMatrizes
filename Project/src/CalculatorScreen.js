@@ -287,7 +287,6 @@ export default function CalculatorScreen({ isPortrait }) {
                         operationHappening && applyOperation();
 
                         if (matrixState !== MatrixState.LambdaxA) {
-                            changeFullEquation(null);
                             exitEditingMode();
                             matrixState === MatrixState.editing 
                                 && changeReadyMatrix(editableMatrix);
@@ -434,7 +433,9 @@ export default function CalculatorScreen({ isPortrait }) {
                                 newNumber: new ElementData({
                                     scalar: originalValue === null
                                         ? element
-                                        : originalValue.scalar.toString() + element,
+                                        : originalValue.scalar !== 1
+                                            ? originalValue.scalar.toString() + element
+                                            : element,
                                     variables: (originalValue !== null && originalValue.variables) || []
                                 })
                             });
