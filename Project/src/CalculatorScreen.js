@@ -34,6 +34,7 @@ export default function CalculatorScreen({ isPortrait }) {
     let [editableOperatorNumber, changeEditableOperatorNumber] = useState(null);
     let [columnDirectionActive, changeColumnDirectionActive] = useState(true);
     let [isVariableKeyboardActive, changeIsVariableKeyboardActive] = useState(false);
+    let [fullScreenDeterminant, changeFullScreenDeterminant] = useState(false);
 
     function printState() {
         console.log({
@@ -283,15 +284,20 @@ export default function CalculatorScreen({ isPortrait }) {
                 changeReadyMatrix={changeReadyMatrix}
                 onPressBackground={
                     () => {
-                        
-                        operationHappening && applyOperation();
 
-                        if (matrixState !== MatrixState.LambdaxA) {
-                            exitEditingMode();
-                            matrixState === MatrixState.editing 
-                                && changeReadyMatrix(editableMatrix);
-                            changeSettingsOfSelectedMatrixElement(null);
+                        if (fullScreenDeterminant)
+                            changeFullScreenDeterminant(false);
+                        else {
+                            operationHappening && applyOperation();
+    
+                            if (matrixState !== MatrixState.LambdaxA) {
+                                exitEditingMode();
+                                matrixState === MatrixState.editing 
+                                    && changeReadyMatrix(editableMatrix);
+                                changeSettingsOfSelectedMatrixElement(null);
+                            }
                         }
+
                     }
                 }
                 editableMatrix={editableMatrix}
@@ -328,6 +334,8 @@ export default function CalculatorScreen({ isPortrait }) {
                 fullEquation={fullEquation}
                 viewReduced={viewReduced}
                 changeViewReduced={changeViewReduced}
+                fullScreenDeterminant={fullScreenDeterminant}
+                changeFullScreenDeterminant={changeFullScreenDeterminant}
                 isPortrait={isPortrait}
             />
             <ButtonsArea
@@ -349,6 +357,7 @@ export default function CalculatorScreen({ isPortrait }) {
                 isMatrixFull={MatrixOperations.isMatrixFull(matrixOnScreen)}
                 isMatrixSquare={MatrixOperations.isMatrixSquare(matrixOnScreen)}
                 isKeyboardBeActive={selectedMatrixElement || matrixState === MatrixState.LambdaxA}
+                fullKeyboardDisabled={fullScreenDeterminant}
                 isCheckActive={
                     matrixState !== MatrixState.LambdaxA
                         ? MatrixOperations.isMatrixFull(matrixOnScreen)

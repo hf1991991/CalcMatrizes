@@ -80,7 +80,7 @@ export function decimalPlaces(number) {
     return number.toString().split(".").pop().length;
 }
 
-const PRECISION = 4;
+const PRECISION = 6;
 
 export function smartToFixed(element) {
     // A precisao define quantos zeros ou noves seguidos apos a virgula a funcao deveria aceitar para que ela arredende o numero:

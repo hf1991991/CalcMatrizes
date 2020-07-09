@@ -24,6 +24,8 @@ export default function MatrixArea({
     viewReduced,
     changeViewReduced,
     isPortrait,
+    fullScreenDeterminant,
+    changeFullScreenDeterminant
 }) {
  
     let [matrixAreaWidth, changeMatrixAreaWidth] = useState(0);
@@ -32,15 +34,22 @@ export default function MatrixArea({
         return number !== null 
             ? findFraction(toFixedOnZeroes(number))
             : null;
-    }
+    } 
 
-    function formatDeterminant(determinant) {
+    function formatDeterminant({ determinant, overflow=true, det=true }) {
         if (determinant === null) return null
         stringDeterminant = determinant.commaStringify();
-        if (stringDeterminant && !ScalarOperations.isNumber(stringDeterminant)) return `det: ${stringDeterminant}`;
+        if (stringDeterminant.length > 8 && overflow) stringDeterminant = stringDeterminant.substring(0, 8 - 3) + '...';
+        if (stringDeterminant && !ScalarOperations.isNumber(stringDeterminant)) 
+            return det
+            ? `det: ${stringDeterminant}`
+            : stringDeterminant;
+        
         const formatted = formatNumberToFraction(stringDeterminant);
         return formatted !== null 
-            ? `det: ${formatted}`
+            ? det
+                ? `det: ${formatted}`
+                : formatted
             : null;
     }
 
@@ -95,15 +104,41 @@ export default function MatrixArea({
                                     viewReduced={viewReduced}
                                 />
                             )
-                            : (
-                                <Matrix 
-                                    maxMatrixWidth={matrixAreaWidth - 2 * BUTTON_AREAS_CROSS_WIDTH}
-                                    matrixNumbers={readyMatrix}
-                                    selectedMatrixElement={selectedMatrixElement}
-                                    changeSelectedMatrixElement={changeSelectedMatrixElement}
-                                    editableOperatorNumber={editableOperatorNumber}
-                                />
-                            )
+                            : fullScreenDeterminant
+                                ? (
+                                    <View
+                                        style={{
+                                            justifyContent: 'center',
+                                            alignItems: 'center',
+                                            flex: 1,
+                                        }}
+                                    >
+                                        <Text
+                                            style={{
+                                                color: '#fff',
+                                                fontSize: 60,
+                                                textAlign: 'center'
+                                            }}
+                                        >
+                                            {
+                                                formatDeterminant({
+                                                    determinant: MatrixOperations.determinant(readyMatrix),
+                                                    overflow: false,
+                                                    det: false
+                                                })
+                                            }
+                                        </Text>
+                                    </View>
+                                )
+                                : (
+                                    <Matrix 
+                                        maxMatrixWidth={matrixAreaWidth - 2 * BUTTON_AREAS_CROSS_WIDTH}
+                                        matrixNumbers={readyMatrix}
+                                        selectedMatrixElement={selectedMatrixElement}
+                                        changeSelectedMatrixElement={changeSelectedMatrixElement}
+                                        editableOperatorNumber={editableOperatorNumber}
+                                    />
+                                )
                         : (
                             <View
                                 style={{
@@ -140,6 +175,7 @@ export default function MatrixArea({
                             MatrixState.XxBeA,
                         ]
                         .includes(matrixState)
+                        || fullScreenDeterminant
                     }
                     editableDimensions={editableDimensions}
                     changeEditableDimensions={changeEditableDimensions}
@@ -157,6 +193,7 @@ export default function MatrixArea({
                         MatrixState.BxXeA,
                     ]
                     .includes(matrixState)
+                    || fullScreenDeterminant
                 }
                 editableDimensions={editableDimensions}
                 changeEditableDimensions={changeEditableDimensions}
@@ -164,7 +201,7 @@ export default function MatrixArea({
                     matrixState !== MatrixState.LambdaxA
                         ? fullEquation !== null && !isPortrait
                             ? getEquationTypeString(fullEquation.equationType)
-                            : editableDimensions
+                            : editableDimensions && !fullScreenDeterminant
                                 ? `${editableDimensions.rows}x${editableDimensions.columns}`
                                 : ''
                         : 'Scalar'
@@ -181,17 +218,20 @@ export default function MatrixArea({
                                 ? viewReduced ? 'Reduzida' : 'Original'
                                 : null
                         : !operationHappening
-                            && formatDeterminant(MatrixOperations.determinant(readyMatrix))
+                            && formatDeterminant({
+                                determinant: MatrixOperations.determinant(readyMatrix)
+                            })
                 }
                 bottomMiddleText={
                     matrixState === MatrixState.ready && solutionType
                 }
                 onPressBottomRightText={
-                    fullEquation !== null 
-                        ? !isPortrait
+                    !isPortrait
+                        ? fullEquation !== null 
                             ? (() => changeViewReduced(!viewReduced))
                             : () => {}
-                        : () => {}
+                        : !operationHappening
+                            && (() => changeFullScreenDeterminant(!fullScreenDeterminant))
                 }
                 crossWidth={BUTTON_AREAS_CROSS_WIDTH}
             />
