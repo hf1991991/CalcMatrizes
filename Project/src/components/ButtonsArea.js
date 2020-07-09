@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import CalculatorButton from './CalculatorButton';
 import { MatrixState, ButtonType } from '../utilities/constants';
-import { ElementData } from '../utilities/ExpressionClasses';
 
 export default function ButtonsArea(props) {
     const { 
@@ -11,10 +10,9 @@ export default function ButtonsArea(props) {
         numberWritten,
         secondSetOfKeysActive, 
         selectedMatrixElement,
-        operatorsActive,
+        isKeyboardBeActive,
         editableOperatorNumber,
         isRActive,
-        isKeyboardBeActive,
         isVariableKeyboardActive=true,
     } = props;
 
@@ -64,7 +62,7 @@ export default function ButtonsArea(props) {
                 <CalculatorButton
                     {...props}
                     buttonType={
-                        operatorsActive
+                        isKeyboardBeActive
                             ? ButtonType.Divide
                             : isRActive 
                                 ? ButtonType.XxBeA
@@ -104,7 +102,7 @@ export default function ButtonsArea(props) {
                 <CalculatorButton
                     {...props}
                     buttonType={
-                        operatorsActive
+                        isKeyboardBeActive
                             ? ButtonType.Multiply
                             : isRActive 
                                 ? ButtonType.XxAeB
@@ -142,7 +140,7 @@ export default function ButtonsArea(props) {
                 <CalculatorButton
                     {...props}
                     buttonType={
-                        operatorsActive
+                        isKeyboardBeActive
                             ? ButtonType.Subtract
                             : isRActive 
                                 ? ButtonType.BxXeA
@@ -182,7 +180,7 @@ export default function ButtonsArea(props) {
                 <CalculatorButton
                     {...props}
                     buttonType={
-                        operatorsActive
+                        isKeyboardBeActive
                             ? ButtonType.Add
                             : isRActive 
                                 ? ButtonType.AxXeB

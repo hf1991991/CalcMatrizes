@@ -362,10 +362,6 @@ export default function CalculatorScreen({ isPortrait }) {
                 isVariableKeyboardActive={isVariableKeyboardActive}
                 changeIsVariableKeyboardActive={changeIsVariableKeyboardActive}
                 isRActive={isRActive}
-                operatorsActive={
-                    matrixState === MatrixState.editing
-                    || matrixState === MatrixState.LambdaxA
-                }
                 selectedOperator={selectedOperator}
                 editableOperatorNumber={editableOperatorNumber}
                 onPressAC={
