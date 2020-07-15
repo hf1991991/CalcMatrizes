@@ -95,4 +95,62 @@ export default class ScalarOperations {
         return newNumber;
     }
 
+    static subscript(number) {
+        number = number.toString();
+        let newNumber = '';
+        for (let index = 0; index < number.length; index++) {
+            switch (number[index]) {
+                case '0':
+                    newNumber += '\u2080';
+                    break;
+                case '1':
+                    newNumber +=  '\u2081';
+                    break;
+                case '2':
+                    newNumber += '\u2082';
+                    break;
+                case '3':
+                    newNumber += '\u2083';
+                    break;
+                case '4':
+                    newNumber += '\u2084';
+                    break;
+                case '5':
+                    newNumber += '\u2085';
+                    break;
+                case '6':
+                    newNumber += '\u2086';
+                    break;
+                case '7':
+                    newNumber += '\u2087';
+                    break;
+                case '8':
+                    newNumber += '\u2088';
+                    break;
+                case '9':
+                    newNumber += '\u2089';
+                    break;
+                case '-':
+                    newNumber += '\u208B';
+                    break;
+                case '+':
+                    newNumber += '\u208A';
+                    break;
+                case '/':
+                    newNumber += '\u141F';
+                    break;
+                case '(':
+                    newNumber += '\u208D';
+                    break;
+                case ')':
+                    newNumber += '\u208E';
+                    break;
+                default:
+                    newNumber += number[index];
+                    break;
+            }
+        }
+        return newNumber;
+    }
+
 }

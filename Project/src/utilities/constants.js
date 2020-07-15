@@ -1,3 +1,5 @@
+import ScalarOperations from "./ScalarOperations";
+
 export const MatrixState = {
     ready: 'ready',
     editing: 'editing',
@@ -129,7 +131,7 @@ export function findFraction(number) {
         if (count(numerator, /\./, true) === 0 || numerator.toString().endsWith('.0')) {
             if (denominator === 1) return number;
             if (numerator.toString().endsWith('.0')) numerator = numerator.toString().split('.')[0];
-            return `${numerator}/${denominator}`;
+            return `${ScalarOperations.superscript(numerator)}\u2044${ScalarOperations.subscript(denominator)} `;
         }
     }
 
