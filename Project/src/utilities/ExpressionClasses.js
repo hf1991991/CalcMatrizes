@@ -33,10 +33,8 @@ export class ExpressionData {
                         parenthesisEnglobe(base)
                             ? base.substring(1, base.length - 1)
                             : base
-                    })^${
-                        exponent.startsWith('-')
-                            ? `(${exponent})`
-                            : exponent
+                    })${
+                        ScalarOperations.superscript(exponent)
                     }`;
             case Operator.Divide:
                 return `${this.elements[0].algebraicStringify({ dontFindFraction })}/(${List.from(this.elements).splice(1, this.elements.length - 1).map(a => a.algebraicStringify({ dontFindFraction })).join(')/(')}`;
@@ -119,9 +117,7 @@ export class ElementData {
         const formatExponent = 
             (exponent) => exponent === 1
                 ? ''
-                : findPossibleFraction(exponent).toString().indexOf('/') !== -1 || findPossibleFraction(exponent).toString().indexOf('-') !== -1
-                    ? `^(${findPossibleFraction(exponent)})`
-                    : `^${findPossibleFraction(exponent)}`
+                : ScalarOperations.superscript(findPossibleFraction(exponent))
         const formatVariables = 
             () => this.variables.map(
                     vari => `${vari.variable}${formatExponent(vari.exponent)}`
