@@ -2,6 +2,8 @@ import React from 'react';
 import { View, Text, TouchableOpacity, FlatList } from 'react-native';
 import { findFraction, smartToFixed, toFixedOnZeroes, toFixedWithThreeDots } from '../utilities/constants';
 
+import { useCalculator } from '../hooks/useCalculator';
+
 const ELEMENT_HEIGHT = 40;
 const ELEMENT_VERTICAL_MARGIN = 11;
 
@@ -9,12 +11,15 @@ export default function MatrixColumn({
     matrixNumbers,
     matrixColumnElements,
     selectedMatrixElement,
-    changeSelectedMatrixElement,
     minWidth,
     flatListDimensions,
     changeFlatListDimensions,
     editableOperatorNumber,
 }) {
+
+    const { 
+        changeSelectedMatrixElement
+    } = useCalculator();
 
     function isElementSelected({ row, column }) {
         return selectedMatrixElement && selectedMatrixElement.row === row && selectedMatrixElement.column === column;
@@ -39,13 +44,18 @@ export default function MatrixColumn({
     }
 
     function formatElement({ number, row, column }) {
-        // console.log({number})
+        // console.log({
+        //     number, 
+        //     selected: isElementSelected({ row, column }),
+        //     rowAndColumn: { row, column },
+        //     editableOperatorNumber
+        // })
         return (
             isElementSelected({ row, column })
             && editableOperatorNumber 
                 ? editableOperatorNumber
                 : number
-        ).commaStringify({ dontFindFraction: isElementSelected({ row, column })});
+        )?.commaStringify({ dontFindFraction: isElementSelected({ row, column })});
     }
 
     return (

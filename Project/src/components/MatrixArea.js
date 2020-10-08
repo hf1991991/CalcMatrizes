@@ -1,74 +1,103 @@
-import React, { useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { View, Text } from 'react-native';
 import Matrix from './Matrix';
-import { MatrixState, findFraction, toFixedOnZeroes, SystemSolutionType } from '../utilities/constants';
+import { CalcState, findFraction, toFixedOnZeroes, SystemSolutionType } from '../utilities/constants';
 import ArrowButtonsArea from './ArrowButtonsArea';
 import MatrixOperations from '../utilities/MatrixOperations';
 import FullEquation from './FullEquation';
 import ScalarOperations from '../utilities/ScalarOperations';
 
+import { useCalculator } from '../hooks/useCalculator';
+import { useOrientation } from '../hooks/useOrientation';
+
 const BUTTON_AREAS_CROSS_WIDTH = 70;
 
-export default function MatrixArea({ 
-    matrixState,
-    readyMatrix,
-    selectedMatrixElement,
-    changeSelectedMatrixElement,
-    editableDimensions,
-    changeEditableDimensions,
-    editableScalar,
-    operationHappening,
-    editableOperatorNumber,
-    solutionType,
-    fullEquation,
-    viewReduced,
-    changeViewReduced,
-    isPortrait,
-    fullScreenDeterminant,
-    changeFullScreenDeterminant
-}) {
+export default function MatrixArea() {
+    const { isPortrait } = useOrientation();
+
+    const { 
+        calcState,
+        matrixOnScreen,
+        selectedMatrixElement,
+        editableDimensions,
+        editableScalar,
+        changeViewReduced,
+        changeFullScreenDeterminant,
+        operationHappening,
+        editableOperatorNumber,
+        changeEditableDimensions,
+        solutionType,
+        fullEquation,
+        viewReduced,
+        fullScreenDeterminant
+    } = useCalculator();
  
-    let [matrixAreaWidth, changeMatrixAreaWidth] = useState(0);
+    const [matrixAreaWidth, changeMatrixAreaWidth] = useState(0);
  
-    function formatNumberToFraction(number) {
-        return number !== null 
-            ? findFraction(toFixedOnZeroes(number))
-            : null;
-    } 
+    const formatNumberToFraction = useCallback(
+        (number) => {
+            return number !== null 
+                ? findFraction(toFixedOnZeroes(number))
+                : null;
+        }, []
+    );
 
-    function formatDeterminant({ determinant, overflow=true, det=true }) {
-        if (determinant === null) return null
-        stringDeterminant = determinant.commaStringify();
-        if (stringDeterminant.length > 8 && overflow) stringDeterminant = stringDeterminant.substring(0, 8 - 3) + '...';
-        if (stringDeterminant && !ScalarOperations.isNumber(stringDeterminant)) 
-            return det
-            ? `det: ${stringDeterminant}`
-            : stringDeterminant;
-        
-        const formatted = formatNumberToFraction(stringDeterminant);
-        return formatted !== null 
-            ? det
-                ? `det: ${formatted}`
-                : formatted
-            : null;
-    }
+    const formatDeterminant = useCallback(
+        ({ determinant, overflow=true, det=true }) => {
+            if (determinant === null) return null
+            const stringDeterminant = determinant?.commaStringify();
+            if (stringDeterminant.length > 8 && overflow) stringDeterminant = stringDeterminant.substring(0, 8 - 3) + '...';
+            if (stringDeterminant && !ScalarOperations.isNumber(stringDeterminant)) 
+                return det
+                    ? `det: ${stringDeterminant}`
+                    : stringDeterminant;
+            
+            const formatted = formatNumberToFraction(stringDeterminant);
+            return formatted !== null 
+                ? det
+                    ? `det: ${formatted}`
+                    : formatted
+                : null;
+        }, [formatNumberToFraction]
+    );
 
-    function formatScalar(scalar) {
-        return scalar.commaStringify({ dontFindFraction: true });
-    }
+    const scalarText = useMemo(
+        () => {
+            const scalar = editableOperatorNumber === null
+                ? editableScalar
+                : editableOperatorNumber;
+            if (scalar === null) return null;
+            return scalar?.commaStringify({ dontFindFraction: true });
+        }, [editableOperatorNumber, editableScalar]
+    );
 
-    function getEquationTypeString(equationType) {
-        switch (equationType) {
-            case MatrixState.AxXeB:
-                return "A×X=B";
-            case MatrixState.BxXeA:
-                return "B×X=A";
-            case MatrixState.XxAeB:
-                return "X×A=B";
-            case MatrixState.XxBeA:
-                return "X×B=A";
-        }
-    }
+    const equationTypeString = useMemo(
+        () => {
+            switch (fullEquation?.equationType) {
+                case CalcState.AxXeB:
+                    return "A×X=B";
+                case CalcState.BxXeA:
+                    return "B×X=A";
+                case CalcState.XxAeB:
+                    return "X×A=B";
+                case CalcState.XxBeA:
+                    return "X×B=A";
+                default:
+                    return null;
+            }
+        }, [fullEquation]
+    );
+
+    const bottomLeftText = useMemo(
+        () => calcState !== CalcState.LambdaxA
+            ? fullEquation !== null && !isPortrait
+                ? equationTypeString
+                : editableDimensions && !fullScreenDeterminant
+                    ? `${editableDimensions.rows}x${editableDimensions.columns}`
+                    : ''
+            : 'Scalar',
+        [equationTypeString, calcState, fullEquation, editableDimensions, isPortrait]
+    )
 
     return (
         <View
@@ -95,7 +124,7 @@ export default function MatrixArea({
                     crossWidth={BUTTON_AREAS_CROSS_WIDTH}
                 />
                 {
-                    matrixState !== MatrixState.LambdaxA
+                    calcState !== CalcState.LambdaxA
                         ? fullEquation !== null && !isPortrait
                             ? (
                                 <FullEquation 
@@ -122,7 +151,7 @@ export default function MatrixArea({
                                         >
                                             {
                                                 formatDeterminant({
-                                                    determinant: MatrixOperations.determinant(readyMatrix),
+                                                    determinant: MatrixOperations.determinant(matrixOnScreen),
                                                     overflow: false,
                                                     det: false
                                                 })
@@ -133,9 +162,8 @@ export default function MatrixArea({
                                 : (
                                     <Matrix 
                                         maxMatrixWidth={matrixAreaWidth - 2 * BUTTON_AREAS_CROSS_WIDTH}
-                                        matrixNumbers={readyMatrix}
+                                        matrixNumbers={matrixOnScreen}
                                         selectedMatrixElement={selectedMatrixElement}
-                                        changeSelectedMatrixElement={changeSelectedMatrixElement}
                                         editableOperatorNumber={editableOperatorNumber}
                                     />
                                 )
@@ -154,27 +182,23 @@ export default function MatrixArea({
                                         textAlign: 'right'
                                     }}
                                 >
-                                    {formatScalar(
-                                        editableOperatorNumber === null
-                                            ? editableScalar
-                                            : editableOperatorNumber
-                                    )}
+                                    {scalarText}
                                 </Text>
                             </View>
                         )
                 }
                 <ArrowButtonsArea 
                     vertical
-                    hidden={matrixState === MatrixState.ready || !editableDimensions}
+                    hidden={calcState === CalcState.ready || !editableDimensions}
                     disabled={
                         [
-                            MatrixState.addMatrix,
-                            MatrixState.subtractMatrix,
-                            MatrixState.BxA,
-                            MatrixState.XxAeB,
-                            MatrixState.XxBeA,
+                            CalcState.addMatrix,
+                            CalcState.subtractMatrix,
+                            CalcState.BxA,
+                            CalcState.XxAeB,
+                            CalcState.XxBeA,
                         ]
-                        .includes(matrixState)
+                        .includes(calcState)
                         || fullScreenDeterminant
                     }
                     editableDimensions={editableDimensions}
@@ -183,55 +207,47 @@ export default function MatrixArea({
                 />
             </View>
             <ArrowButtonsArea 
-                hidden={matrixState === MatrixState.ready || !editableDimensions}
+                hidden={calcState === CalcState.ready || !editableDimensions}
                 disabled={
                     [
-                        MatrixState.addMatrix,
-                        MatrixState.subtractMatrix,
-                        MatrixState.AxB,
-                        MatrixState.AxXeB,
-                        MatrixState.BxXeA,
+                        CalcState.addMatrix,
+                        CalcState.subtractMatrix,
+                        CalcState.AxB,
+                        CalcState.AxXeB,
+                        CalcState.BxXeA,
                     ]
-                    .includes(matrixState)
+                    .includes(calcState)
                     || fullScreenDeterminant
                 }
                 editableDimensions={editableDimensions}
                 changeEditableDimensions={changeEditableDimensions}
-                bottomLeftText={
-                    matrixState !== MatrixState.LambdaxA
-                        ? fullEquation !== null && !isPortrait
-                            ? getEquationTypeString(fullEquation.equationType)
-                            : editableDimensions && !fullScreenDeterminant
-                                ? `${editableDimensions.rows}x${editableDimensions.columns}`
-                                : ''
-                        : 'Scalar'
-                }
+                bottomLeftText={bottomLeftText}
                 bottomRightText={
                     fullEquation !== null && !isPortrait
                         ? [
-                            MatrixState.AxXeB,
-                            MatrixState.BxXeA,
-                            MatrixState.XxAeB,
-                            MatrixState.XxBeA,
+                            CalcState.AxXeB,
+                            CalcState.BxXeA,
+                            CalcState.XxAeB,
+                            CalcState.XxBeA,
                         ].includes(fullEquation.equationType) 
                             && fullEquation.solutionType !== SystemSolutionType.SPD
                                 ? viewReduced ? 'Reduzida' : 'Original'
                                 : null
                         : !operationHappening
                             && formatDeterminant({
-                                determinant: MatrixOperations.determinant(readyMatrix)
+                                determinant: MatrixOperations.determinant(matrixOnScreen)
                             })
                 }
                 bottomMiddleText={
-                    matrixState === MatrixState.ready && solutionType
+                    calcState === CalcState.ready && solutionType
                 }
                 onPressBottomRightText={
                     !isPortrait
                         ? fullEquation !== null 
-                            ? (() => changeViewReduced(!viewReduced))
+                            ? changeViewReduced
                             : () => {}
                         : !operationHappening
-                            && (() => changeFullScreenDeterminant(!fullScreenDeterminant))
+                            && changeFullScreenDeterminant
                 }
                 crossWidth={BUTTON_AREAS_CROSS_WIDTH}
             />

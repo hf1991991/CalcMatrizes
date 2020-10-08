@@ -11,7 +11,7 @@ export default function FullEquation({
     totalMaxAreaWidth,
     viewReduced,
 }) {
-    let [matrix1Height, changeMatrix1Height] = useState(0);
+    const [matrix1Height, changeMatrix1Height] = useState(0);
 
     const equationData = new EquationData({
         fullEquation, 

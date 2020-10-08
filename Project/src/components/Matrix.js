@@ -7,12 +7,11 @@ import MatrixOperations from '../utilities/MatrixOperations';
 export default function Matrix({ 
     matrixNumbers,
     selectedMatrixElement=null,
-    changeSelectedMatrixElement=() => {},
     maxMatrixWidth,
     editableOperatorNumber=null,
     onLayout,
 }) {
-    let [flatListDimensions, changeFlatListDimensions] = useState({
+    const [flatListDimensions, changeFlatListDimensions] = useState({
         height: 0,
         width: 0,
     });
@@ -56,7 +55,6 @@ export default function Matrix({
                                     matrixNumbers={matrixNumbers}
                                     matrixColumnElements={item.data}
                                     selectedMatrixElement={selectedMatrixElement}
-                                    changeSelectedMatrixElement={changeSelectedMatrixElement}
                                     minWidth={50}
                                     flatListDimensions={flatListDimensions}
                                     changeFlatListDimensions={changeFlatListDimensions}

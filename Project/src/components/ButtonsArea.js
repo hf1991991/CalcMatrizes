@@ -1,22 +1,23 @@
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import CalculatorButton from './CalculatorButton';
-import { MatrixState, ButtonType } from '../utilities/constants';
+import { CalcState, ButtonType } from '../utilities/constants';
 
-export default function ButtonsArea(props) {
+import { useCalculator } from '../hooks/useCalculator';
+
+export default function ButtonsArea() {
     const { 
-        hidden,
-        matrixState, 
-        numberWritten,
-        secondSetOfKeysActive, 
-        selectedMatrixElement,
-        isKeyboardBeActive,
+        calcState, 
+        getNumberWritten,
         editableOperatorNumber,
+        isNumberKeyboardActive,
+        selectedMatrixElement,
+        secondSetOfKeysActive, 
         isRActive,
-        isVariableKeyboardActive=true,
-    } = props;
+        isVariableKeyboardActive
+    } = useCalculator();
 
-    let [buttonsAreaWidth, changeButtonsAreaWidth] = useState(0);
+    const [buttonsAreaWidth, changeButtonsAreaWidth] = useState(0);
 
     const styles = StyleSheet.create({
         button: {
@@ -29,9 +30,6 @@ export default function ButtonsArea(props) {
     
     return (
         <View
-            style={{
-                display: hidden && 'none',
-            }}
             onLayout={(event) => {
                 changeButtonsAreaWidth(event.nativeEvent.layout.width);
             }}
@@ -40,29 +38,25 @@ export default function ButtonsArea(props) {
                 style={styles.button}
             >
                 <CalculatorButton
-                    {...props}
                     buttonType={
-                        (numberWritten !== null && numberWritten.commaStringify() === '0') || matrixState === MatrixState.ready
+                        (getNumberWritten({ doNotStringify: true }) == 0) || calcState === CalcState.ready
                             ? ButtonType.AC
                             : ButtonType.CE
                     }
                 />
                 <CalculatorButton
-                    {...props}
                     buttonType={
-                        isKeyboardBeActive
+                        isNumberKeyboardActive
                             ? ButtonType.abc
                             : ButtonType.R
                     }
                 />
                 <CalculatorButton
-                    {...props}
                     buttonType={ButtonType.Second}
                 />
                 <CalculatorButton
-                    {...props}
                     buttonType={
-                        isKeyboardBeActive
+                        isNumberKeyboardActive
                             ? ButtonType.Divide
                             : isRActive 
                                 ? ButtonType.XxBeA
@@ -76,7 +70,6 @@ export default function ButtonsArea(props) {
                 style={styles.button}
             >
                 <CalculatorButton
-                    {...props}
                     buttonType={
                         isVariableKeyboardActive 
                             ? ButtonType.g
@@ -84,7 +77,6 @@ export default function ButtonsArea(props) {
                     }
                 />
                 <CalculatorButton
-                    {...props}
                     buttonType={
                         isVariableKeyboardActive 
                             ? ButtonType.h
@@ -92,7 +84,6 @@ export default function ButtonsArea(props) {
                     }
                 />
                 <CalculatorButton
-                    {...props}
                     buttonType={
                         isVariableKeyboardActive 
                             ? ButtonType.i
@@ -100,9 +91,8 @@ export default function ButtonsArea(props) {
                     }
                 />
                 <CalculatorButton
-                    {...props}
                     buttonType={
-                        isKeyboardBeActive
+                        isNumberKeyboardActive
                             ? ButtonType.Multiply
                             : isRActive 
                                 ? ButtonType.XxAeB
@@ -114,7 +104,6 @@ export default function ButtonsArea(props) {
                 style={styles.button}
             >
                 <CalculatorButton
-                    {...props}
                     buttonType={
                         isVariableKeyboardActive 
                             ? ButtonType.d
@@ -122,7 +111,6 @@ export default function ButtonsArea(props) {
                     }
                 />
                 <CalculatorButton
-                    {...props}
                     buttonType={
                         isVariableKeyboardActive 
                             ? ButtonType.e
@@ -130,7 +118,6 @@ export default function ButtonsArea(props) {
                     }
                 />
                 <CalculatorButton
-                    {...props}
                     buttonType={
                         isVariableKeyboardActive 
                             ? ButtonType.f
@@ -138,9 +125,8 @@ export default function ButtonsArea(props) {
                     }
                 />
                 <CalculatorButton
-                    {...props}
                     buttonType={
-                        isKeyboardBeActive
+                        isNumberKeyboardActive
                             ? ButtonType.Subtract
                             : isRActive 
                                 ? ButtonType.BxXeA
@@ -154,7 +140,6 @@ export default function ButtonsArea(props) {
                 style={styles.button}
             >
                 <CalculatorButton
-                    {...props}
                     buttonType={
                         isVariableKeyboardActive 
                             ? ButtonType.a
@@ -162,7 +147,6 @@ export default function ButtonsArea(props) {
                     }
                 />
                 <CalculatorButton
-                    {...props}
                     buttonType={
                         isVariableKeyboardActive 
                             ? ButtonType.b
@@ -170,7 +154,6 @@ export default function ButtonsArea(props) {
                     }
                 />
                 <CalculatorButton
-                    {...props}
                     buttonType={
                         isVariableKeyboardActive 
                             ? ButtonType.c
@@ -178,9 +161,8 @@ export default function ButtonsArea(props) {
                     }
                 />
                 <CalculatorButton
-                    {...props}
                     buttonType={
-                        isKeyboardBeActive
+                        isNumberKeyboardActive
                             ? ButtonType.Add
                             : isRActive 
                                 ? ButtonType.AxXeB
@@ -194,18 +176,12 @@ export default function ButtonsArea(props) {
                 style={styles.button}
             >
                 <CalculatorButton
-                    {...props}
-                    style={{
-                        flex: 2,
-                    }}
                     buttonType={ButtonType[0]}
                 />
                 <CalculatorButton
-                    {...props}
                     buttonType={ButtonType.Comma}
                 />
                 <CalculatorButton
-                    {...props}
                     buttonType={
                         selectedMatrixElement || editableOperatorNumber !== null
                             ? ButtonType.Enter

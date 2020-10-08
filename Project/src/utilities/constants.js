@@ -1,6 +1,6 @@
 import ScalarOperations from "./ScalarOperations";
 
-export const MatrixState = {
+export const CalcState = {
     ready: 'ready',
     editing: 'editing',
     addMatrix: 'addMatrix',

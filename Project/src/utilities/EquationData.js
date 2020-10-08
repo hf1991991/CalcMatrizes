@@ -1,10 +1,10 @@
-import { MatrixState, SystemSolutionType } from './constants';
+import { CalcState, SystemSolutionType } from './constants';
 
 export default class EquationData {
 
     constructor({ fullEquation, viewReduced=false }) {
         switch (fullEquation.equationType) {
-            case MatrixState.AxXeB:
+            case CalcState.AxXeB:
                 if (fullEquation.solutionType !== SystemSolutionType.SPD) {
                     this.firstOperator = '×';
                     this.variablePosition = 2;
@@ -25,7 +25,7 @@ export default class EquationData {
                     this.matrix3 = fullEquation.matrixB;
                 }
                 break;
-            case MatrixState.BxXeA:
+            case CalcState.BxXeA:
                 if (fullEquation.solutionType !== SystemSolutionType.SPD) {
                     this.firstOperator = '×';
                     this.variablePosition = 2;
@@ -46,7 +46,7 @@ export default class EquationData {
                     this.matrix3 = fullEquation.matrixA;
                 }
                 break;
-            case MatrixState.XxAeB:
+            case CalcState.XxAeB:
                 if (fullEquation.solutionType !== SystemSolutionType.SPD) {
                     this.firstOperator = '×';
                     this.variablePosition = 1;
@@ -67,7 +67,7 @@ export default class EquationData {
                     this.matrix3 = fullEquation.matrixB;
                 }
                 break;
-            case MatrixState.XxBeA:
+            case CalcState.XxBeA:
                 if (fullEquation.solutionType !== SystemSolutionType.SPD) {
                     this.firstOperator = '×';
                     this.variablePosition = 1;
@@ -88,48 +88,48 @@ export default class EquationData {
                     this.matrix3 = fullEquation.matrixA;
                 }
                 break;
-            case MatrixState.addMatrix:
+            case CalcState.addMatrix:
                 this.matrix1 = fullEquation.matrixA;
                 this.firstOperator = '+';
                 this.matrix2 = fullEquation.matrixB;
                 this.secondOperator = '=';
                 this.matrix3 = fullEquation.matrixC;
                 break;
-            case MatrixState.subtractMatrix:
+            case CalcState.subtractMatrix:
                 this.matrix1 = fullEquation.matrixA;
                 this.firstOperator = '-';
                 this.matrix2 = fullEquation.matrixB;
                 this.secondOperator = '=';
                 this.matrix3 = fullEquation.matrixC;
                 break;
-            case MatrixState.AxB:
+            case CalcState.AxB:
                 this.matrix1 = fullEquation.matrixA;
                 this.firstOperator = '×';
                 this.matrix2 = fullEquation.matrixB;
                 this.secondOperator = '=';
                 this.matrix3 = fullEquation.matrixC;
                 break;
-            case MatrixState.BxA:
+            case CalcState.BxA:
                 this.matrix1 = fullEquation.matrixA;
                 this.firstOperator = '×';
                 this.matrix2 = fullEquation.matrixB;
                 this.secondOperator = '=';
                 this.matrix3 = fullEquation.matrixC;
                 break;
-            case MatrixState.LambdaxA:
-                this.scalar = fullEquation.scalar.commaStringify();
+            case CalcState.LambdaxA:
+                this.scalar = fullEquation.scalar?.commaStringify();
                 this.firstOperator = '×';
                 this.matrix2 = fullEquation.matrixB;
                 this.secondOperator = '=';
                 this.matrix3 = fullEquation.matrixC;
                 break;
-            case MatrixState.transpose:
+            case CalcState.transpose:
                 this.matrix1 = fullEquation.matrixA;
                 this.singleMatrixOperator = 'T';
                 this.firstOperator = '=';
                 this.matrix2 = fullEquation.matrixB;
                 break;
-            case MatrixState.invert:
+            case CalcState.invert:
                 this.matrix1 = fullEquation.matrixA;
                 this.singleMatrixOperator = '-1';
                 this.firstOperator = '=';
