@@ -24,7 +24,7 @@ export default function ButtonsArea() {
             height: (buttonsAreaWidth/4)*0.7,
             flexDirection: 'row',
             marginVertical: 3,
-            marginHorizontal: 6,
+            marginHorizontal: 6
         },
     });
     
@@ -32,6 +32,9 @@ export default function ButtonsArea() {
         <View
             onLayout={(event) => {
                 changeButtonsAreaWidth(event.nativeEvent.layout.width);
+            }}
+            style={{
+                marginBottom: 10
             }}
         >
             <View 

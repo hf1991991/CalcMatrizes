@@ -12,13 +12,13 @@
 		13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB11A68108700A75B9A /* LaunchScreen.xib */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
+		1413FDAE1A4E9208A2CE7A43 /* libPods-CalcMatrizes-CalcMatrizesTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BE1613F5237C449DFF3EF0A2 /* libPods-CalcMatrizes-CalcMatrizesTests.a */; };
+		22317175F7F0A58106DB53FF /* libPods-CalcMatrizes.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 92FA1F2C94FC61250498BABC /* libPods-CalcMatrizes.a */; };
 		2437215C4FC1228BB098BAF5 /* libPods-CalcMatrizes-tvOSTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D236E9F00CAF2B2BB2C9A98 /* libPods-CalcMatrizes-tvOSTests.a */; };
 		2D02E4BC1E0B4A80006451C7 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
 		2D02E4BD1E0B4A84006451C7 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		2D02E4BF1E0B4AB3006451C7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		2DCD954D1E0B4F2C00145EB5 /* CalcMatrizesTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* CalcMatrizesTests.m */; };
-		58662907AA63D6599C9381F6 /* libPods-CalcMatrizes-CalcMatrizesTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BE0409200752CBBBFE201DDE /* libPods-CalcMatrizes-CalcMatrizesTests.a */; };
-		69C7FDF7B36966B07578867F /* libPods-CalcMatrizes.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F7EA36E96FD9B74479F84956 /* libPods-CalcMatrizes.a */; };
 		F5DEC5C0538E958CB1CB2E7C /* libPods-CalcMatrizes-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7E726375B9E7F869913885C0 /* libPods-CalcMatrizes-tvOS.a */; };
 /* End PBXBuildFile section */
 
@@ -59,14 +59,14 @@
 		7E726375B9E7F869913885C0 /* libPods-CalcMatrizes-tvOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-CalcMatrizes-tvOS.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8B91D5D3700649AC8C579647 /* Pods-CalcMatrizes-CalcMatrizesTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CalcMatrizes-CalcMatrizesTests.release.xcconfig"; path = "Target Support Files/Pods-CalcMatrizes-CalcMatrizesTests/Pods-CalcMatrizes-CalcMatrizesTests.release.xcconfig"; sourceTree = "<group>"; };
 		8F6F0F6F988687D0CCD95F46 /* Pods-CalcMatrizes.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CalcMatrizes.release.xcconfig"; path = "Target Support Files/Pods-CalcMatrizes/Pods-CalcMatrizes.release.xcconfig"; sourceTree = "<group>"; };
+		92FA1F2C94FC61250498BABC /* libPods-CalcMatrizes.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-CalcMatrizes.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9F1023846F7A3CFFAD2DBB07 /* Pods-CalcMatrizes-CalcMatrizesTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CalcMatrizes-CalcMatrizesTests.debug.xcconfig"; path = "Target Support Files/Pods-CalcMatrizes-CalcMatrizesTests/Pods-CalcMatrizes-CalcMatrizesTests.debug.xcconfig"; sourceTree = "<group>"; };
 		A371A0D687DC3AA3A60171BF /* Pods-CalcMatrizes-tvOSTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CalcMatrizes-tvOSTests.debug.xcconfig"; path = "Target Support Files/Pods-CalcMatrizes-tvOSTests/Pods-CalcMatrizes-tvOSTests.debug.xcconfig"; sourceTree = "<group>"; };
 		B1B6DF4AF5D707C424FB4244 /* Pods-CalcMatrizes-tvOSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CalcMatrizes-tvOSTests.release.xcconfig"; path = "Target Support Files/Pods-CalcMatrizes-tvOSTests/Pods-CalcMatrizes-tvOSTests.release.xcconfig"; sourceTree = "<group>"; };
-		BE0409200752CBBBFE201DDE /* libPods-CalcMatrizes-CalcMatrizesTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-CalcMatrizes-CalcMatrizesTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		BE1613F5237C449DFF3EF0A2 /* libPods-CalcMatrizes-CalcMatrizesTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-CalcMatrizes-CalcMatrizesTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D81F1991E11165C022378405 /* Pods-CalcMatrizes-tvOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CalcMatrizes-tvOS.release.xcconfig"; path = "Target Support Files/Pods-CalcMatrizes-tvOS/Pods-CalcMatrizes-tvOS.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		ED2971642150620600B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS12.0.sdk/System/Library/Frameworks/JavaScriptCore.framework; sourceTree = DEVELOPER_DIR; };
-		F7EA36E96FD9B74479F84956 /* libPods-CalcMatrizes.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-CalcMatrizes.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -74,7 +74,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				58662907AA63D6599C9381F6 /* libPods-CalcMatrizes-CalcMatrizesTests.a in Frameworks */,
+				1413FDAE1A4E9208A2CE7A43 /* libPods-CalcMatrizes-CalcMatrizesTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -82,7 +82,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				69C7FDF7B36966B07578867F /* libPods-CalcMatrizes.a in Frameworks */,
+				22317175F7F0A58106DB53FF /* libPods-CalcMatrizes.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -156,10 +156,10 @@
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				ED2971642150620600B7C4FE /* JavaScriptCore.framework */,
-				F7EA36E96FD9B74479F84956 /* libPods-CalcMatrizes.a */,
-				BE0409200752CBBBFE201DDE /* libPods-CalcMatrizes-CalcMatrizesTests.a */,
 				7E726375B9E7F869913885C0 /* libPods-CalcMatrizes-tvOS.a */,
 				1D236E9F00CAF2B2BB2C9A98 /* libPods-CalcMatrizes-tvOSTests.a */,
+				92FA1F2C94FC61250498BABC /* libPods-CalcMatrizes.a */,
+				BE1613F5237C449DFF3EF0A2 /* libPods-CalcMatrizes-CalcMatrizesTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -633,7 +633,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 30;
+				CURRENT_PROJECT_VERSION = 36;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -666,7 +666,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 30;
+				CURRENT_PROJECT_VERSION = 36;
 				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = CalcMatrizes/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
