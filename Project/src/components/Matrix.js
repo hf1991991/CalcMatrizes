@@ -10,6 +10,7 @@ export default function Matrix({
     maxMatrixWidth,
     editableOperatorNumber=null,
     onLayout,
+    changeSelectedMatrixElement
 }) {
     const [flatListDimensions, changeFlatListDimensions] = useState({
         height: 0,
@@ -59,6 +60,7 @@ export default function Matrix({
                                     flatListDimensions={flatListDimensions}
                                     changeFlatListDimensions={changeFlatListDimensions}
                                     editableOperatorNumber={editableOperatorNumber}
+                                    changeSelectedMatrixElement={changeSelectedMatrixElement}
                                 />
                             );
                         }}

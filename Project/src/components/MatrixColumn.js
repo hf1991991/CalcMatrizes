@@ -2,8 +2,6 @@ import React, { useCallback } from 'react';
 import { View, Text, TouchableOpacity, FlatList } from 'react-native';
 import { findFraction, smartToFixed, toFixedOnZeroes, toFixedWithThreeDots } from '../utilities/constants';
 
-import { useCalculator } from '../hooks/useCalculator';
-
 const ELEMENT_HEIGHT = 40;
 const ELEMENT_VERTICAL_MARGIN = 11;
 
@@ -15,12 +13,8 @@ export default function MatrixColumn({
     flatListDimensions,
     changeFlatListDimensions,
     editableOperatorNumber,
+    changeSelectedMatrixElement=() => {}
 }) {
-
-    const { 
-        changeSelectedMatrixElement
-    } = useCalculator();
-
     const isElementSelected = useCallback(
         ({ row, column }) => selectedMatrixElement 
             && selectedMatrixElement.row === row 

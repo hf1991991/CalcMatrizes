@@ -23,6 +23,7 @@ export default function MatrixArea() {
         editableScalar,
         changeViewReduced,
         onPressGaussianEliminationReduced,
+        changeSelectedMatrixElement,
         changeFullScreenDeterminant,
         operationHappening,
         editableOperatorNumber,
@@ -166,6 +167,7 @@ export default function MatrixArea() {
                                         matrixNumbers={matrixOnScreen}
                                         selectedMatrixElement={selectedMatrixElement}
                                         editableOperatorNumber={editableOperatorNumber}
+                                        changeSelectedMatrixElement={changeSelectedMatrixElement}
                                     />
                                 )
                         : (
@@ -232,9 +234,9 @@ export default function MatrixArea() {
                             CalcState.XxBeA,
                         ].includes(fullEquation.equationType) 
                             && fullEquation.solutionType !== SystemSolutionType.SPD
-                                ? viewReduced ? 'Reduzida' : 'Original'
+                                ? viewReduced ? 'Original' : 'Reduzida'
                                 : fullEquation.equationType === CalcState.gaussianElimination
-                                    ? viewReduced ? 'Reduzida' : 'Não Reduzida'
+                                    ? viewReduced ? 'Não Reduzida' : 'Reduzida'
                                     : null
                         : !operationHappening
                                 && formatDeterminant({
