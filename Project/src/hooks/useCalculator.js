@@ -17,8 +17,12 @@ export const CalculatorProvider = ({ children }) => {
     const [calcState, setCalcState] = useState(CalcState.editing);
 
     // Estados de matrizes:
-    const [readyMatrix, setReadyMatrix] = useState(INITIAL_MATRIX);
+    const [readyMatrix, _setReadyMatrix] = useState(INITIAL_MATRIX);
     const [editableMatrix, setEditableMatrix] = useState(INITIAL_MATRIX);
+    const [matrixHistory, setMatrixHistory] = useState({
+        history: [MatrixOperations.copyMatrixData(INITIAL_MATRIX)],
+        currentPosition: 0
+    });
     const [selectedMatrixElement, setSelectedMatrixElement] = useState({
         row: 0,
         column: 0,
@@ -104,6 +108,71 @@ export const CalculatorProvider = ({ children }) => {
                 CalcState.XxBeA,
             ].includes(calcState);
         }, [calcState]
+    );
+
+    const setReadyMatrix = useCallback(
+        newMatrix => {
+
+            _setReadyMatrix(newMatrix);
+
+            const { currentPosition } = matrixHistory;
+
+            const newHistory = [...matrixHistory.history].slice(0, currentPosition + 1);
+
+            if (!MatrixOperations.compareMatrices(newMatrix, newHistory[newHistory.length - 1]))
+                setMatrixHistory({
+                    history: [ ...newHistory, MatrixOperations.copyMatrixData(newMatrix) ],
+                    currentPosition: currentPosition + 1
+                });
+
+        }, [matrixHistory, _setReadyMatrix, setMatrixHistory]
+    );
+
+    const clearHistory = useCallback(
+        () => setMatrixHistory(
+            {
+                history: [MatrixOperations.copyMatrixData(matrixOnScreen)],
+                currentPosition: 0
+            }
+        ), [matrixOnScreen, _setReadyMatrix, setMatrixHistory]
+    );
+
+    const undoHistory = useCallback(
+        () => {
+
+            const { history, currentPosition } = matrixHistory;
+
+            setMatrixHistory(
+                {
+                    history,
+                    currentPosition: currentPosition - 1
+                }
+            );
+            
+            _setReadyMatrix(
+                MatrixOperations.copyMatrixData(history[currentPosition - 1])
+            );
+
+        }, [matrixHistory, _setReadyMatrix, setMatrixHistory]
+    );
+
+    const redoHistory = useCallback(
+        () => {
+
+            const { history, currentPosition } = matrixHistory;
+
+            setMatrixHistory(
+                {
+                    history,
+                    currentPosition: currentPosition + 1
+                }
+            );
+            
+            _setReadyMatrix(
+                MatrixOperations.copyMatrixData(history[currentPosition + 1])
+            );
+
+        }, [matrixHistory, _setReadyMatrix, setMatrixHistory]
     );
 
     const getNumberWritten = useCallback(
@@ -270,8 +339,6 @@ export const CalculatorProvider = ({ children }) => {
     const enterEditingMode = useCallback(
         ({ newEditableMatrix, newCalcState, newSelectedElement = undefined, newScalar }) => {
             setCalcState(newCalcState);
-
-            console.log({newCalcState, calcState})
 
             setFullEquation(null);
             setEditableMatrix(newEditableMatrix)
@@ -512,6 +579,7 @@ export const CalculatorProvider = ({ children }) => {
 
                 if (MatrixOperations.isMatrixEmpty(matrixOnScreen)) {
                     exitEditingMode();
+                    clearHistory();
                     changeSettingsOfSelectedMatrixElement(0);
                 }
             } else {
@@ -861,6 +929,7 @@ export const CalculatorProvider = ({ children }) => {
                 // Estados de matrizes:
                 readyMatrix,
                 editableMatrix,
+                matrixHistory,
                 selectedMatrixElement,
                 shouldUserInputOverwriteElement,
                 editableDimensions,
@@ -887,6 +956,8 @@ export const CalculatorProvider = ({ children }) => {
                 isInverseEnabled,
                 isCheckActive,
                 // ---- useCallbacks: ----
+                undoHistory,
+                redoHistory,
                 getNumberWritten,
                 changeNumberWritten,
                 changeEditableDimensions,

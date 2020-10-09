@@ -1,5 +1,7 @@
-import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import React, { useMemo } from 'react';
+import { View, Text, TouchableOpacity, Image } from 'react-native';
+import { useCalculator } from '../hooks/useCalculator';
+import { useOrientation } from '../hooks/useOrientation';
 import ArrowButton from './ArrowButton';
 
 export default function ArrowButtonsArea({ 
@@ -15,7 +17,25 @@ export default function ArrowButtonsArea({
     onPressBottomLeftText,
     onPressBottomMiddleText,
     onPressBottomRightText,
+    forwardHistory,
+    backHistory
 }) {
+
+    const {
+        matrixHistory,
+        undoHistory,
+        redoHistory
+    } = useCalculator();
+
+    const { isPortrait } = useOrientation();
+
+    const historyDisabled = useMemo(
+        () => forwardHistory 
+            ? matrixHistory.currentPosition === matrixHistory.history.length - 1
+            : matrixHistory.currentPosition === 0,
+        [forwardHistory, matrixHistory]
+    );
+
     return (
         <View
             style={{
@@ -50,6 +70,32 @@ export default function ArrowButtonsArea({
                         >
                             {bottomLeftText}
                         </Text>
+                    </TouchableOpacity>
+                )
+            }
+            {
+                (forwardHistory || backHistory) && isPortrait && (
+                    <TouchableOpacity
+                        onPress={forwardHistory ? redoHistory : undoHistory}
+                        style={{
+                            position: 'absolute',
+                            top: 0,
+                            opacity: historyDisabled && 0.5,
+                        }}
+                        disabled={historyDisabled}
+                    >
+                        <Image
+                            style={{
+                                width: 18.5*1.3,
+                                height: 18.5*1.3,
+                            }}
+                            disabled
+                            source={
+                                forwardHistory
+                                    ? require('../../assets/icons/forwardHistory.png')
+                                    : require('../../assets/icons/backHistory.png')
+                            }
+                        />
                     </TouchableOpacity>
                 )
             }

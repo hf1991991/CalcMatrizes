@@ -120,6 +120,7 @@ export default function MatrixArea() {
             >
                 <ArrowButtonsArea 
                     vertical
+                    backHistory
                     hidden
                     editableDimensions={editableDimensions}
                     changeEditableDimensions={changeEditableDimensions}
@@ -192,6 +193,7 @@ export default function MatrixArea() {
                 }
                 <ArrowButtonsArea 
                     vertical
+                    forwardHistory
                     hidden={calcState === CalcState.ready || !editableDimensions}
                     disabled={
                         [
@@ -204,6 +206,7 @@ export default function MatrixArea() {
                         .includes(calcState)
                         || fullScreenDeterminant
                     }
+                    bottomLeftText={bottomLeftText}
                     editableDimensions={editableDimensions}
                     changeEditableDimensions={changeEditableDimensions}
                     crossWidth={BUTTON_AREAS_CROSS_WIDTH}

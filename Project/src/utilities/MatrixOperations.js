@@ -121,6 +121,26 @@ export default class MatrixOperations {
         return MatrixOperations.transpose(matrix).dimensions();
     }
 
+    static compareMatrices(matrix1, matrix2) {
+        if (
+            matrix1.dimensions().rows !== matrix2.dimensions().rows
+            || matrix1.dimensions().columns !== matrix2.dimensions().columns
+        ) return false;
+
+        for (let row = 0; row < matrix1.dimensions().rows; row++) {
+            for (let column = 0; column < matrix1.dimensions().columns; column++) {
+                console.log({
+                    1: matrix1.data[row][column]?.commaStringify(),
+                    2: matrix2.data[row][column]?.commaStringify()
+                })
+                if (
+                    matrix1.data[row][column]?.commaStringify() !== matrix2.data[row][column]?.commaStringify()
+                ) return false;
+            }
+        }
+        return true;
+    }
+
     static isMatrixFull(matrix) {
         if (!matrix) return false;
 
