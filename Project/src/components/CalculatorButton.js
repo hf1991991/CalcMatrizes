@@ -36,6 +36,7 @@ export default function CalculatorButton({ buttonType }) {
                 onPressBxA,
                 onInvert,
                 onTranspose,
+                onPressResolveEquation,
                 onPressAddMatrix,
                 onPressSubtractMatrix,
                 onPressOperator,

@@ -45,7 +45,7 @@ export default function MatrixArea() {
     const formatDeterminant = useCallback(
         ({ determinant, overflow=true, det=true }) => {
             if (determinant === null) return null
-            const stringDeterminant = determinant?.commaStringify();
+            let stringDeterminant = determinant?.commaStringify();
             if (stringDeterminant.length > 8 && overflow) stringDeterminant = stringDeterminant.substring(0, 8 - 3) + '...';
             if (stringDeterminant && !ScalarOperations.isNumber(stringDeterminant)) 
                 return det
