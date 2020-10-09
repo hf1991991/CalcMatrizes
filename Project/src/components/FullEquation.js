@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text } from 'react-native';
 import Matrix from './Matrix';
 import EquationData from '../utilities/EquationData';
+import { CalcState } from '../utilities/constants';
 
 const OPERATORS_WIDTH = 50;
 const X_OPERATOR_WIDTH = 50;
@@ -117,7 +118,9 @@ export default function FullEquation({
                             color: '#fff',
                             textAlign: 'center',
                             fontSize: 35,
-                            width: OPERATORS_WIDTH,
+                            width: fullEquation.equationType === CalcState.gaussianElimination
+                                ? 60
+                                : OPERATORS_WIDTH,
                         }}
                     >
                         {equationData.firstOperator}

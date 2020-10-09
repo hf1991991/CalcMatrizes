@@ -681,6 +681,35 @@ export const CalculatorProvider = ({ children }) => {
         ]
     );
 
+    const onPressGaussianElimination = useCallback(
+        () => {
+
+            const {
+                rowEchelonForm,
+                reducedRowEchelonForm
+            } = MatrixOperations.getGaussianElimination(matrixOnScreen);
+
+            setViewReduced(false);
+            setFullEquation({
+                equationType: CalcState.gaussianElimination,
+                matrixA: matrixOnScreen,
+                matrixC: rowEchelonForm,
+                matrixD: reducedRowEchelonForm
+            });
+
+            setReadyMatrix(rowEchelonForm);
+
+        }, [matrixOnScreen, setViewReduced, setFullEquation, setReadyMatrix]
+    );
+
+    const onPressGaussianEliminationReduced = useCallback(
+        () => {
+            changeViewReduced();
+            setReadyMatrix(viewReduced ? fullEquation.matrixC : fullEquation.matrixD);
+        },
+        [viewReduced, fullEquation, changeViewReduced, setReadyMatrix]
+    );
+
     const onTranspose = useCallback(
         () => {
 
@@ -879,6 +908,8 @@ export const CalculatorProvider = ({ children }) => {
                 onPressOperator,
                 onPressR,
                 onPressResolveEquation,
+                onPressGaussianElimination, 
+                onPressGaussianEliminationReduced, 
                 onTranspose,
                 onInvert,
                 onEnter,

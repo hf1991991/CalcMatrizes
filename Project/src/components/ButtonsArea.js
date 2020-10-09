@@ -96,7 +96,9 @@ export default function ButtonsArea() {
                             ? ButtonType.Multiply
                             : isRActive 
                                 ? ButtonType.XxAeB
-                                : ButtonType.LambdaxA
+                                : secondSetOfKeysActive
+                                    ? ButtonType.GaussianElimination
+                                    : ButtonType.LambdaxA
                     }
                 />
             </View>

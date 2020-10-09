@@ -560,6 +560,32 @@ export default class MatrixOperations {
     }
 
 
+    static getGaussianElimination(matrix) {
+        const { matrixA: rowEchelonForm } = MatrixOperations.partialGaussianElimination({
+            matrixA: matrix, 
+            matrixB: MatrixOperations.emptyMatrix({
+                rows: matrix.dimensions().rows,
+                columns: 1,
+            }), 
+            eliminateBelowMainDiagonal: true
+        });
+
+        const { matrixA: reducedRowEchelonForm } = MatrixOperations.partialGaussianElimination({
+            matrixA: rowEchelonForm, 
+            matrixB: MatrixOperations.emptyMatrix({
+                rows: matrix.dimensions().rows,
+                columns: 1,
+            }), 
+            eliminateBelowMainDiagonal: false
+        });
+
+        return {
+            rowEchelonForm,
+            reducedRowEchelonForm
+        };
+    }
+
+
     /* 
         Resolve o sistema A * X = B, quando a incognita procede a matriz A conhecida, 
         ou o sistema X * A = B, quando a incognita precede a matriz A conhecida.

@@ -37,6 +37,7 @@ export default function CalculatorButton({ buttonType }) {
                 onInvert,
                 onTranspose,
                 onPressResolveEquation,
+                onPressGaussianElimination,
                 onPressAddMatrix,
                 onPressSubtractMatrix,
                 onPressOperator,
@@ -246,6 +247,11 @@ export default function CalculatorButton({ buttonType }) {
                             active: calcState === CalcState.XxBeA,
                             disabled: !isMatrixFull,
                             onPress: () => onPressResolveEquation(CalcState.XxBeA),
+                        });
+                    case ButtonType.GaussianElimination:
+                        return new ButtonData({
+                            source: require('../../assets/buttons/GaussianElimination.png'),
+                            onPress: onPressGaussianElimination,
                         });
                     case ButtonType.LambdaxA:
                         return new ButtonData({

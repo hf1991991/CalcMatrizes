@@ -22,6 +22,7 @@ export default function MatrixArea() {
         editableDimensions,
         editableScalar,
         changeViewReduced,
+        onPressGaussianEliminationReduced,
         changeFullScreenDeterminant,
         operationHappening,
         editableOperatorNumber,
@@ -232,11 +233,13 @@ export default function MatrixArea() {
                         ].includes(fullEquation.equationType) 
                             && fullEquation.solutionType !== SystemSolutionType.SPD
                                 ? viewReduced ? 'Reduzida' : 'Original'
-                                : null
+                                : fullEquation.equationType === CalcState.gaussianElimination
+                                    ? viewReduced ? 'Reduzida' : 'Não Reduzida'
+                                    : null
                         : !operationHappening
-                            && formatDeterminant({
-                                determinant: MatrixOperations.determinant(matrixOnScreen)
-                            })
+                                && formatDeterminant({
+                                    determinant: MatrixOperations.determinant(matrixOnScreen)
+                                })
                 }
                 bottomMiddleText={
                     calcState === CalcState.ready && solutionType
@@ -244,7 +247,9 @@ export default function MatrixArea() {
                 onPressBottomRightText={
                     !isPortrait
                         ? fullEquation !== null 
-                            ? changeViewReduced
+                            ? fullEquation.equationType === CalcState.gaussianElimination
+                                ? onPressGaussianEliminationReduced
+                                : changeViewReduced
                             : () => {}
                         : !operationHappening
                             && changeFullScreenDeterminant

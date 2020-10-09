@@ -12,6 +12,7 @@ export const CalcState = {
     BxXeA: 'BxXeA',
     XxAeB: 'XxAeB',
     XxBeA: 'XxBeA',
+    gaussianElimination: 'gaussianElimination',
     transpose: 'transpose',
     invert: 'invert',
 }
@@ -58,6 +59,7 @@ export const ButtonType = {
     BxXeA: 'BxXeA',
     XxAeB: 'XxAeB',
     XxBeA: 'XxBeA',
+    GaussianElimination: 'GaussianElimination',
     LambdaxA: 'LambdaxA',
     AxB: 'AxB',
     BxA: 'BxA',

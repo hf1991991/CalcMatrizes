@@ -88,6 +88,14 @@ export default class EquationData {
                     this.matrix3 = fullEquation.matrixA;
                 }
                 break;
+            case CalcState.gaussianElimination:
+                this.firstOperator = 'GE(';
+                this.matrix2 = fullEquation.matrixA;
+                this.secondOperator = ') =';
+                this.matrix3 = viewReduced
+                    ? fullEquation.matrixD
+                    : fullEquation.matrixC;
+                break;
             case CalcState.addMatrix:
                 this.matrix1 = fullEquation.matrixA;
                 this.firstOperator = '+';
