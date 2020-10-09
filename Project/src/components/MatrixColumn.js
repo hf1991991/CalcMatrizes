@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { View, Text, TouchableOpacity, FlatList } from 'react-native';
 import { findFraction, smartToFixed, toFixedOnZeroes, toFixedWithThreeDots } from '../utilities/constants';
 
@@ -21,42 +21,49 @@ export default function MatrixColumn({
         changeSelectedMatrixElement
     } = useCalculator();
 
-    function isElementSelected({ row, column }) {
-        return selectedMatrixElement && selectedMatrixElement.row === row && selectedMatrixElement.column === column;
-    }
+    const isElementSelected = useCallback(
+        ({ row, column }) => selectedMatrixElement 
+            && selectedMatrixElement.row === row 
+            && selectedMatrixElement.column === column,
+        [selectedMatrixElement]
+    );
 
-    function getElementStyle(row, column) {
-        return {
-            backgroundColor: isElementSelected({ row, column })
-                ? '#404040'
-                : (matrixNumbers?.data[row][column] === null)
-                    ? '#1c1c1c'
-                    : 'transparent',
-            ...(
-                (matrixNumbers?.data[row][column] === null)
-                && {
-                    //borderColor: '#fff',
-                    //borderWidth: 1.5,
-                    //borderStyle: 'dashed',
-                }
-            )
-        };
-    }
+    const getElementStyle = useCallback(
+        (row, column) => {
+            return {
+                backgroundColor: isElementSelected({ row, column })
+                    ? '#404040'
+                    : (matrixNumbers?.data[row][column] === null)
+                        ? '#1c1c1c'
+                        : 'transparent',
+                ...(
+                    (matrixNumbers?.data[row][column] === null)
+                    && {
+                        //borderColor: '#fff',
+                        //borderWidth: 1.5,
+                        //borderStyle: 'dashed',
+                    }
+                )
+            };
+        }, [matrixNumbers, isElementSelected]
+    );
 
-    function formatElement({ number, row, column }) {
-        // console.log({
-        //     number, 
-        //     selected: isElementSelected({ row, column }),
-        //     rowAndColumn: { row, column },
-        //     editableOperatorNumber
-        // })
-        return (
-            isElementSelected({ row, column })
-            && editableOperatorNumber 
-                ? editableOperatorNumber
-                : number
-        )?.commaStringify({ dontFindFraction: isElementSelected({ row, column })});
-    }
+    const formatElement = useCallback(
+        ({ number, row, column }) => {
+            // console.log({
+            //     number, 
+            //     selected: isElementSelected({ row, column }),
+            //     rowAndColumn: { row, column },
+            //     editableOperatorNumber
+            // })
+            return (
+                isElementSelected({ row, column })
+                && editableOperatorNumber 
+                    ? editableOperatorNumber
+                    : number
+            )?.commaStringify({ dontFindFraction: isElementSelected({ row, column })});
+        }, [editableOperatorNumber, isElementSelected]
+    );
 
     return (
         <FlatList
