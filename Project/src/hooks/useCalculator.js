@@ -242,8 +242,6 @@ export const CalculatorProvider = ({ children }) => {
     const changeSelectedMatrixElement = useCallback(
         (selectedElement) => {
 
-            console.log({ selectedElement });
-
             operationHappening && applyOperation();
 
             changeSettingsOfSelectedMatrixElement(selectedElement);
@@ -255,7 +253,7 @@ export const CalculatorProvider = ({ children }) => {
                     newSelectedElement: selectedElement
                 });
             }
-        }, [readyMatrix, operationHappening, applyOperation, changeSettingsOfSelectedMatrixElement, enterEditingMode]
+        }, [calcState, readyMatrix, operationHappening, applyOperation, changeSettingsOfSelectedMatrixElement, enterEditingMode]
     );
 
 
@@ -272,6 +270,8 @@ export const CalculatorProvider = ({ children }) => {
     const enterEditingMode = useCallback(
         ({ newEditableMatrix, newCalcState, newSelectedElement = undefined, newScalar }) => {
             setCalcState(newCalcState);
+
+            console.log({newCalcState, calcState})
 
             setFullEquation(null);
             setEditableMatrix(newEditableMatrix)
