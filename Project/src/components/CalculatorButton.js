@@ -117,46 +117,55 @@ export default function CalculatorButton({ buttonType }) {
                         return new ButtonData({
                             source: require('../../assets/buttons/a.png'), 
                             onPress: () => onPressNumberButton('a'),
+                            disabled: !isNumberKeyboardActive,
                         });
                     case ButtonType.b:
                         return new ButtonData({
                             source: require('../../assets/buttons/b.png'), 
                             onPress: () => onPressNumberButton('b'),
+                            disabled: !isNumberKeyboardActive,
                         });
                     case ButtonType.c:
                         return new ButtonData({
                             source: require('../../assets/buttons/c.png'), 
                             onPress: () => onPressNumberButton('c'),
+                            disabled: !isNumberKeyboardActive,
                         });
                     case ButtonType.d:
                         return new ButtonData({
                             source: require('../../assets/buttons/d.png'), 
                             onPress: () => onPressNumberButton('d'),
+                            disabled: !isNumberKeyboardActive,
                         });
                     case ButtonType.e:
                         return new ButtonData({
                             source: require('../../assets/buttons/e.png'), 
                             onPress: () => onPressNumberButton('e'),
+                            disabled: !isNumberKeyboardActive,
                         });
                     case ButtonType.f:
                         return new ButtonData({
                             source: require('../../assets/buttons/f.png'), 
                             onPress: () => onPressNumberButton('f'),
+                            disabled: !isNumberKeyboardActive,
                         });
                     case ButtonType.g:
                         return new ButtonData({
                             source: require('../../assets/buttons/g.png'), 
                             onPress: () => onPressNumberButton('g'),
+                            disabled: !isNumberKeyboardActive,
                         });
                     case ButtonType.h:
                         return new ButtonData({
                             source: require('../../assets/buttons/h.png'), 
                             onPress: () => onPressNumberButton('h'),
+                            disabled: !isNumberKeyboardActive,
                         });
                     case ButtonType.i:
                         return new ButtonData({
                             source: require('../../assets/buttons/i.png'), 
                             onPress: () => onPressNumberButton('i'),
+                            disabled: !isNumberKeyboardActive,
                         });
                     case ButtonType.AC:
                         return new ButtonData({
