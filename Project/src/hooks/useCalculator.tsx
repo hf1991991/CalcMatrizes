@@ -4,13 +4,108 @@ import MatrixOperations from '../utilities/MatrixOperations';
 import ScalarOperations from '../utilities/ScalarOperations';
 import { simplifyExpression, varOperation } from '../utilities/ExpressionSimplification';
 import { ElementData, VariableData, ExpressionData } from '../utilities/ExpressionClasses';
+import MatrixData, { MatrixDimensions } from '../utilities/MatrixData';
+
+interface MatrixHistory {
+    history: Array<MatrixData>;
+    currentPosition: number;
+}
+
+interface SelectedMatrixElement {
+    row: number;
+    column: number;
+}
+
+interface FullEquation {
+    equationType: CalcState;
+    solutionType: SystemSolutionType;
+    matrixA: MatrixData;
+    matrixB: MatrixData;
+    matrixC: MatrixData;
+    matrixD: MatrixData;
+}
+
+interface GetNumberWrittenParams { 
+    forceNotOperatorNumber?: boolean;
+    doNotStringify?: boolean; 
+}
+
+interface ChangeNumberWrittenParams { 
+    newNumber: ElementData; 
+    forceNotOperatorNumber?: boolean;
+}
+
+interface CalculatorContextData {
+    // ---- useStates: ----
+    // Estado geral da calculadora:
+    calcState: CalcState;
+    // Estados de matrizes:
+    readyMatrix: MatrixData;
+    editableMatrix: MatrixData;
+    matrixHistory: MatrixHistory;
+    selectedMatrixElement: SelectedMatrixElement;
+    shouldUserInputOverwriteElement: boolean;
+    editableDimensions: MatrixDimensions;
+    // Estados de escalares:
+    editableScalar: ElementData;
+    fullScreenDeterminant: boolean;
+    // Estados de operações:
+    operationHappening: boolean;
+    editableOperatorNumber: ElementData;
+    solutionType: SystemSolutionType;
+    fullEquation: FullEquation;
+    viewReduced: boolean;
+    // Estados de botões
+    secondSetOfKeysActive: boolean;
+    isRActive: boolean;
+    columnDirectionActive: boolean;
+    isVariableKeyboardActive: boolean;
+    selectedOperator: Operator;
+    // ---- useMemos: ----
+    isNumberKeyboardActive: boolean;
+    matrixOnScreen: MatrixData;
+    isMatrixSquare: boolean;
+    isMatrixFull: boolean;
+    isInverseEnabled: boolean;
+    isCheckActive: boolean;
+    // ---- useCallbacks: ----
+    undoHistory(): void;
+    redoHistory(): void;
+    getNumberWritten(params: GetNumberWrittenParams): ElementData | string;
+    changeNumberWritten(params: ChangeNumberWrittenParams): void;
+    changeEditableDimensions(params: MatrixDimensions): void;
+    changeSelectedMatrixElement(selectedElement: MatrixDimensions): void;
+    changeColumnDirectionActive(): void;
+    changeSecondSetOfKeysActive(): void;
+    changeViewReduced(): void;
+    changeFullScreenDeterminant(): void;
+    changeIsVariableKeyboardActive(): void;
+    onPressInfoAreaBackground(): void;
+    onPressNumberButton(element: number | string): void;
+    onPressAC(): void;
+    onPressCE(): void;
+    onPressAddMatrix(): void;
+    onPressSubtractMatrix(): void;
+    onPressAxB(): void;
+    onPressBxA(): void;
+    onPressLambdaxA(): void;
+    onPressOperator(operator: Operator): void;
+    onPressR(): void;
+    onPressResolveEquation(newState: CalcState): void;
+    onPressGaussianElimination(): void; 
+    onPressGaussianEliminationReduced(): void; 
+    onTranspose(): void;
+    onInvert(): void;
+    onEnter(): void;
+    onCheck(): void;
+}
 
 const INITIAL_MATRIX = MatrixOperations.emptyMatrix({
     rows: 3,
     columns: 1,
 });
 
-const CalculatorContext = createContext({});
+const CalculatorContext = createContext<CalculatorContextData>({} as CalculatorContextData);
 
 export const CalculatorProvider = ({ children }) => {
     // Estado geral da Calculadora:
@@ -48,8 +143,26 @@ export const CalculatorProvider = ({ children }) => {
     const [isVariableKeyboardActive, setIsVariableKeyboardActive] = useState(false);
     const [selectedOperator, setSelectedOperator] = useState(null);
 
+    const setReadyMatrix = useCallback(
+        (newMatrix: MatrixData) => {
+
+            _setReadyMatrix(newMatrix);
+
+            const { currentPosition } = matrixHistory;
+
+            const newHistory = [...matrixHistory.history].slice(0, currentPosition + 1);
+
+            if (!MatrixOperations.compareMatrices(newMatrix, newHistory[newHistory.length - 1]))
+                setMatrixHistory({
+                    history: [ ...newHistory, MatrixOperations.copyMatrixData(newMatrix) ],
+                    currentPosition: currentPosition + 1
+                });
+
+        }, [matrixHistory, _setReadyMatrix, setMatrixHistory]
+    );
+
     const isNumberKeyboardActive = useMemo(
-        () => selectedMatrixElement || calcState === CalcState.LambdaxA,
+        () => !!selectedMatrixElement || calcState === CalcState.LambdaxA,
         [calcState, selectedMatrixElement]
     );
 
@@ -62,7 +175,7 @@ export const CalculatorProvider = ({ children }) => {
 
     const changeMatrixOnScreen = useMemo(
         () => (
-            newMatrix => (
+            (newMatrix: MatrixData) => (
                 calcState === CalcState.ready
                     ? setReadyMatrix(newMatrix)
                     : setEditableMatrix(newMatrix)
@@ -108,24 +221,6 @@ export const CalculatorProvider = ({ children }) => {
                 CalcState.XxBeA,
             ].includes(calcState);
         }, [calcState]
-    );
-
-    const setReadyMatrix = useCallback(
-        newMatrix => {
-
-            _setReadyMatrix(newMatrix);
-
-            const { currentPosition } = matrixHistory;
-
-            const newHistory = [...matrixHistory.history].slice(0, currentPosition + 1);
-
-            if (!MatrixOperations.compareMatrices(newMatrix, newHistory[newHistory.length - 1]))
-                setMatrixHistory({
-                    history: [ ...newHistory, MatrixOperations.copyMatrixData(newMatrix) ],
-                    currentPosition: currentPosition + 1
-                });
-
-        }, [matrixHistory, _setReadyMatrix, setMatrixHistory]
     );
 
     const clearHistory = useCallback(
@@ -176,8 +271,12 @@ export const CalculatorProvider = ({ children }) => {
     );
 
     const getNumberWritten = useCallback(
-        ({ forceNotOperatorNumber = false, doNotStringify = false } = {}) => {
-
+        (
+            { 
+                forceNotOperatorNumber = false, 
+                doNotStringify = false 
+            }: GetNumberWrittenParams = {} as GetNumberWrittenParams
+        ) => {
 
             if (operationHappening && !forceNotOperatorNumber)
                 return editableOperatorNumber === null && !doNotStringify
@@ -211,7 +310,12 @@ export const CalculatorProvider = ({ children }) => {
     );
 
     const changeNumberWritten = useCallback(
-        ({ newNumber, forceNotOperatorNumber = false }) => {
+        (
+            { 
+                newNumber, 
+                forceNotOperatorNumber = false 
+            }: ChangeNumberWrittenParams
+        ) => {
 
             if (operationHappening && !forceNotOperatorNumber)
                 setEditableOperatorNumber(newNumber);
@@ -226,16 +330,17 @@ export const CalculatorProvider = ({ children }) => {
                     numberWritten: newNumber
                 }));
 
-        }, [
-        calcState,
-        readyMatrix,
-        editableMatrix,
-        selectedMatrixElement,
-        operationHappening,
-        setEditableOperatorNumber,
-        setEditableScalar,
-        setEditableMatrix
-    ]
+        }, 
+        [
+            calcState,
+            readyMatrix,
+            editableMatrix,
+            selectedMatrixElement,
+            operationHappening,
+            setEditableOperatorNumber,
+            setEditableScalar,
+            setEditableMatrix
+        ]
     );
 
     const changeViewReduced = useCallback(
@@ -254,7 +359,7 @@ export const CalculatorProvider = ({ children }) => {
     );
 
     const onPressNumberButton = useCallback(
-        (element) => {
+        (element: string | number) => {
 
             const originalValue = getNumberWritten({ doNotStringify: true });
 
@@ -308,6 +413,55 @@ export const CalculatorProvider = ({ children }) => {
         }, [setShouldUserInputOverwriteElement, setSelectedMatrixElement]
     );
 
+    const resetScalarOperations = useCallback(
+        () => {
+            setEditableOperatorNumber(null);
+            setOperationHappening(false);
+            setSelectedOperator(null);
+        }, [setEditableOperatorNumber, setOperationHappening, setSelectedOperator]
+    );
+
+    const applyOperation = useCallback(
+        () => {
+            resetScalarOperations();
+
+            if (editableOperatorNumber !== null)
+                changeNumberWritten({
+                    newNumber: varOperation(
+                        getNumberWritten({ forceNotOperatorNumber: true, doNotStringify: true }),
+                        selectedOperator,
+                        editableOperatorNumber
+                    ),
+                    forceNotOperatorNumber: true,
+                });
+        }, [editableOperatorNumber, selectedOperator, resetScalarOperations, changeNumberWritten, getNumberWritten]
+    );
+
+    const enterEditingMode = useCallback(
+        ({ newEditableMatrix, newCalcState, newSelectedElement = undefined, newScalar }) => {
+            setCalcState(newCalcState);
+
+            setFullEquation(null);
+            setEditableMatrix(newEditableMatrix)
+            setEditableDimensions(newEditableMatrix ? newEditableMatrix.dimensions() : null);
+
+            setSolutionType(null);
+
+            setEditableScalar(newScalar);
+
+            newSelectedElement !== undefined && changeSettingsOfSelectedMatrixElement(newSelectedElement);
+        },
+        [
+            setCalcState,
+            setFullEquation,
+            setEditableMatrix,
+            setEditableDimensions,
+            setSolutionType,
+            setEditableScalar,
+            changeSettingsOfSelectedMatrixElement
+        ]
+    );
+
     const changeSelectedMatrixElement = useCallback(
         (selectedElement) => {
 
@@ -335,31 +489,6 @@ export const CalculatorProvider = ({ children }) => {
         () => setSecondSetOfKeysActive(!secondSetOfKeysActive),
         [secondSetOfKeysActive, setSecondSetOfKeysActive]
     )
-
-    const enterEditingMode = useCallback(
-        ({ newEditableMatrix, newCalcState, newSelectedElement = undefined, newScalar }) => {
-            setCalcState(newCalcState);
-
-            setFullEquation(null);
-            setEditableMatrix(newEditableMatrix)
-            setEditableDimensions(newEditableMatrix ? newEditableMatrix.dimensions() : null);
-
-            setSolutionType(null);
-
-            setEditableScalar(newScalar);
-
-            newSelectedElement !== undefined && changeSettingsOfSelectedMatrixElement(newSelectedElement);
-        },
-        [
-            setCalcState,
-            setFullEquation,
-            setEditableMatrix,
-            setEditableDimensions,
-            setSolutionType,
-            setEditableScalar,
-            changeSettingsOfSelectedMatrixElement
-        ]
-    );
 
     const exitEditingMode = useCallback(
         () => setCalcState(CalcState.ready),
@@ -402,30 +531,6 @@ export const CalculatorProvider = ({ children }) => {
         }, [selectedMatrixElement, editableMatrix, columnDirectionActive, changeSettingsOfSelectedMatrixElement]
     );
 
-    const resetScalarOperations = useCallback(
-        () => {
-            setEditableOperatorNumber(null);
-            setOperationHappening(false);
-            setSelectedOperator(null);
-        }, [setEditableOperatorNumber, setOperationHappening, setSelectedOperator]
-    );
-
-    const applyOperation = useCallback(
-        () => {
-            resetScalarOperations();
-
-            if (editableOperatorNumber !== null)
-                changeNumberWritten({
-                    newNumber: varOperation(
-                        getNumberWritten({ forceNotOperatorNumber: true, doNotStringify: true }),
-                        selectedOperator,
-                        editableOperatorNumber
-                    ),
-                    forceNotOperatorNumber: true,
-                });
-        }, [editableOperatorNumber, selectedOperator, resetScalarOperations, changeNumberWritten, getNumberWritten]
-    );
-
     const solveOperationsFullEquationSetup = useCallback(
         () => {
 
@@ -433,15 +538,14 @@ export const CalculatorProvider = ({ children }) => {
                 partiallyEliminatedOriginal,
                 solution,
                 systemSolutionsType,
-            } = MatrixOperations.findSolutionForMatrixEquation({
-                matrixA: isAFirst ? readyMatrix : editableMatrix,
-                matrixB: isAFirst ? editableMatrix : readyMatrix,
-                verticalElimination: [
+            } = MatrixOperations.findSolutionForMatrixEquation(
+                isAFirst ? readyMatrix : editableMatrix,
+                isAFirst ? editableMatrix : readyMatrix,
+                [
                     CalcState.XxAeB,
                     CalcState.XxBeA,
                 ].includes(calcState),
-                showSteps: false,
-            });
+            );
 
             setViewReduced(false);
             setFullEquation({
@@ -719,7 +823,7 @@ export const CalculatorProvider = ({ children }) => {
     );
 
     const onPressResolveEquation = useCallback(
-        (newState) => {
+        (newState: CalcState) => {
             setIsRActive(!isRActive);
 
             setReadyMatrix(

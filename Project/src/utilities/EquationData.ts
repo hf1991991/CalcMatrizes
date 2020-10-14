@@ -2,6 +2,15 @@ import { CalcState, SystemSolutionType } from './constants';
 
 export default class EquationData {
 
+    firstOperator = undefined;
+    variablePosition = undefined;
+    secondOperator = undefined;
+    matrix1 = undefined;
+    matrix2 = undefined;
+    matrix3 = undefined;
+    scalar = undefined;
+    singleMatrixOperator = undefined;
+
     constructor({ fullEquation, viewReduced=false }) {
         switch (fullEquation.equationType) {
             case CalcState.AxXeB:
@@ -149,11 +158,16 @@ export default class EquationData {
     }
 
     getQuantityOfMatrices() {
-        return (this.matrix1 !== undefined) + (this.matrix2 !== undefined) + (this.matrix3 !== undefined);
+        return (this.matrix1 !== undefined ? 1 : 0) 
+            + (this.matrix2 !== undefined ? 1 : 0) 
+            + (this.matrix3 !== undefined ? 1 : 0);
     }
 
     getQuantityOfOperators() {
-        return (this.firstOperator !== undefined) + (this.secondOperator !== undefined) + (this.singleMatrixOperator !== undefined) + (this.scalar !== undefined);
+        return (this.firstOperator !== undefined ? 1 : 0) 
+            + (this.secondOperator !== undefined ? 1 : 0) 
+            + (this.singleMatrixOperator !== undefined ? 1 : 0) 
+            + (this.scalar !== undefined ? 1 : 0);
     }
 
     hasXOperator() {

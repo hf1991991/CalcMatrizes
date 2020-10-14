@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import CalculatorButton from './CalculatorButton';
 import { CalcState, ButtonType } from '../utilities/constants';
 
 import { useCalculator } from '../hooks/useCalculator';
+import { ElementData } from '../utilities/ExpressionClasses';
 
 export default function ButtonsArea() {
     const { 
@@ -42,7 +44,7 @@ export default function ButtonsArea() {
             >
                 <CalculatorButton
                     buttonType={
-                        (getNumberWritten({ doNotStringify: true }) == 0) || calcState === CalcState.ready
+                        ((getNumberWritten({ doNotStringify: true }) as ElementData)?.scalar == 0) || calcState === CalcState.ready
                             ? ButtonType.AC
                             : ButtonType.CE
                     }
@@ -76,21 +78,21 @@ export default function ButtonsArea() {
                     buttonType={
                         isVariableKeyboardActive 
                             ? ButtonType.g
-                            : ButtonType[7]
+                            : ButtonType.Seven
                     }
                 />
                 <CalculatorButton
                     buttonType={
                         isVariableKeyboardActive 
                             ? ButtonType.h
-                            : ButtonType[8]
+                            : ButtonType.Eight
                     }
                 />
                 <CalculatorButton
                     buttonType={
                         isVariableKeyboardActive 
                             ? ButtonType.i
-                            : ButtonType[9]
+                            : ButtonType.Nine
                     }
                 />
                 <CalculatorButton
@@ -112,21 +114,21 @@ export default function ButtonsArea() {
                     buttonType={
                         isVariableKeyboardActive 
                             ? ButtonType.d
-                            : ButtonType[4]
+                            : ButtonType.Four
                     }
                 />
                 <CalculatorButton
                     buttonType={
                         isVariableKeyboardActive 
                             ? ButtonType.e
-                            : ButtonType[5]
+                            : ButtonType.Five
                     }
                 />
                 <CalculatorButton
                     buttonType={
                         isVariableKeyboardActive 
                             ? ButtonType.f
-                            : ButtonType[6]
+                            : ButtonType.Six
                     }
                 />
                 <CalculatorButton
@@ -148,21 +150,21 @@ export default function ButtonsArea() {
                     buttonType={
                         isVariableKeyboardActive 
                             ? ButtonType.a
-                            : ButtonType[1]
+                            : ButtonType.One
                     }
                 />
                 <CalculatorButton
                     buttonType={
                         isVariableKeyboardActive 
                             ? ButtonType.b
-                            : ButtonType[2]
+                            : ButtonType.Two
                     }
                 />
                 <CalculatorButton
                     buttonType={
                         isVariableKeyboardActive 
                             ? ButtonType.c
-                            : ButtonType[3]
+                            : ButtonType.Three
                     }
                 />
                 <CalculatorButton
@@ -181,7 +183,7 @@ export default function ButtonsArea() {
                 style={styles.button}
             >
                 <CalculatorButton
-                    buttonType={ButtonType[0]}
+                    buttonType={ButtonType.Zero}
                 />
                 <CalculatorButton
                     buttonType={ButtonType.Comma}

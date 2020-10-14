@@ -167,10 +167,10 @@ export default class MatrixOperations {
         return matrix && matrix.dimensions().rows === matrix.dimensions().columns;
     }
 
-    static printMatrix(matrix) {
-        for (row of matrix.data) {
+    static printMatrix(matrix: MatrixData) {
+        for (let row of matrix.data) {
             let rowString = '';
-            for (elem of row) {
+            for (let elem of row) {
                 rowString += ` ${elem.stringify()} `;
             }
             console.log(rowString);
@@ -611,7 +611,7 @@ export default class MatrixOperations {
         ou o sistema X * A = B, quando a incognita precede a matriz A conhecida.
         OBS: verticalElimination deve ser verdadeiro se a ordem da equação a ser escalonada é X*A=B.
     */
-    static findSolutionForMatrixEquation({ matrixA, matrixB, verticalElimination=false, showSteps }) {
+    static findSolutionForMatrixEquation(matrixA: MatrixData, matrixB: MatrixData, verticalElimination: boolean=false) {
         let matrixACopy = MatrixOperations.copyMatrixData(matrixA);
         let matrixX = MatrixOperations.copyMatrixData(matrixB);
     
@@ -626,37 +626,32 @@ export default class MatrixOperations {
         const firstElimination = MatrixOperations.partialGaussianElimination({
             matrixA: matrixACopy, 
             matrixB: matrixX, 
-            eliminateBelowMainDiagonal: true, 
-            showSteps, 
-            verticalElimination,
+            eliminateBelowMainDiagonal: true
         });
         
         const secondElimination = MatrixOperations.partialGaussianElimination({
             ...firstElimination,
-            eliminateBelowMainDiagonal: false, 
-            showSteps, 
-            verticalElimination,
+            eliminateBelowMainDiagonal: false
         });
 
         matrixACopy = secondElimination.matrixA;
         matrixX = secondElimination.matrixB;
     
-        const systemSolutionsType = MatrixOperations.systemSolutionTypesVerification({
-            matrixA: matrixACopy, 
-            matrixB: matrixX, 
-            verticalElimination,
-        });
+        const systemSolutionsType = MatrixOperations.systemSolutionTypesVerification(
+            matrixACopy, 
+            matrixX
+        );
         
         let partiallyEliminatedOriginal = matrixACopy;
         let solution = matrixX;
 
         if (systemSolutionsType === SystemSolutionType.SPD) {
-            solution = MatrixOperations.resizeMatrixAfterPartialElimination({
+            solution = MatrixOperations.resizeMatrixAfterPartialElimination(
                 matrixA,
                 matrixB,
                 matrixX,
-                verticalElimination,
-            });
+                verticalElimination
+            );
         }
 
         if (verticalElimination) {
@@ -677,7 +672,7 @@ export default class MatrixOperations {
         };
     }
     
-    static systemSolutionTypesVerification({ matrixA, matrixB, verticalElimination }) {
+    static systemSolutionTypesVerification(matrixA: MatrixData, matrixB: MatrixData) {
         /* Se na matriz A houver uma linha completa de 
         elementos nulos e, na mesma linha da matriz B, houver 
         algum elemento não nulo, a expressão é um SI. */
@@ -691,12 +686,12 @@ export default class MatrixOperations {
             let allElementsOfRowNull = true;
 
             for (let column = 0; column < matrixA.dimensions().columns; column++) {
-                if (matrixA.data && matrixA.data[row] && matrixA.data[row][column] !== 0.0) allElementsOfRowNull = false;
+                if (matrixA.data && matrixA.data[row] && matrixA.data[row][column].scalar !== 0.0) allElementsOfRowNull = false;
             }
 
             if (allElementsOfRowNull) {
                 for (let column = 0; column < matrixB.dimensions().columns; column++) {
-                    if (matrixB.data && matrixB.data[row] && matrixB.data[row][column] !== 0.0) return SystemSolutionType.SI;
+                    if (matrixB.data && matrixB.data[row] && matrixB.data[row][column].scalar !== 0.0) return SystemSolutionType.SI;
                 }
                 return SystemSolutionType.SPI;
             }
@@ -714,14 +709,14 @@ export default class MatrixOperations {
                 column < matrixB.dimensions().columns; 
                 column++
             ) {
-                if (matrixB.data && matrixB.data[row] && matrixB.data[row][column] !== 0) return SystemSolutionType.SI;
+                if (matrixB.data && matrixB.data[row] && matrixB.data[row][column].scalar !== 0) return SystemSolutionType.SI;
             }
         }
         
         return SystemSolutionType.SPD;
     }
     
-    static resizeMatrixAfterPartialElimination({ matrixA, matrixB, matrixX, verticalElimination }) {
+    static resizeMatrixAfterPartialElimination(matrixA: MatrixData, matrixB: MatrixData, matrixX: MatrixData, verticalElimination: boolean=false) {
         return MatrixOperations.resizeMatrix({
             originalMatrix: MatrixOperations.emptyMatrix(matrixX.dimensions()),
             editableMatrix: matrixX,

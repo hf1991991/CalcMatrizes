@@ -1,78 +1,78 @@
 import ScalarOperations from "./ScalarOperations";
 
-export const CalcState = {
-    ready: 'ready',
-    editing: 'editing',
-    addMatrix: 'addMatrix',
-    subtractMatrix: 'subtractMatrix',
-    AxB: 'AxB',
-    BxA: 'BxA',
-    LambdaxA: 'LambdaxA',
-    AxXeB: 'AxXeB',
-    BxXeA: 'BxXeA',
-    XxAeB: 'XxAeB',
-    XxBeA: 'XxBeA',
-    gaussianElimination: 'gaussianElimination',
-    transpose: 'transpose',
-    invert: 'invert',
+export enum CalcState {
+    ready = 'ready',
+    editing = 'editing',
+    addMatrix = 'addMatrix',
+    subtractMatrix = 'subtractMatrix',
+    AxB = 'AxB',
+    BxA = 'BxA',
+    LambdaxA = 'LambdaxA',
+    AxXeB = 'AxXeB',
+    BxXeA = 'BxXeA',
+    XxAeB = 'XxAeB',
+    XxBeA = 'XxBeA',
+    gaussianElimination = 'gaussianElimination',
+    transpose = 'transpose',
+    invert = 'invert'
 }
 
-export const Operator = {
-    Add: 'Add',
-    Subtract: 'Subtract',
-    Multiply: 'Multiply',
-    Divide: 'Divide',
-    Elevate: 'Elevate',
+export enum Operator {
+    Add = 'Add',
+    Subtract = 'Subtract',
+    Multiply = 'Multiply',
+    Divide = 'Divide',
+    Elevate = 'Elevate'
 }
 
-export const ButtonType = {
-    1: 1,
-    2: 2,
-    3: 3,
-    4: 4,
-    5: 5,
-    6: 6,
-    7: 7,
-    8: 8,
-    9: 9,
-    0: 0,
-    abc: 'abc',
-    a: 'a',
-    b: 'b',
-    c: 'c',
-    d: 'd',
-    e: 'e',
-    f: 'f',
-    g: 'g',
-    h: 'h',
-    i: 'i',
-    Comma: 'Comma',
-    AC: 'AC',
-    CE: 'CE',
-    Operators: 'Operators',
-    Save: 'Save',
-    SavedList: 'SavedList',
-    Second: 'Second',
-    ColumnDirection: 'ColumnDirection',
-    R: 'R',
-    AxXeB: 'AxXeB',
-    BxXeA: 'BxXeA',
-    XxAeB: 'XxAeB',
-    XxBeA: 'XxBeA',
-    GaussianElimination: 'GaussianElimination',
-    LambdaxA: 'LambdaxA',
-    AxB: 'AxB',
-    BxA: 'BxA',
-    Inverse: 'Inverse',
-    Transposed: 'Transposed',
-    Subtract: 'Subtract',
-    Add: 'Add',
-    SubtractMatrix: 'SubtractMatrix',
-    AddMatrix: 'AddMatrix',
-    Multiply: 'Multiply',
-    Divide: 'Divide',
-    Enter: 'Enter',
-    Check: 'Check',
+export enum ButtonType {
+    One = 1,
+    Two = 2,
+    Three = 3,
+    Four = 4,
+    Five = 5,
+    Six = 6,
+    Seven = 7,
+    Eight = 8,
+    Nine = 9,
+    Zero = 0,
+    abc = 'abc',
+    a = 'a',
+    b = 'b',
+    c = 'c',
+    d = 'd',
+    e = 'e',
+    f = 'f',
+    g = 'g',
+    h = 'h',
+    i = 'i',
+    Comma = 'Comma',
+    AC = 'AC',
+    CE = 'CE',
+    Operators = 'Operators',
+    Save = 'Save',
+    SavedList = 'SavedList',
+    Second = 'Second',
+    ColumnDirection = 'ColumnDirection',
+    R = 'R',
+    AxXeB = 'AxXeB',
+    BxXeA = 'BxXeA',
+    XxAeB = 'XxAeB',
+    XxBeA = 'XxBeA',
+    GaussianElimination = 'GaussianElimination',
+    LambdaxA = 'LambdaxA',
+    AxB = 'AxB',
+    BxA = 'BxA',
+    Inverse = 'Inverse',
+    Transposed = 'Transposed',
+    Subtract = 'Subtract',
+    Add = 'Add',
+    SubtractMatrix = 'SubtractMatrix',
+    AddMatrix = 'AddMatrix',
+    Multiply = 'Multiply',
+    Divide = 'Divide',
+    Enter = 'Enter',
+    Check = 'Check'
 }
 
 export function count(string, substring, caseSensitive) {
@@ -137,10 +137,7 @@ export function findFraction(number) {
         }
     }
 
-    return toFixedWithThreeDots(
-        number,
-        PRECISION,
-    );
+    return toFixedWithThreeDots(number);
 }
 
 export function toFixedOnZeroes(number) {
@@ -154,10 +151,10 @@ export function toFixedOnZeroes(number) {
     return Number.parseFloat(string);
 }
 
-export const SystemSolutionType = {
-    SPI: 'SPI',
-    SPD: 'SPD',
-    SI: 'SI',
+export enum SystemSolutionType {
+    SPI = 'SPI',
+    SPD = 'SPD',
+    SI = 'SI'
 };
 
 export function toFixedWithThreeDots(number) {

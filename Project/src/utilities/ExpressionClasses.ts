@@ -3,6 +3,10 @@ import ScalarOperations from "./ScalarOperations";
 
 export class ExpressionData {
 
+    operator: Operator;
+    elements: Array<ElementData>;
+    isSimplified: boolean;
+
     constructor({ operator, elements, isSimplified=false }) {
         this.operator = operator;
         this.elements = elements;
@@ -37,14 +41,14 @@ export class ExpressionData {
                         ScalarOperations.superscript(exponent)
                     }`;
             case Operator.Divide:
-                return `${this.elements[0].algebraicStringify({ dontFindFraction })}/(${List.from(this.elements).splice(1, this.elements.length - 1).map(a => a.algebraicStringify({ dontFindFraction })).join(')/(')}`;
+                return `${this.elements[0].algebraicStringify({ dontFindFraction })}/(${this.elements.splice(1, this.elements.length - 1).map(a => a.algebraicStringify({ dontFindFraction })).join(')/(')}`;
             case Operator.Multiply:
                 return `${this.elements.map(a => a.algebraicStringify({ dontFindFraction })).join('×')}`;
             case Operator.Add:
                 const terms = this.elements.map(a => a.algebraicStringify({ dontFindFraction })).map(a => a.startsWith('-') ? a : '+' + a).join('');
                 return `(${terms.startsWith('+') ? terms.substring(1, terms.length) : terms})`;
             case Operator.Subtract:
-                return `(${this.elements[0].algebraicStringify({ dontFindFraction })}-${List.from(this.elements).splice(1, this.elements.length - 1).map(a => a.algebraicStringify({ dontFindFraction })).join('-')})`;
+                return `(${this.elements[0].algebraicStringify({ dontFindFraction })}-${this.elements.splice(1, this.elements.length - 1).map(a => a.algebraicStringify({ dontFindFraction })).join('-')})`;
         }
     }
 
@@ -54,9 +58,19 @@ export class ExpressionData {
 
 } 
 
+interface ElementDataData {
+    variables?: Array<VariableData>;
+    scalar?: number | string;
+    unfilteredString?: string;
+}
+
 export class ElementData {
 
-    constructor({ variables=[], scalar=1, unfilteredString=null }) {
+    variables: Array<VariableData>;
+    scalar: number | string;
+    unfilteredString: string;
+
+    constructor({ variables=[], scalar=1, unfilteredString=null }: ElementDataData) {
         this.variables = variables;
         this.scalar = unfilteredString ? scalar : smartToFixed(scalar);
         this.unfilteredString = unfilteredString;
@@ -69,7 +83,7 @@ export class ElementData {
 
         // console.log(JSON.stringify({jaca: this.variables}))
 
-        for (variableData of this.variables) {
+        for (let variableData of this.variables) {
             const index = fixed.map(vari => vari.variable).indexOf(variableData.variable)
 
             // console.log(JSON.stringify({index, variableData, fixed}))
@@ -128,6 +142,9 @@ export class ElementData {
 } 
 
 export class VariableData {
+
+    variable: string;
+    exponent: number;
 
     constructor({ variable, exponent=1 }) {
         this.variable = variable;
