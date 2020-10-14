@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-               BuildableName = "CalcMatrizes.app"
-               BlueprintName = "CalcMatrizes"
-               ReferencedContainer = "container:CalcMatrizes.xcodeproj">
+               BuildableName = "calcmatrizes.app"
+               BlueprintName = "calcmatrizes"
+               ReferencedContainer = "container:calcmatrizes.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "00E356ED1AD99517003FC87E"
-               BuildableName = "CalcMatrizesTests.xctest"
-               BlueprintName = "CalcMatrizesTests"
-               ReferencedContainer = "container:CalcMatrizes.xcodeproj">
+               BuildableName = "calcmatrizesTests.xctest"
+               BlueprintName = "calcmatrizesTests"
+               ReferencedContainer = "container:calcmatrizes.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -55,9 +55,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "CalcMatrizes.app"
-            BlueprintName = "CalcMatrizes"
-            ReferencedContainer = "container:CalcMatrizes.xcodeproj">
+            BuildableName = "calcmatrizes.app"
+            BlueprintName = "calcmatrizes"
+            ReferencedContainer = "container:calcmatrizes.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -72,9 +72,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "CalcMatrizes.app"
-            BlueprintName = "CalcMatrizes"
-            ReferencedContainer = "container:CalcMatrizes.xcodeproj">
+            BuildableName = "calcmatrizes.app"
+            BlueprintName = "calcmatrizes"
+            ReferencedContainer = "container:calcmatrizes.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

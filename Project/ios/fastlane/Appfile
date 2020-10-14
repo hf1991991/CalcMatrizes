@@ -1,5 +1,5 @@
 app_identifier("com.polijunior.calcmatrizes") # The bundle identifier of your app
-apple_id("contasntec@polijunior.com.br") # Your Apple email address
+apple_id("henrique@falconer.com.br") # Your Apple email address
 
 itc_team_id("120576502") # App Store Connect Team ID
 team_id("82L63Y7JQJ") # Developer Portal Team ID
