@@ -1,11 +1,7 @@
+import MatrixDimensions from "../interfaces/MatrixDimensions";
 import SelectedMatrixElement from "../interfaces/SelectedMatrixElement";
 import { ElementData, ExpressionData } from "./ExpressionClasses";
 import MatrixOperations from "./MatrixOperations";
-
-export interface MatrixDimensions {
-    rows: number;
-    columns: number;
-}
 
 export default class MatrixData {
     data: Array<Array<ElementData | ExpressionData>>;

@@ -1,6 +1,6 @@
 import { ImageSourcePropType } from "react-native";
 
-export default interface ButtonData {
+interface ButtonData {
     source: ImageSourcePropType;
     sourceActive?: ImageSourcePropType;
     onPress?: (params: any) => void;
@@ -8,3 +8,5 @@ export default interface ButtonData {
     disabled?: boolean;
     active?: boolean;
 }
+
+export default ButtonData;

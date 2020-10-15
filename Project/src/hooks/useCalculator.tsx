@@ -4,8 +4,9 @@ import MatrixOperations from '../utilities/MatrixOperations';
 import ScalarOperations from '../utilities/ScalarOperations';
 import { simplifyExpression, varOperation } from '../utilities/ExpressionSimplification';
 import { ElementData, VariableData, ExpressionData } from '../utilities/ExpressionClasses';
-import MatrixData, { MatrixDimensions } from '../utilities/MatrixData';
+import MatrixData from '../utilities/MatrixData';
 import SelectedMatrixElement from '../interfaces/SelectedMatrixElement';
+import MatrixDimensions from '../interfaces/MatrixDimensions';
 
 interface MatrixHistory {
     history: Array<MatrixData>;
