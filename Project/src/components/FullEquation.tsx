@@ -7,11 +7,11 @@ import { CalcState } from '../utilities/constants';
 const OPERATORS_WIDTH = 50;
 const X_OPERATOR_WIDTH = 50;
 
-export default function FullEquation({ 
+const FullEquation: React.FC = ({ 
     fullEquation,
     totalMaxAreaWidth,
     viewReduced,
-}) {
+}) => {
     const [matrix1Height, changeMatrix1Height] = useState(0);
 
     const equationData = new EquationData({
@@ -166,3 +166,5 @@ export default function FullEquation({
         </View>
     );
 }
+
+export default FullEquation;

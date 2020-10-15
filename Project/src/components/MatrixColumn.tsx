@@ -5,7 +5,7 @@ import { findFraction, smartToFixed, toFixedOnZeroes, toFixedWithThreeDots } fro
 const ELEMENT_HEIGHT = 40;
 const ELEMENT_VERTICAL_MARGIN = 11;
 
-export default function MatrixColumn({ 
+const MatrixColumn: React.FC = ({ 
     matrixNumbers,
     matrixColumnElements,
     selectedMatrixElement,
@@ -14,7 +14,7 @@ export default function MatrixColumn({
     changeFlatListDimensions,
     editableOperatorNumber,
     changeSelectedMatrixElement=() => {}
-}) {
+}) => {
     const isElementSelected = useCallback(
         ({ row, column }) => selectedMatrixElement 
             && selectedMatrixElement.row === row 
@@ -121,3 +121,5 @@ export default function MatrixColumn({
         />
     );
 }
+
+export default MatrixColumn;

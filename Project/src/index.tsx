@@ -4,7 +4,7 @@ import CalculatorScreen from './CalculatorScreen';
 import { OrientionProvider } from './hooks/useOrientation';
 import { CalculatorProvider } from './hooks/useCalculator';
 
-const App = () => {
+const App: React.FC = () => {
     return (
         <OrientionProvider>
             <CalculatorProvider>

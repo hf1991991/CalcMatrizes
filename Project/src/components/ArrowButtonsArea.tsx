@@ -4,7 +4,7 @@ import { useCalculator } from '../hooks/useCalculator';
 import { useOrientation } from '../hooks/useOrientation';
 import ArrowButton from './ArrowButton';
 
-export default function ArrowButtonsArea({ 
+const ArrowButtonsArea: React.FC = ({ 
     vertical,
     hidden,
     disabled=false,
@@ -19,7 +19,7 @@ export default function ArrowButtonsArea({
     onPressBottomRightText,
     forwardHistory,
     backHistory
-}) {
+}) => {
 
     const {
         matrixHistory,
@@ -193,3 +193,5 @@ export default function ArrowButtonsArea({
         </View>
     );
 }
+
+export default ArrowButtonsArea;

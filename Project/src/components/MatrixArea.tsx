@@ -12,7 +12,7 @@ import { useOrientation } from '../hooks/useOrientation';
 
 const BUTTON_AREAS_CROSS_WIDTH = 70;
 
-export default function MatrixArea() {
+const MatrixArea: React.FC = () => {
     const { isPortrait } = useOrientation();
 
     const { 
@@ -264,3 +264,5 @@ export default function MatrixArea() {
         </View>
     );
 }
+
+export default MatrixArea;

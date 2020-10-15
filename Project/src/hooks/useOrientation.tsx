@@ -7,7 +7,7 @@ interface OrientationContextData {
 
 const OrientationContext = createContext<OrientationContextData>({} as OrientationContextData);
 
-export const OrientionProvider = ({ children }) => {
+export const OrientionProvider: React.FC = ({ children }) => {
 
     const checkIfPortrait = useCallback(() => {
         const dimensions = Dimensions.get('screen');

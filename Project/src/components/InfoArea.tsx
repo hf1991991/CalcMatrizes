@@ -3,7 +3,7 @@ import { View, TouchableWithoutFeedback } from 'react-native';
 import MatrixArea from './MatrixArea';
 import { useCalculator } from '../hooks/useCalculator';
 
-export default function InfoArea() {
+const InfoArea: React.FC = () => {
     const { onPressInfoAreaBackground } = useCalculator();
 
     return (
@@ -14,3 +14,5 @@ export default function InfoArea() {
         </TouchableWithoutFeedback>
     );
 }
+
+export default InfoArea;

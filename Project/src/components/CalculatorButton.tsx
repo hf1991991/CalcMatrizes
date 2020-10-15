@@ -1,11 +1,11 @@
 import React, { useMemo } from 'react';
 import { Image, TouchableOpacity } from 'react-native';
 import { ButtonType, CalcState, Operator } from '../utilities/constants';
-import ButtonData from '../utilities/ButtonData';
+import ButtonData from '../interfaces/ButtonData';
 
 import { useCalculator } from '../hooks/useCalculator';
 
-export default function CalculatorButton({ buttonType }) {
+const CalculatorButton: React.FC = ({ buttonType }) => {
     const useCalculatorData = useCalculator();
 
     const buttonData = useMemo(
@@ -403,3 +403,5 @@ export default function CalculatorButton({ buttonType }) {
         </TouchableOpacity>
     );
 }
+
+export default CalculatorButton;

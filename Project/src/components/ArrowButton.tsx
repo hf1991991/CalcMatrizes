@@ -1,12 +1,12 @@
 import React from 'react';
 import { Image, TouchableOpacity } from 'react-native';
 
-export default function ArrowButton({ 
-    vertical=false,
-    source,
-    onPress,
-    disabled=false,
-}) {
+const ArrowButton: React.FC = ({ 
+    vertical=false, 
+    source, 
+    onPress, 
+    disabled=false 
+}) => {
     return (
         <TouchableOpacity 
             onPress={onPress} 
@@ -34,3 +34,5 @@ export default function ArrowButton({
         </TouchableOpacity>
     );
 }
+
+export default ArrowButton;

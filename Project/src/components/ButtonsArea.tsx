@@ -7,7 +7,7 @@ import { CalcState, ButtonType } from '../utilities/constants';
 import { useCalculator } from '../hooks/useCalculator';
 import { ElementData } from '../utilities/ExpressionClasses';
 
-export default function ButtonsArea() {
+const ButtonsArea: React.FC = () => {
     const { 
         calcState, 
         getNumberWritten,
@@ -199,3 +199,5 @@ export default function ButtonsArea() {
         </View>
     );
 }
+
+export default ButtonsArea;

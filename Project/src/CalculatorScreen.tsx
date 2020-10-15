@@ -4,7 +4,7 @@ import ButtonsArea from './components/ButtonsArea';
 import InfoArea from './components/InfoArea';
 import { useOrientation } from './hooks/useOrientation';
 
-export default function CalculatorScreen() {
+const CalculatorScreen: React.FC = () => {
     const { isPortrait } = useOrientation();
     
     return (
@@ -21,3 +21,5 @@ export default function CalculatorScreen() {
         </SafeAreaView>
     );
 }
+
+export default CalculatorScreen;

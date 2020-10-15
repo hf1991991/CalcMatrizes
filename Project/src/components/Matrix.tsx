@@ -4,14 +4,14 @@ import MatrixContainer from './MatrixContainer';
 import MatrixColumn from './MatrixColumn';
 import MatrixOperations from '../utilities/MatrixOperations';
 
-export default function Matrix({ 
+const Matrix: React.FC = ({ 
     matrixNumbers,
     selectedMatrixElement=null,
     maxMatrixWidth,
     editableOperatorNumber=null,
     onLayout,
     changeSelectedMatrixElement
-}) {
+}) => {
     const [flatListDimensions, changeFlatListDimensions] = useState({
         height: 0,
         width: 0,
@@ -70,3 +70,5 @@ export default function Matrix({
         />
     );
 }
+
+export default Matrix;

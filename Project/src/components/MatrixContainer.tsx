@@ -1,7 +1,7 @@
 import React from 'react';
 import { View } from 'react-native';
 
-const HorizontalLines = () => (
+const HorizontalLines: React.FC = () => (
     <View
         style={{
             flexDirection: 'row',
@@ -25,7 +25,7 @@ const HorizontalLines = () => (
     </View>
 );
 
-export default function MatrixColumns({ matrixContent, maxWidth }) {
+const MatrixContainer: React.FC = ({ matrixContent, maxWidth }) => {
     return (
         <View
             style={{
@@ -51,3 +51,5 @@ export default function MatrixColumns({ matrixContent, maxWidth }) {
         </View>
     );
 }
+
+export default MatrixContainer;
