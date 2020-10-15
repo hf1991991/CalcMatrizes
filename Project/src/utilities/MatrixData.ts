@@ -3,7 +3,7 @@ import SelectedMatrixElement from "../interfaces/SelectedMatrixElement";
 import { ElementData, ExpressionData } from "./ExpressionClasses";
 import MatrixOperations from "./MatrixOperations";
 
-export default class MatrixData {
+class MatrixData {
     data: Array<Array<ElementData | ExpressionData>>;
 
     constructor(data: Array<Array<ElementData | ExpressionData>>) {
@@ -21,3 +21,5 @@ export default class MatrixData {
         return row < this.dimensions().rows && column < this.dimensions().columns;
     } 
 }
+
+export default MatrixData;

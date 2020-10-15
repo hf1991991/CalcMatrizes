@@ -1,6 +1,6 @@
 import { CalcState, SystemSolutionType } from './constants';
 
-export default class EquationData {
+class EquationData {
 
     firstOperator = undefined;
     variablePosition = undefined;
@@ -182,3 +182,5 @@ export default class EquationData {
     }
 
 }
+
+export default EquationData;

@@ -4,7 +4,7 @@ import ScalarOperations from "./ScalarOperations";
 import * as ExpressionSimplification from "./ExpressionSimplification";
 import { ElementData, ExpressionData } from "./ExpressionClasses";
 
-export default class MatrixOperations {
+class MatrixOperations {
 
     static changeElement({ matrix, column, row, numberWritten }) {
         let matrixDataCopy = [...matrix.data];
@@ -712,3 +712,5 @@ export default class MatrixOperations {
         });
     }
 }
+
+export default MatrixOperations;

@@ -1,6 +1,6 @@
 import { Operator, count } from "./constants";
 
-export default class ScalarOperations {
+class ScalarOperations {
 
     static applyOperation({ operation, scalar1, scalar2 }) {
 
@@ -154,3 +154,5 @@ export default class ScalarOperations {
     }
 
 }
+
+export default ScalarOperations;
