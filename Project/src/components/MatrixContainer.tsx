@@ -1,5 +1,10 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { View } from 'react-native';
+
+interface MatrixContainerProps { 
+    matrixContent: ReactNode;
+    maxWidth: number;
+}
 
 const HorizontalLines: React.FC = () => (
     <View
@@ -25,7 +30,7 @@ const HorizontalLines: React.FC = () => (
     </View>
 );
 
-const MatrixContainer: React.FC = ({ matrixContent, maxWidth }) => {
+const MatrixContainer = ({ matrixContent, maxWidth }: MatrixContainerProps) => {
     return (
         <View
             style={{

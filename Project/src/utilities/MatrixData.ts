@@ -1,12 +1,13 @@
+import MatrixColumnData from "../interfaces/MatrixColumnData";
 import MatrixDimensions from "../interfaces/MatrixDimensions";
 import SelectedMatrixElement from "../interfaces/SelectedMatrixElement";
 import { ElementData, ExpressionData } from "./ExpressionClasses";
 import MatrixOperations from "./MatrixOperations";
 
 class MatrixData {
-    data: Array<Array<ElementData | ExpressionData>>;
+    data: Array<MatrixColumnData>;
 
-    constructor(data: Array<Array<ElementData | ExpressionData>>) {
+    constructor(data: Array<MatrixColumnData>) {
         this.data = MatrixOperations.applyFrescuresToMatrixData(data);
     }
 

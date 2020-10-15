@@ -3,6 +3,8 @@ import { smartToFixed, SystemSolutionType, Operator } from "./constants";
 import ScalarOperations from "./ScalarOperations";
 import * as ExpressionSimplification from "./ExpressionSimplification";
 import { ElementData, ExpressionData } from "./ExpressionClasses";
+import ElementDataWithPosition from "../interfaces/ElementDataWithPosition";
+import MatrixColumnWithPosition from "../interfaces/MatrixColumnWithPosition";
 
 class MatrixOperations {
 
@@ -12,13 +14,13 @@ class MatrixOperations {
         return new MatrixData(matrixDataCopy);
     }
 
-    static insertElementsPosition(matrix) {
-        let positionMatrix = [];
+    static insertElementsPosition(matrix: MatrixData): Array<MatrixColumnWithPosition> {
+        let positionMatrix: Array<MatrixColumnWithPosition> = [];
 
         if (!matrix) return positionMatrix;
 
         for (let column = matrix.dimensions().columns - 1; column >= 0 ; column--) {
-            let positionMatrixColumn = [];
+            let positionMatrixColumn: Array<ElementDataWithPosition> = [];
             for (let row = matrix.dimensions().rows - 1; row >= 0 ; row--) {
                 positionMatrixColumn.push({
                     number: matrix.data[row][column],

@@ -1,18 +1,25 @@
 import React from 'react';
-import { Image, TouchableOpacity } from 'react-native';
+import { Image, ImageSourcePropType, TouchableOpacity } from 'react-native';
 
-const ArrowButton: React.FC = ({ 
+interface ArrowButtonProps { 
+    vertical: boolean;
+    source: ImageSourcePropType; 
+    onPress(): void; 
+    disabled: boolean; 
+}
+
+const ArrowButton = ({ 
     vertical=false, 
     source, 
     onPress, 
     disabled=false 
-}) => {
+}: ArrowButtonProps) => {
     return (
         <TouchableOpacity 
             onPress={onPress} 
             disabled={disabled} 
             style={{
-                opacity: disabled && 0.5,
+                opacity: disabled ? 0.5 : 1,
             }} 
         >
             <Image

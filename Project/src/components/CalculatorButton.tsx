@@ -1,11 +1,15 @@
 import React, { useMemo } from 'react';
-import { Image, TouchableOpacity } from 'react-native';
+import { Image, TouchableOpacity, ImageSourcePropType } from 'react-native';
 import { ButtonType, CalcState, Operator } from '../utilities/constants';
 import ButtonData from '../interfaces/ButtonData';
 
 import { useCalculator } from '../hooks/useCalculator';
 
-const CalculatorButton: React.FC = ({ buttonType }) => {
+interface CalculatorButtonProps {
+    buttonType: ButtonType;
+}
+
+const CalculatorButton = ({ buttonType }: CalculatorButtonProps) => {
     const useCalculatorData = useCalculator();
 
     const buttonData = useMemo(
@@ -45,7 +49,7 @@ const CalculatorButton: React.FC = ({ buttonType }) => {
                 onCheck,
             } = useCalculatorData;
 
-            const getData = (): ButtonData => {
+            const getData = () => {
                 switch (buttonType) {
                     case ButtonType.Zero:
                         return {
@@ -369,11 +373,19 @@ const CalculatorButton: React.FC = ({ buttonType }) => {
                 }
             }
 
-            const data = getData();
+            const data: ButtonData = {
+                sourceActive: require('../../assets/buttons/Comma.png'),
+                ...getData()
+            };
 
             return {
                 ...data,
-                disabled: data.disabled || fullKeyboardDisabled
+                disabled: data.disabled || fullKeyboardDisabled,
+                correctSource: (
+                    (data.active || false)
+                        ? data.sourceActive
+                        : data.source
+                    )
             }
         }, [useCalculatorData, buttonType]
     );
@@ -382,7 +394,7 @@ const CalculatorButton: React.FC = ({ buttonType }) => {
         <TouchableOpacity
             style={{
                 flex: buttonData.flex || 1,
-                opacity: buttonData.disabled && 0.6
+                opacity: buttonData.disabled ? 0.6 : 1
             }}
             disabled={buttonData.disabled || false}
             onPress={buttonData.onPress}
@@ -393,11 +405,7 @@ const CalculatorButton: React.FC = ({ buttonType }) => {
                     height: undefined,
                     width: undefined,
                 }}
-                source={
-                    buttonData.active || false
-                        ? buttonData.sourceActive
-                        : buttonData.source
-                }
+                source={buttonData.correctSource}
                 resizeMode='contain'
             />
         </TouchableOpacity>

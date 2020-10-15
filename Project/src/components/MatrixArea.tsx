@@ -91,13 +91,13 @@ const MatrixArea: React.FC = () => {
     );
 
     const bottomLeftText = useMemo(
-        () => calcState !== CalcState.LambdaxA
+        () => (calcState !== CalcState.LambdaxA
             ? fullEquation !== null && !isPortrait
                 ? equationTypeString
                 : editableDimensions && !fullScreenDeterminant
                     ? `${editableDimensions.rows}x${editableDimensions.columns}`
                     : ''
-            : 'Scalar',
+            : 'Scalar') || '',
         [equationTypeString, calcState, fullEquation, editableDimensions, isPortrait]
     )
 
@@ -165,7 +165,7 @@ const MatrixArea: React.FC = () => {
                                 : (
                                     <Matrix 
                                         maxMatrixWidth={matrixAreaWidth - 2 * BUTTON_AREAS_CROSS_WIDTH}
-                                        matrixNumbers={matrixOnScreen}
+                                        matrixData={matrixOnScreen}
                                         selectedMatrixElement={selectedMatrixElement}
                                         editableOperatorNumber={editableOperatorNumber}
                                         changeSelectedMatrixElement={changeSelectedMatrixElement}

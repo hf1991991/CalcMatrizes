@@ -1,76 +1,99 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { View, Text } from 'react-native';
 import Matrix from './Matrix';
 import EquationData from '../utilities/EquationData';
 import { CalcState } from '../utilities/constants';
+import FullEquationData from '../interfaces/FullEquationData';
 
 const OPERATORS_WIDTH = 50;
 const X_OPERATOR_WIDTH = 50;
 
-const FullEquation: React.FC = ({ 
+interface FullEquationProps { 
+    fullEquation: FullEquationData;
+    totalMaxAreaWidth: number;
+    viewReduced: boolean;
+}
+
+interface ScalarProps {
+    scalar: number | string;
+}
+
+interface XOperatorProps {
+    variableDimensions: string;
+}
+
+const Scalar = ({ scalar }: ScalarProps) => {
+    return (
+        <Text
+            style={{
+                color: '#fff',
+                textAlign: 'center',
+                fontSize: 30,
+                top: 2,
+            }}
+        >
+            {scalar}
+        </Text>
+    );
+}
+
+const XOperator = ({ variableDimensions }: XOperatorProps) => {
+    return (
+        <Text
+            style={{
+                color: '#fff',
+                textAlign: 'center',
+                fontSize: 30,
+                top: 2,
+                width: X_OPERATOR_WIDTH,
+            }}
+        >
+            <Text
+                style={{
+                    color: '#fff',
+                    fontSize: 30,
+                }}
+            >
+                X
+            </Text>
+            <Text
+                style={{
+                    color: '#fff',
+                    fontSize: 14,
+                    top: 50,
+                }}
+            >
+                {variableDimensions}
+            </Text>
+        </Text>
+    );
+}
+
+const FullEquation = ({ 
     fullEquation,
     totalMaxAreaWidth,
     viewReduced,
-}) => {
+}: FullEquationProps) => {
     const [matrix1Height, changeMatrix1Height] = useState(0);
 
-    const equationData = new EquationData({
-        fullEquation, 
-        viewReduced,
-    });
+    const equationData = useMemo<EquationData>(
+        () => new EquationData({
+            fullEquation, 
+            viewReduced,
+        }),
+        [fullEquation, viewReduced]
+    );
 
-    function Scalar({ scalar }) {
-        return (
-            <Text
-                style={{
-                    color: '#fff',
-                    textAlign: 'center',
-                    fontSize: 30,
-                    top: 2,
-                }}
-            >
-                {scalar}
-            </Text>
-        );
-    }
-
-    function XOperator() {
-        return (
-            <Text
-                style={{
-                    color: '#fff',
-                    textAlign: 'center',
-                    fontSize: 30,
-                    top: 2,
-                    width: X_OPERATOR_WIDTH,
-                }}
-            >
-                <Text
-                    style={{
-                        color: '#fff',
-                        fontSize: 30,
-                    }}
-                >
-                    X
-                </Text>
-                <Text
-                    style={{
-                        color: '#fff',
-                        fontSize: 14,
-                        top: 50,
-                    }}
-                >
-                    {equationData.getVariableDimensions()}
-                </Text>
-            </Text>
-        );
-    }
-    const singleMatrixMaxWidth = (
-            totalMaxAreaWidth 
-            - equationData.getQuantityOfOperators() * OPERATORS_WIDTH
-            - equationData.hasXOperator() * X_OPERATOR_WIDTH
-        ) 
-        / equationData.getQuantityOfMatrices();
+    const singleMatrixMaxWidth = useMemo(
+        () => (
+            (
+                totalMaxAreaWidth 
+                - equationData.getQuantityOfOperators() * OPERATORS_WIDTH
+                - (equationData.hasXOperator() ? X_OPERATOR_WIDTH : 0)
+            ) / equationData.getQuantityOfMatrices()
+        ),
+        [fullEquation, viewReduced]
+    );
 
     return (
         <View
@@ -84,7 +107,7 @@ const FullEquation: React.FC = ({
                     ? (
                         <Matrix 
                             maxMatrixWidth={singleMatrixMaxWidth}
-                            matrixNumbers={equationData.matrix1}
+                            matrixData={equationData.matrix1}
                             onLayout={(event) => {
                                 changeMatrix1Height(event.nativeEvent.layout.height);
                             }}
@@ -93,7 +116,7 @@ const FullEquation: React.FC = ({
                     : equationData.scalar !== undefined
                         ? <Scalar scalar={equationData.scalar} />
                         : equationData.variablePosition === 1
-                            && <XOperator />
+                            && <XOperator variableDimensions={equationData.getVariableDimensions()} />
             }
             {
                 equationData.singleMatrixOperator && (
@@ -132,11 +155,11 @@ const FullEquation: React.FC = ({
                     ? (
                         <Matrix 
                             maxMatrixWidth={singleMatrixMaxWidth}
-                            matrixNumbers={equationData.matrix2}
+                            matrixData={equationData.matrix2}
                         />
                     )
                     : equationData.variablePosition === 2
-                        &&  <XOperator />
+                        &&  <XOperator variableDimensions={equationData.getVariableDimensions()} />
             }
             {
                 equationData.secondOperator && (
@@ -157,11 +180,11 @@ const FullEquation: React.FC = ({
                     ? (
                         <Matrix 
                             maxMatrixWidth={singleMatrixMaxWidth}
-                            matrixNumbers={equationData.matrix3}
+                            matrixData={equationData.matrix3}
                         />
                     )
                     : equationData.variablePosition === 3
-                        &&  <XOperator />
+                        &&  <XOperator variableDimensions={equationData.getVariableDimensions()} />
             }
         </View>
     );

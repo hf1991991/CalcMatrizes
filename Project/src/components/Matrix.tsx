@@ -1,17 +1,29 @@
 import React, { useState } from 'react';
-import { View, FlatList } from 'react-native';
+import { View, FlatList, LayoutChangeEvent } from 'react-native';
 import MatrixContainer from './MatrixContainer';
 import MatrixColumn from './MatrixColumn';
 import MatrixOperations from '../utilities/MatrixOperations';
+import SelectedMatrixElement from '../interfaces/SelectedMatrixElement';
+import { ElementData } from '../utilities/ExpressionClasses';
+import MatrixData from '../utilities/MatrixData';
 
-const Matrix: React.FC = ({ 
-    matrixNumbers,
+interface MatrixProps { 
+    matrixData: MatrixData;
+    selectedMatrixElement?: SelectedMatrixElement | null;
+    maxMatrixWidth: number;
+    editableOperatorNumber?: ElementData | null;
+    onLayout?(e: LayoutChangeEvent): void;
+    changeSelectedMatrixElement?(position: SelectedMatrixElement): void;
+}
+
+const Matrix = ({ 
+    matrixData,
     selectedMatrixElement=null,
     maxMatrixWidth,
     editableOperatorNumber=null,
     onLayout,
     changeSelectedMatrixElement
-}) => {
+}: MatrixProps) => {
     const [flatListDimensions, changeFlatListDimensions] = useState({
         height: 0,
         width: 0,
@@ -32,7 +44,6 @@ const Matrix: React.FC = ({
                 >
                     <FlatList
                         horizontal
-                        showsHorizontalScrollIndicator
                         directionalLockEnabled={false}
                         style={{
                             transform:[{rotateY:'180deg'}],
@@ -48,13 +59,13 @@ const Matrix: React.FC = ({
                             right: 1,
                             left: 1,
                         }}
-                        data={MatrixOperations.insertElementsPosition(matrixNumbers)}
+                        data={MatrixOperations.insertElementsPosition(matrixData)}
                         keyExtractor={element => element.column.toString()}
                         renderItem={({ item }) => {
                             return (
                                 <MatrixColumn
-                                    matrixNumbers={matrixNumbers}
-                                    matrixColumnElements={item.data}
+                                    wholeMatrix={matrixData}
+                                    matrixColumn={item.data}
                                     selectedMatrixElement={selectedMatrixElement}
                                     minWidth={50}
                                     flatListDimensions={flatListDimensions}

@@ -7,19 +7,11 @@ import { ElementData, VariableData, ExpressionData } from '../utilities/Expressi
 import MatrixData from '../utilities/MatrixData';
 import SelectedMatrixElement from '../interfaces/SelectedMatrixElement';
 import MatrixDimensions from '../interfaces/MatrixDimensions';
+import FullEquationData from '../interfaces/FullEquationData';
 
 interface MatrixHistory {
     history: Array<MatrixData>;
     currentPosition: number;
-}
-
-interface FullEquation {
-    equationType: CalcState;
-    solutionType: SystemSolutionType;
-    matrixA: MatrixData;
-    matrixB: MatrixData;
-    matrixC: MatrixData;
-    matrixD: MatrixData;
 }
 
 interface GetNumberWrittenParams { 
@@ -50,7 +42,7 @@ interface CalculatorContextData {
     operationHappening: boolean;
     editableOperatorNumber: ElementData;
     solutionType: SystemSolutionType;
-    fullEquation: FullEquation;
+    fullEquation: FullEquationData;
     viewReduced: boolean;
     // Estados de botões
     secondSetOfKeysActive: boolean;
@@ -71,7 +63,7 @@ interface CalculatorContextData {
     getNumberWritten(params: GetNumberWrittenParams): ElementData | string;
     changeNumberWritten(params: ChangeNumberWrittenParams): void;
     changeEditableDimensions(params: MatrixDimensions): void;
-    changeSelectedMatrixElement(selectedElement: MatrixDimensions): void;
+    changeSelectedMatrixElement(selectedElement: SelectedMatrixElement): void;
     changeColumnDirectionActive(): void;
     changeSecondSetOfKeysActive(): void;
     changeViewReduced(): void;
@@ -638,7 +630,7 @@ export const CalculatorProvider: React.FC = ({ children }) => {
     );
 
     const changeEditableDimensions = useCallback(
-        ({ rows, columns }) => {
+        ({ rows, columns }: MatrixDimensions) => {
             setEditableDimensions({ rows, columns });
             setEditableMatrix(
                 MatrixOperations.resizeMatrix({

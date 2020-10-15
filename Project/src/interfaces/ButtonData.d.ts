@@ -2,7 +2,7 @@ import { ImageSourcePropType } from "react-native";
 
 interface ButtonData {
     source: ImageSourcePropType;
-    sourceActive?: ImageSourcePropType;
+    sourceActive: ImageSourcePropType;
     onPress?: (params: any) => void;
     flex?: number;
     disabled?: boolean;

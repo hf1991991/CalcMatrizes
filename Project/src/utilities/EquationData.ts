@@ -1,17 +1,25 @@
+import FullEquationData from '../interfaces/FullEquationData';
 import { CalcState, SystemSolutionType } from './constants';
+import MatrixData from './MatrixData';
+
+interface EquationDataParams {
+    fullEquation: FullEquationData;
+    viewReduced?: boolean;
+}
 
 class EquationData {
 
-    firstOperator = undefined;
-    variablePosition = undefined;
-    secondOperator = undefined;
-    matrix1 = undefined;
-    matrix2 = undefined;
-    matrix3 = undefined;
-    scalar = undefined;
-    singleMatrixOperator = undefined;
+    firstOperator: string | undefined;
+    variablePosition: number | undefined;
+    secondOperator: string | undefined;
+    matrix1: MatrixData | undefined;
+    matrix2: MatrixData | undefined;
+    matrix3: MatrixData | undefined;
+    scalar: string | undefined;
+    singleMatrixOperator: string | undefined;
 
-    constructor({ fullEquation, viewReduced=false }) {
+    constructor({ fullEquation, viewReduced=false }: EquationDataParams) {
+
         switch (fullEquation.equationType) {
             case CalcState.AxXeB:
                 if (fullEquation.solutionType !== SystemSolutionType.SPD) {
@@ -170,7 +178,7 @@ class EquationData {
             + (this.scalar !== undefined ? 1 : 0);
     }
 
-    hasXOperator() {
+    hasXOperator(): boolean {
         return this.variablePosition !== undefined;
     }
 

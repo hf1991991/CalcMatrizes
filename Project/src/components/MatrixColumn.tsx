@@ -1,20 +1,41 @@
 import React, { useCallback } from 'react';
 import { View, Text, TouchableOpacity, FlatList } from 'react-native';
+import ElementDataWithPosition from '../interfaces/ElementDataWithPosition';
+import MatrixColumnData from '../interfaces/MatrixColumnData';
+import SelectedMatrixElement from '../interfaces/SelectedMatrixElement';
 import { findFraction, smartToFixed, toFixedOnZeroes, toFixedWithThreeDots } from '../utilities/constants';
+import { ElementData } from '../utilities/ExpressionClasses';
+import MatrixData from '../utilities/MatrixData';
 
 const ELEMENT_HEIGHT = 40;
 const ELEMENT_VERTICAL_MARGIN = 11;
 
-const MatrixColumn: React.FC = ({ 
-    matrixNumbers,
-    matrixColumnElements,
+interface FlatListDimensions {
+    height: number;
+    width: number;
+}
+
+interface MatrixColumnProps { 
+    wholeMatrix: MatrixData;
+    matrixColumn: Array<ElementDataWithPosition>;
+    selectedMatrixElement: SelectedMatrixElement | null;
+    minWidth: number;
+    flatListDimensions: FlatListDimensions;
+    changeFlatListDimensions(dimensions: FlatListDimensions): void;
+    editableOperatorNumber: ElementData | null;
+    changeSelectedMatrixElement?(position: SelectedMatrixElement): void;
+}
+
+const MatrixColumn = ({ 
+    wholeMatrix,
+    matrixColumn,
     selectedMatrixElement,
     minWidth,
     flatListDimensions,
     changeFlatListDimensions,
     editableOperatorNumber,
     changeSelectedMatrixElement=() => {}
-}) => {
+}: MatrixColumnProps) => {
     const isElementSelected = useCallback(
         ({ row, column }) => selectedMatrixElement 
             && selectedMatrixElement.row === row 
@@ -27,11 +48,11 @@ const MatrixColumn: React.FC = ({
             return {
                 backgroundColor: isElementSelected({ row, column })
                     ? '#404040'
-                    : (matrixNumbers?.data[row][column] === null)
+                    : (wholeMatrix?.data[row][column] === null)
                         ? '#1c1c1c'
                         : 'transparent',
                 ...(
-                    (matrixNumbers?.data[row][column] === null)
+                    (wholeMatrix?.data[row][column] === null)
                     && {
                         //borderColor: '#fff',
                         //borderWidth: 1.5,
@@ -39,7 +60,7 @@ const MatrixColumn: React.FC = ({
                     }
                 )
             };
-        }, [matrixNumbers, isElementSelected]
+        }, [wholeMatrix, isElementSelected]
     );
 
     const formatElement = useCallback(
@@ -65,15 +86,15 @@ const MatrixColumn: React.FC = ({
                 transform:[{rotateX:'180deg'}],
             }}
             scrollEnabled={false}
-            key={JSON.stringify(matrixNumbers.dimensions())}
+            key={JSON.stringify(wholeMatrix.dimensions())}
             onLayout={() => {
                 changeFlatListDimensions({
                     ...flatListDimensions,
-                    height: (ELEMENT_HEIGHT + 2 * ELEMENT_VERTICAL_MARGIN) * matrixNumbers.dimensions().rows,
+                    height: (ELEMENT_HEIGHT + 2 * ELEMENT_VERTICAL_MARGIN) * wholeMatrix.dimensions().rows,
                 });
             }}
             keyExtractor={element => `${element.row}:${element.column}`}
-            data={matrixColumnElements}
+            data={matrixColumn}
             renderItem={({ item }) => {
                 const { number, row, column } = item;
                 return (

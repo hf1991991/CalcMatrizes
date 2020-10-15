@@ -2,10 +2,28 @@ import React, { useMemo } from 'react';
 import { View, Text, TouchableOpacity, Image } from 'react-native';
 import { useCalculator } from '../hooks/useCalculator';
 import { useOrientation } from '../hooks/useOrientation';
+import MatrixDimensions from '../interfaces/MatrixDimensions';
 import ArrowButton from './ArrowButton';
 
-const ArrowButtonsArea: React.FC = ({ 
-    vertical,
+interface ArrowButtonsAreaProps { 
+    vertical?: boolean;
+    hidden: boolean;
+    disabled?: boolean;
+    editableDimensions: MatrixDimensions;
+    changeEditableDimensions(dimensions: MatrixDimensions): void;
+    crossWidth: number;
+    bottomLeftText?: string;
+    bottomRightText?: string;
+    bottomMiddleText?: string;
+    onPressBottomLeftText?(): void;
+    onPressBottomMiddleText?(): void;
+    onPressBottomRightText?(): void;
+    forwardHistory?: boolean;
+    backHistory?: boolean;
+}
+
+const ArrowButtonsArea = ({ 
+    vertical=false,
     hidden,
     disabled=false,
     editableDimensions,
@@ -19,7 +37,7 @@ const ArrowButtonsArea: React.FC = ({
     onPressBottomRightText,
     forwardHistory,
     backHistory
-}) => {
+}: ArrowButtonsAreaProps) => {
 
     const {
         matrixHistory,
@@ -80,7 +98,7 @@ const ArrowButtonsArea: React.FC = ({
                         style={{
                             position: 'absolute',
                             top: 0,
-                            opacity: historyDisabled && 0.5,
+                            opacity: historyDisabled ? 0.5: 1,
                         }}
                         disabled={historyDisabled}
                     >
@@ -89,7 +107,6 @@ const ArrowButtonsArea: React.FC = ({
                                 width: 18.5*1.3,
                                 height: 18.5*1.3,
                             }}
-                            disabled
                             source={
                                 forwardHistory
                                     ? require('../../assets/icons/forwardHistory.png')

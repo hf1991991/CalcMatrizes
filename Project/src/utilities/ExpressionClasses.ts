@@ -58,19 +58,19 @@ export class ExpressionData {
 
 } 
 
-interface ElementDataData {
+interface ElementDataParams {
     variables?: Array<VariableData>;
     scalar?: number | string;
-    unfilteredString?: string;
+    unfilteredString?: boolean;
 }
 
 export class ElementData {
 
     variables: Array<VariableData>;
     scalar: number | string;
-    unfilteredString: string;
+    unfilteredString: boolean;
 
-    constructor({ variables=[], scalar=1, unfilteredString=null }: ElementDataData) {
+    constructor({ variables=[], scalar=1, unfilteredString=false }: ElementDataParams) {
         this.variables = variables;
         this.scalar = unfilteredString ? scalar : smartToFixed(scalar);
         this.unfilteredString = unfilteredString;
