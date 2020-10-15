@@ -1,4 +1,5 @@
-import { ElementData } from "./ExpressionClasses";
+import SelectedMatrixElement from "../interfaces/SelectedMatrixElement";
+import { ElementData, ExpressionData } from "./ExpressionClasses";
 import MatrixOperations from "./MatrixOperations";
 
 export interface MatrixDimensions {
@@ -7,9 +8,9 @@ export interface MatrixDimensions {
 }
 
 export default class MatrixData {
-    data: Array<Array<ElementData>>;
+    data: Array<Array<ElementData | ExpressionData>>;
 
-    constructor({ data }) {
+    constructor(data: Array<Array<ElementData | ExpressionData>>) {
         this.data = MatrixOperations.applyFrescuresToMatrixData(data);
     }
 
@@ -20,7 +21,7 @@ export default class MatrixData {
         };
     }
 
-    hasPosition({ row, column }) {
+    hasPosition({ row, column }: SelectedMatrixElement) {
         return row < this.dimensions().rows && column < this.dimensions().columns;
     } 
 }

@@ -9,9 +9,7 @@ export default class MatrixOperations {
     static changeElement({ matrix, column, row, numberWritten }) {
         let matrixDataCopy = [...matrix.data];
         matrixDataCopy[row][column] = numberWritten;
-        return new MatrixData({
-            data: matrixDataCopy,
-        });
+        return new MatrixData(matrixDataCopy);
     }
 
     static insertElementsPosition(matrix) {
@@ -48,9 +46,7 @@ export default class MatrixOperations {
             copyData.push(copyDataRow);
         }
 
-        return new MatrixData({
-            data: copyData,
-        });
+        return new MatrixData(copyData);
     }
 
     static minDimensions = (matrix1, matrix2) => ({
@@ -91,9 +87,14 @@ export default class MatrixOperations {
     }
 
     static resizeMatrix({ originalMatrix, editableMatrix, rows, columns }) {
-        return new MatrixData({
-            data: MatrixOperations.joinEditableAndOriginalMatrices({ originalMatrix, editableMatrix, rows, columns }),
-        });
+        return new MatrixData(
+            MatrixOperations.joinEditableAndOriginalMatrices({ 
+                originalMatrix, 
+                editableMatrix, 
+                rows, 
+                columns 
+            })
+        );
     }
 
     static addColumn(matrix) {
@@ -199,8 +200,8 @@ export default class MatrixOperations {
             : Number.parseFloat(string);
     }
 
-    static applyFrescuresToMatrixData(matrixData) {
-        if (!matrixData) return null;
+    static applyFrescuresToMatrixData(matrixData: Array<Array<ElementData | ExpressionData>>): Array<Array<ElementData | ExpressionData>> {
+        if (!matrixData) return [];
 
         let converted = [];
 
@@ -238,9 +239,7 @@ export default class MatrixOperations {
             matrix.push(matrixRow);
         }
 
-        return new MatrixData({
-            data: matrix,
-        });
+        return new MatrixData(matrix);
     }
 
     static identity(dimension) {
@@ -254,9 +253,7 @@ export default class MatrixOperations {
             identity.push(identityRow);
         }
 
-        return new MatrixData({
-            data: identity,
-        });
+        return new MatrixData(identity);
     }
 
     static sum(matrixA, matrixB) {
@@ -276,9 +273,7 @@ export default class MatrixOperations {
             matrix.push(matrixRow);
         }
 
-        return new MatrixData({
-            data: matrix,
-        });    
+        return new MatrixData(matrix);    
     }
 
     static subtract(matrixA, matrixB) {
@@ -298,9 +293,7 @@ export default class MatrixOperations {
             matrix.push(matrixRow);
         }
 
-        return new MatrixData({
-            data: matrix,
-        });    
+        return new MatrixData(matrix);    
     }
 
     static multiplyMatrix(matrixA, matrixB) {
@@ -330,9 +323,7 @@ export default class MatrixOperations {
             matrix.push(matrixRow);
         }
 
-        return new MatrixData({
-            data: matrix,
-        });    
+        return new MatrixData(matrix);    
     }
 
     static multiplyMatrixByScalar({ matrixA, scalar }) {
@@ -352,9 +343,7 @@ export default class MatrixOperations {
             matrix.push(matrixRow);
         }
 
-        return new MatrixData({
-            data: matrix,
-        });    
+        return new MatrixData(matrix);    
     }
 
     static transpose(matrix) {
@@ -368,9 +357,7 @@ export default class MatrixOperations {
             transposedData.push(transposedRow);
         }
 
-        return new MatrixData({
-            data: transposedData,
-        });
+        return new MatrixData(transposedData);
     }
 
     static invert(matrix) {

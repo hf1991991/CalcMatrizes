@@ -1,7 +1,11 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { Dimensions } from 'react-native';
 
-const OrientationContext = createContext({});
+interface OrientationContextData {
+    isPortrait: boolean;
+}
+
+const OrientationContext = createContext<OrientationContextData>({} as OrientationContextData);
 
 export const OrientionProvider = ({ children }) => {
 
@@ -16,7 +20,7 @@ export const OrientionProvider = ({ children }) => {
         () => Dimensions.addEventListener(
             'change', () => setIsPortrait(checkIfPortrait())
         ), 
-        [checkIfPortrait]
+        []
     )
 
     return (

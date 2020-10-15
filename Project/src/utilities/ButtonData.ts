@@ -1,10 +1,10 @@
-export default class ButtonData {
-    constructor({source, sourceActive, style, onPress, disabled=false, active=false}) {
-        this.source = source;
-        this.sourceActive = sourceActive;
-        this.style = style;
-        this.onPress = onPress;
-        this.disabled = disabled;
-        this.active = active;
-    }
+import { ImageSourcePropType } from "react-native";
+
+export default interface ButtonData {
+    source: ImageSourcePropType;
+    sourceActive?: ImageSourcePropType;
+    onPress?: (params: any) => void;
+    flex?: number;
+    disabled?: boolean;
+    active?: boolean;
 }

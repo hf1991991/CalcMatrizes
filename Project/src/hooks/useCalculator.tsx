@@ -5,15 +5,11 @@ import ScalarOperations from '../utilities/ScalarOperations';
 import { simplifyExpression, varOperation } from '../utilities/ExpressionSimplification';
 import { ElementData, VariableData, ExpressionData } from '../utilities/ExpressionClasses';
 import MatrixData, { MatrixDimensions } from '../utilities/MatrixData';
+import SelectedMatrixElement from '../interfaces/SelectedMatrixElement';
 
 interface MatrixHistory {
     history: Array<MatrixData>;
     currentPosition: number;
-}
-
-interface SelectedMatrixElement {
-    row: number;
-    column: number;
 }
 
 interface FullEquation {
@@ -107,7 +103,7 @@ const INITIAL_MATRIX = MatrixOperations.emptyMatrix({
 
 const CalculatorContext = createContext<CalculatorContextData>({} as CalculatorContextData);
 
-export const CalculatorProvider = ({ children }) => {
+export const CalculatorProvider: React.FC = ({ children }) => {
     // Estado geral da Calculadora:
     const [calcState, setCalcState] = useState(CalcState.editing);
 
