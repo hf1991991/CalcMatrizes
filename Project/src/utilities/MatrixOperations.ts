@@ -5,10 +5,16 @@ import * as ExpressionSimplification from "./ExpressionSimplification";
 import { ElementData, ExpressionData } from "./ExpressionClasses";
 import ElementDataWithPosition from "../interfaces/ElementDataWithPosition";
 import MatrixColumnWithPosition from "../interfaces/MatrixColumnWithPosition";
+import SelectedMatrixElement from "../interfaces/SelectedMatrixElement";
+
+interface ChangeElementParams extends SelectedMatrixElement { 
+    matrix: MatrixData, 
+    numberWritten: ElementData
+}
 
 class MatrixOperations {
 
-    static changeElement({ matrix, column, row, numberWritten }) {
+    static changeElement({ matrix, column, row, numberWritten }: ChangeElementParams) {
         let matrixDataCopy = [...matrix.data];
         matrixDataCopy[row][column] = numberWritten;
         return new MatrixData(matrixDataCopy);
@@ -665,11 +671,6 @@ class MatrixOperations {
         /* Se na matriz A houver uma linha completa de 
         elementos nulos e, na mesma linha da matriz B, houver 
         algum elemento não nulo, a expressão é um SI. */
-
-        /*
-        MatrixOperations.printMatrix(matrixA);
-        MatrixOperations.printMatrix(matrixB);
-        */
     
         for (let row = 0; row < matrixA.dimensions().columns; row++) {
             let allElementsOfRowNull = true;
@@ -680,7 +681,7 @@ class MatrixOperations {
 
             if (allElementsOfRowNull) {
                 for (let column = 0; column < matrixB.dimensions().columns; column++) {
-                    if (matrixB.data && matrixB.data[row] && matrixB.data[row][column].scalar !== 0.0) return SystemSolutionType.SI;
+                    if (matrixB.data && matrixB.data[row] && matrixB.data[row][column]?.scalar !== 0.0) return SystemSolutionType.SI;
                 }
                 return SystemSolutionType.SPI;
             }

@@ -8,6 +8,7 @@ import MatrixData from '../utilities/MatrixData';
 import SelectedMatrixElement from '../interfaces/SelectedMatrixElement';
 import MatrixDimensions from '../interfaces/MatrixDimensions';
 import FullEquationData from '../interfaces/FullEquationData';
+import ElementDataWithPosition from '../interfaces/ElementDataWithPosition';
 
 interface MatrixHistory {
     history: Array<MatrixData>;
@@ -32,24 +33,24 @@ interface CalculatorContextData {
     readyMatrix: MatrixData;
     editableMatrix: MatrixData;
     matrixHistory: MatrixHistory;
-    selectedMatrixElement: SelectedMatrixElement;
+    selectedMatrixElement: SelectedMatrixElement | null;
     shouldUserInputOverwriteElement: boolean;
     editableDimensions: MatrixDimensions;
     // Estados de escalares:
-    editableScalar: ElementData;
+    editableScalar: ElementData | null;
     fullScreenDeterminant: boolean;
     // Estados de operações:
     operationHappening: boolean;
-    editableOperatorNumber: ElementData;
-    solutionType: SystemSolutionType;
-    fullEquation: FullEquationData;
+    editableOperatorNumber: ElementData | null;
+    solutionType: SystemSolutionType | null;
+    fullEquation: FullEquationData | null;
     viewReduced: boolean;
     // Estados de botões
     secondSetOfKeysActive: boolean;
     isRActive: boolean;
     columnDirectionActive: boolean;
     isVariableKeyboardActive: boolean;
-    selectedOperator: Operator;
+    selectedOperator: Operator | null;
     // ---- useMemos: ----
     isNumberKeyboardActive: boolean;
     matrixOnScreen: MatrixData;
@@ -60,7 +61,7 @@ interface CalculatorContextData {
     // ---- useCallbacks: ----
     undoHistory(): void;
     redoHistory(): void;
-    getNumberWritten(params: GetNumberWrittenParams): ElementData | string;
+    getNumberWritten(params: GetNumberWrittenParams): ElementData | string | null;
     changeNumberWritten(params: ChangeNumberWrittenParams): void;
     changeEditableDimensions(params: MatrixDimensions): void;
     changeSelectedMatrixElement(selectedElement: SelectedMatrixElement): void;
@@ -107,7 +108,7 @@ export const CalculatorProvider: React.FC = ({ children }) => {
         history: [MatrixOperations.copyMatrixData(INITIAL_MATRIX)],
         currentPosition: 0
     });
-    const [selectedMatrixElement, setSelectedMatrixElement] = useState({
+    const [selectedMatrixElement, setSelectedMatrixElement] = useState<SelectedMatrixElement | null>({
         row: 0,
         column: 0,
     });
@@ -115,14 +116,14 @@ export const CalculatorProvider: React.FC = ({ children }) => {
     const [editableDimensions, setEditableDimensions] = useState(INITIAL_MATRIX.dimensions());
 
     // Estados de escalares:
-    const [editableScalar, setEditableScalar] = useState(null);
+    const [editableScalar, setEditableScalar] = useState<ElementData | null>(null);
     const [fullScreenDeterminant, setFullScreenDeterminant] = useState(false);
 
     // Estados de operações:
     const [operationHappening, setOperationHappening] = useState(false);
-    const [editableOperatorNumber, setEditableOperatorNumber] = useState(null);
-    const [solutionType, setSolutionType] = useState(null);
-    const [fullEquation, setFullEquation] = useState(null);
+    const [editableOperatorNumber, setEditableOperatorNumber] = useState<ElementData | null>(null);
+    const [solutionType, setSolutionType] = useState<SystemSolutionType | null>(null);
+    const [fullEquation, setFullEquation] = useState<FullEquationData | null>(null);
     const [viewReduced, setViewReduced] = useState(false);
 
     // Estados de botões:
@@ -264,15 +265,15 @@ export const CalculatorProvider: React.FC = ({ children }) => {
             { 
                 forceNotOperatorNumber = false, 
                 doNotStringify = false 
-            }: GetNumberWrittenParams = {} as GetNumberWrittenParams
-        ) => {
+            }: GetNumberWrittenParams = ({} as GetNumberWrittenParams)
+        ): ElementData | string | null => {
 
             if (operationHappening && !forceNotOperatorNumber)
                 return editableOperatorNumber === null && !doNotStringify
-                    ? ''
+                    ? '' as string
                     : editableOperatorNumber;
 
-            const { row, column } = selectedMatrixElement || {};
+            const { row, column } = selectedMatrixElement || {} as SelectedMatrixElement;
             const matrixNumber = calcState === CalcState.LambdaxA
                 ? editableScalar
                 : editableMatrix?.data[row]
@@ -292,8 +293,8 @@ export const CalculatorProvider: React.FC = ({ children }) => {
                     : '';
 
             return doNotStringify
-                ? matrixNumber
-                : matrixNumber?.commaStringify({ dontFindFraction: true });
+                ? matrixNumber as ElementData
+                : (matrixNumber as ElementData)?.commaStringify({ dontFindFraction: true });
 
         }, [calcState, editableMatrix, shouldUserInputOverwriteElement, editableScalar, operationHappening, selectedMatrixElement, editableOperatorNumber]
     );
@@ -315,7 +316,7 @@ export const CalculatorProvider: React.FC = ({ children }) => {
             else
                 setEditableMatrix(MatrixOperations.changeElement({
                     matrix: editableMatrix || readyMatrix,
-                    ...selectedMatrixElement,
+                    ...(selectedMatrixElement as SelectedMatrixElement),
                     numberWritten: newNumber
                 }));
 
@@ -358,18 +359,18 @@ export const CalculatorProvider: React.FC = ({ children }) => {
                 changeNumberWritten({
                     newNumber: new ElementData({
                         scalar: originalValue !== null
-                            ? originalValue.scalar
+                            ? (originalValue as ElementData).scalar
                             : 1,
                         variables: [
                             new VariableData({
                                 variable: element
                             }),
-                            ...((originalValue !== null && originalValue.variables) || [])
+                            ...((originalValue !== null && (originalValue as ElementData).variables) || [])
                         ]
                     })
                 });
 
-            else if (getNumberWritten().length === 0 && element === '.')
+            else if ((getNumberWritten() as string).length === 0 && element === '.')
                 changeNumberWritten({
                     newNumber: new ElementData({
                         scalar: '0.'
@@ -382,10 +383,10 @@ export const CalculatorProvider: React.FC = ({ children }) => {
                     newNumber: new ElementData({
                         scalar: originalValue === null
                             ? element
-                            : originalValue.scalar !== 1
-                                ? originalValue.scalar.toString() + element
+                            : (originalValue as ElementData).scalar !== 1
+                                ? (originalValue as ElementData).scalar.toString() + element
                                 : element,
-                        variables: (originalValue !== null && originalValue.variables) || []
+                        variables: (originalValue !== null && (originalValue as ElementData).variables) || []
                     })
                 });
             }
@@ -486,11 +487,11 @@ export const CalculatorProvider: React.FC = ({ children }) => {
 
     const nextElement = useCallback(
         () => {
-            const { row, column } = selectedMatrixElement;
+            const { row, column } = selectedMatrixElement as SelectedMatrixElement;
             const maxRows = editableMatrix.dimensions().rows;
             const maxColumns = editableMatrix.dimensions().columns;
 
-            let selectedElement = { row: null, column: null };
+            let selectedElement = {} as SelectedMatrixElement | null;
 
             if (
                 !(row == maxRows - 1
@@ -568,7 +569,7 @@ export const CalculatorProvider: React.FC = ({ children }) => {
                 equationType: matrixOperation,
                 matrixA: oldMatrix,
                 matrixB: newMatrix
-            });
+            } as FullEquationData);
 
         }, [matrixOnScreen, setFullEquation]
     );
@@ -643,8 +644,8 @@ export const CalculatorProvider: React.FC = ({ children }) => {
                 })
             );
             setSelectedMatrixElement(
-                selectedMatrixElement?.row >= rows
-                    || selectedMatrixElement?.column >= columns
+                selectedMatrixElement?.row || 0 >= rows
+                    || selectedMatrixElement?.column || 0 >= columns
                     ? null
                     : selectedMatrixElement
             );
@@ -866,7 +867,7 @@ export const CalculatorProvider: React.FC = ({ children }) => {
     const onPressGaussianEliminationReduced = useCallback(
         () => {
             changeViewReduced();
-            setReadyMatrix(viewReduced ? fullEquation.matrixC : fullEquation.matrixD);
+            setReadyMatrix((viewReduced ? (fullEquation as FullEquationData).matrixC : (fullEquation as FullEquationData).matrixD) as MatrixData);
         },
         [viewReduced, fullEquation, changeViewReduced, setReadyMatrix]
     );
@@ -885,8 +886,8 @@ export const CalculatorProvider: React.FC = ({ children }) => {
                 });
 
                 changeSettingsOfSelectedMatrixElement({
-                    row: selectedMatrixElement.column,
-                    column: selectedMatrixElement.row,
+                    row: selectedMatrixElement?.column,
+                    column: selectedMatrixElement?.row,
                 });
             }
 

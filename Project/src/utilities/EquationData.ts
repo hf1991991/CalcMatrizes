@@ -184,9 +184,9 @@ class EquationData {
 
     getVariableDimensions() {
         if (this.variablePosition === 1)
-            return `${this.matrix3.dimensions().rows}x${this.matrix2.dimensions().rows}`;
+            return `${this.matrix3?.dimensions().rows}x${this.matrix2?.dimensions().rows}`;
         else
-            return `${this.matrix1.dimensions().columns}x${this.matrix3.dimensions().columns}`;
+            return `${this.matrix1?.dimensions().columns}x${this.matrix3?.dimensions().columns}`;
     }
 
 }

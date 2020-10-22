@@ -247,7 +247,7 @@ const MatrixArea: React.FC = () => {
                                 })
                 }
                 bottomMiddleText={
-                    calcState === CalcState.ready && solutionType
+                    calcState === CalcState.ready ? solutionType : ''
                 }
                 onPressBottomRightText={
                     !isPortrait
@@ -257,7 +257,8 @@ const MatrixArea: React.FC = () => {
                                 : changeViewReduced
                             : () => {}
                         : !operationHappening
-                            && changeFullScreenDeterminant
+                            ? changeFullScreenDeterminant
+                            : () => {}
                 }
                 crossWidth={BUTTON_AREAS_CROSS_WIDTH}
             />
