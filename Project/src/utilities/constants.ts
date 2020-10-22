@@ -75,20 +75,20 @@ export enum ButtonType {
     Check = 'Check'
 }
 
-export function count(string, substring, caseSensitive) {
+export function count(string: number | string, substring: RegExp | string, caseSensitive: boolean) {
     // Se caseSensitive for indefinido, ele é considerada falsa:
-    return ((caseSensitive ? string.toString() : string.toString().toLowerCase()).match(new RegExp((caseSensitive ? substring : substring.toLowerCase()), "g")) || []).length;
+    return ((caseSensitive ? string.toString() : string.toString().toLowerCase()).match(new RegExp((caseSensitive || substring instanceof RegExp ? substring : substring.toLowerCase()), "g")) || []).length;
 }; 
 
-export function decimalPlaces(number) {
-    return number.toString().split(".").pop().length;
+export function decimalPlaces(number: number | string) {
+    return (number.toString().split(".").pop() as string).length;
 }
 
 const PRECISION = 6;
 
-export function smartToFixed(element) {
+export function smartToFixed(element: number) {
     // A precisao define quantos zeros ou noves seguidos apos a virgula a funcao deveria aceitar para que ela arredende o numero:
-    function lastDigitIndex(string) {
+    function lastDigitIndex(string: string) {
         let index = 0;
         let repetitions = 0;
         for (let i = 0; i < string.length - 1; i++) {
@@ -104,17 +104,17 @@ export function smartToFixed(element) {
         return null;
     }
     
-    const digits = element.toString().split(".").pop();
+    const digits = element.toString().split(".").pop() as string;
     
     // console.log({element, lastDig: lastDigitIndex(digits)});
     if (lastDigitIndex(digits) !== null) {
-        return element.toFixed(lastDigitIndex(digits));
+        return element.toFixed(lastDigitIndex(digits) as number);
     }
     else
         return element;
 }
 
-export function findFraction(number) {
+export function findFraction(number: number) {
     const MAX_DENOMINATOR = 10000;
 
     let numerator = null;
@@ -140,7 +140,7 @@ export function findFraction(number) {
     return toFixedWithThreeDots(number);
 }
 
-export function toFixedOnZeroes(number) {
+export function toFixedOnZeroes(number: string | number) {
     if (number === number.toString() && number.startsWith('0.')) return number.toString();
     let string = number.toString();
     if (string.endsWith('.')) return string;
@@ -157,16 +157,16 @@ export enum SystemSolutionType {
     SI = 'SI'
 };
 
-export function toFixedWithThreeDots(number) {
+export function toFixedWithThreeDots(number: string | number) {
     if (number.toString().endsWith('.')) return number.toString();
     number = toFixedOnZeroes(number);
     if (decimalPlaces(number) > PRECISION 
         && count(number.toString(), /\./, true) !== 0
-    ) return Number.parseFloat(number).toFixed(PRECISION) + '...';
+    ) return Number.parseFloat(number.toString()).toFixed(PRECISION) + '...';
     return number;
 }
 
-export function parenthesisEnglobe(string) {
+export function parenthesisEnglobe(string: string) {
 
     // console.log({string})
     if (!string.startsWith('(') || !string.endsWith(')'))
