@@ -78,14 +78,14 @@ export class ElementData {
 
     constructor({ variables=[], scalar=1, unfilteredString=false }: ElementDataParams) {
         this.variables = variables;
-        this.scalar = unfilteredString ? scalar : smartToFixed(scalar);
+        this.scalar = (unfilteredString || Number.isNaN(scalar)) ? scalar : smartToFixed(scalar as number);
         this.unfilteredString = unfilteredString;
 
         this.fixVariables()
     }
 
     fixVariables() {
-        let fixed = [];
+        let fixed: Array<VariableData> = [];
 
         // console.log(JSON.stringify({jaca: this.variables}))
 
@@ -124,9 +124,9 @@ export class ElementData {
     stringify({ onlyVariables=false, dontFindFraction=false }={}) {
 
         const findPossibleFraction =
-            (number) => dontFindFraction
+            (number: number | string) => dontFindFraction || Number.isNaN(number)
                 ? toFixedWithThreeDots(number)
-                : findFraction(number);
+                : findFraction(number as number);
 
         const formatScalar = 
             () => (this.scalar === 1 && this.variables.length !== 0) || onlyVariables
@@ -135,7 +135,7 @@ export class ElementData {
                     ? '-'
                     : findPossibleFraction(this.scalar)
         const formatExponent = 
-            (exponent) => exponent === 1
+            (exponent: number) => exponent === 1
                 ? ''
                 : ScalarOperations.superscript(findPossibleFraction(exponent))
         const formatVariables = 
@@ -147,12 +147,17 @@ export class ElementData {
 
 } 
 
+interface VariableDataParams {
+    variable: string;
+    exponent?: number;
+}
+
 export class VariableData {
 
     variable: string;
     exponent: number;
 
-    constructor({ variable, exponent=1 }) {
+    constructor({ variable, exponent=1 }: VariableDataParams) {
         this.variable = variable;
         this.exponent = exponent;
     }
