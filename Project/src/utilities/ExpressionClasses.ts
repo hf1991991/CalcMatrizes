@@ -1,13 +1,19 @@
 import { smartToFixed, findFraction, Operator, parenthesisEnglobe, toFixedWithThreeDots } from "./constants";
 import ScalarOperations from "./ScalarOperations";
 
+interface ExpressionDataParams {
+    operator: Operator;
+    elements: Array<ElementData>;
+    isSimplified?: boolean;
+}
+
 export class ExpressionData {
 
     operator: Operator;
     elements: Array<ElementData>;
     isSimplified: boolean;
 
-    constructor({ operator, elements, isSimplified=false }) {
+    constructor({ operator, elements, isSimplified=false }: ExpressionDataParams) {
         this.operator = operator;
         this.elements = elements;
         this.isSimplified = isSimplified;

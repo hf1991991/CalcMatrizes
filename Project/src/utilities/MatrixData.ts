@@ -7,7 +7,7 @@ import MatrixOperations from "./MatrixOperations";
 class MatrixData {
     data: Array<MatrixColumnData>;
 
-    constructor(data: Array<MatrixColumnData>) {
+    constructor(data: Array<Array<ElementData | ExpressionData | number>>) {
         this.data = MatrixOperations.applyFrescuresToMatrixData(data);
     }
 

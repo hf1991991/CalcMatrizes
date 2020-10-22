@@ -6,10 +6,28 @@ import { ElementData, ExpressionData } from "./ExpressionClasses";
 import ElementDataWithPosition from "../interfaces/ElementDataWithPosition";
 import MatrixColumnWithPosition from "../interfaces/MatrixColumnWithPosition";
 import SelectedMatrixElement from "../interfaces/SelectedMatrixElement";
+import MatrixColumnData from "../interfaces/MatrixColumnData";
+import MatrixDimensions from "../interfaces/MatrixDimensions";
 
 interface ChangeElementParams extends SelectedMatrixElement { 
-    matrix: MatrixData, 
-    numberWritten: ElementData
+    matrix: MatrixData;
+    numberWritten: ElementData;
+}
+
+interface JoinEditableAndOriginalMatricesParams extends MatrixDimensions { 
+    originalMatrix: MatrixData;
+    editableMatrix: MatrixData;
+}
+
+interface MultiplyMatrixByScalarParams {
+    matrixA: MatrixData;
+    scalar: ElementData;
+}
+
+interface PartialGaussianEliminationParams { 
+    matrixA: MatrixData;
+    matrixB: MatrixData;
+    eliminateBelowMainDiagonal?: boolean;
 }
 
 class MatrixOperations {
@@ -43,7 +61,7 @@ class MatrixOperations {
         return positionMatrix;
     }
 
-    static copyMatrixData(matrix) {
+    static copyMatrixData(matrix: MatrixData) {
         let copyData = [];
 
         for (let row = 0; row < matrix.dimensions().rows; row++) {
@@ -57,17 +75,17 @@ class MatrixOperations {
         return new MatrixData(copyData);
     }
 
-    static minDimensions = (matrix1, matrix2) => ({
+    static minDimensions = (matrix1: MatrixData, matrix2: MatrixData) => ({
         rows: Math.min(matrix1.dimensions().rows, matrix2.dimensions().rows),
         columns: Math.min(matrix1.dimensions().columns, matrix2.dimensions().columns),
     })
 
-    static maxDimensions = (matrix1, matrix2) => ({
+    static maxDimensions = (matrix1: MatrixData, matrix2: MatrixData) => ({
         rows: Math.max(matrix1.dimensions().rows, matrix2.dimensions().rows),
         columns: Math.max(matrix1.dimensions().columns, matrix2.dimensions().columns),
     })
 
-    static joinElements = (matrix1, matrix2, row, column) => {
+    static joinElements = (matrix1: MatrixData, matrix2: MatrixData, row: number, column: number) => {
         const joinedElement = 
             (matrix1.data[row] && matrix1.data[row][column]) 
             || (
@@ -79,7 +97,7 @@ class MatrixOperations {
         return joinedElement === undefined ? 0 : joinedElement;
     }
 
-    static joinEditableAndOriginalMatrices({ originalMatrix, editableMatrix, rows, columns }) {
+    static joinEditableAndOriginalMatrices({ originalMatrix, editableMatrix, rows, columns }: JoinEditableAndOriginalMatricesParams) {
         let joined = [];
 
         for (let row = 0; row < rows; row++) {
@@ -94,7 +112,7 @@ class MatrixOperations {
         return joined;
     }
 
-    static resizeMatrix({ originalMatrix, editableMatrix, rows, columns }) {
+    static resizeMatrix({ originalMatrix, editableMatrix, rows, columns }: JoinEditableAndOriginalMatricesParams) {
         return new MatrixData(
             MatrixOperations.joinEditableAndOriginalMatrices({ 
                 originalMatrix, 
@@ -104,33 +122,12 @@ class MatrixOperations {
             })
         );
     }
-
-    static addColumn(matrix) {
-        for (let row of matrix) row.push(0);
-        return matrix;
-    }
-
-    static removeColumn(matrix) {
-        for (let row of matrix) row.pop();
-        return matrix;
-    }
-
-    static addRow(matrix) {
-        matrix.push([]);
-        for (let column of matrix[0]) matrix[matrix.length - 1].push(0);
-        return matrix;
-    }
-
-    static removeRow(matrix) {
-        matrix.pop();
-        return matrix;
-    }
-
-    static getTransposedDimensions(matrix) {
+    
+    static getTransposedDimensions(matrix: MatrixData) {
         return MatrixOperations.transpose(matrix).dimensions();
     }
 
-    static compareMatrices(matrix1, matrix2) {
+    static compareMatrices(matrix1: MatrixData, matrix2: MatrixData) {
         if (
             matrix1.dimensions().rows !== matrix2.dimensions().rows
             || matrix1.dimensions().columns !== matrix2.dimensions().columns
@@ -150,7 +147,7 @@ class MatrixOperations {
         return true;
     }
 
-    static isMatrixFull(matrix) {
+    static isMatrixFull(matrix: MatrixData) {
         if (!matrix) return false;
 
         for (let row = 0; row < matrix.dimensions().rows; row++) {
@@ -161,7 +158,7 @@ class MatrixOperations {
         return true;
     }
 
-    static isMatrixEmpty(matrix) {
+    static isMatrixEmpty(matrix: MatrixData) {
         if (!matrix) return false;
 
         for (let row = 0; row < matrix.dimensions().rows; row++) {
@@ -172,7 +169,7 @@ class MatrixOperations {
         return true;
     }
 
-    static isMatrixSquare(matrix) {
+    static isMatrixSquare(matrix: MatrixData) {
         return matrix && matrix.dimensions().rows === matrix.dimensions().columns;
     }
 
@@ -201,14 +198,14 @@ class MatrixOperations {
     //     return fixed;
     // }
 
-    static parseFloatPreservingDotAndVariables(string) {
+    static parseFloatPreservingDotAndVariables(string: any) {
         if (ExpressionSimplification.getVariables(string)) return string;
         return string !== null && (string.toString().endsWith('.') || string.toString().startsWith('0.'))
             ? string
             : Number.parseFloat(string);
     }
 
-    static applyFrescuresToMatrixData(matrixData: Array<Array<ElementData | ExpressionData>>): Array<Array<ElementData | ExpressionData>> {
+    static applyFrescuresToMatrixData(matrixData: Array<Array<ElementData | ExpressionData | number>>): Array<MatrixColumnData> {
         if (!matrixData) return [];
 
         let converted = [];
@@ -236,7 +233,7 @@ class MatrixOperations {
         return converted;
     }
 
-    static emptyMatrix({ rows, columns }) {
+    static emptyMatrix({ rows, columns }: MatrixDimensions) {
         let matrix = [];
 
         for (let row = 0; row < rows; row++) {
@@ -250,7 +247,7 @@ class MatrixOperations {
         return new MatrixData(matrix);
     }
 
-    static identity(dimension) {
+    static identity(dimension: number) {
         let identity = [];
 
         for (let row = 0; row < dimension; row++) {
@@ -264,7 +261,7 @@ class MatrixOperations {
         return new MatrixData(identity);
     }
 
-    static sum(matrixA, matrixB) {
+    static sum(matrixA: MatrixData, matrixB: MatrixData) {
         let matrix = [];
 
         for (let row = 0; row < matrixA.dimensions().rows; row++) {
@@ -284,7 +281,7 @@ class MatrixOperations {
         return new MatrixData(matrix);    
     }
 
-    static subtract(matrixA, matrixB) {
+    static subtract(matrixA: MatrixData, matrixB: MatrixData) {
         let matrix = [];
 
         for (let row = 0; row < matrixA.dimensions().rows; row++) {
@@ -304,7 +301,7 @@ class MatrixOperations {
         return new MatrixData(matrix);    
     }
 
-    static multiplyMatrix(matrixA, matrixB) {
+    static multiplyMatrix(matrixA: MatrixData, matrixB: MatrixData) {
         let matrix = [];
 
         for (let row = 0; row < matrixA.dimensions().rows; row++) {
@@ -334,7 +331,7 @@ class MatrixOperations {
         return new MatrixData(matrix);    
     }
 
-    static multiplyMatrixByScalar({ matrixA, scalar }) {
+    static multiplyMatrixByScalar({ matrixA, scalar }: MultiplyMatrixByScalarParams) {
         let matrix = [];
 
         for (let row = 0; row < matrixA.dimensions().rows; row++) {
@@ -354,7 +351,7 @@ class MatrixOperations {
         return new MatrixData(matrix);    
     }
 
-    static transpose(matrix) {
+    static transpose(matrix: MatrixData) {
         let transposedData = [];
 
         for (let column = 0; column < matrix.dimensions().columns; column++) {
@@ -368,7 +365,7 @@ class MatrixOperations {
         return new MatrixData(transposedData);
     }
 
-    static invert(matrix) {
+    static invert(matrix: MatrixData) {
         console.log('STARTING BELOW MAIN DIAGONAL')
         let firstElimination = MatrixOperations.partialGaussianElimination({
             matrixA: matrix,
@@ -390,15 +387,14 @@ class MatrixOperations {
         return MatrixOperations.copyMatrixData(secondElimination.matrixB);
     }
 
-    static determinant(matrix) {
+    static determinant(matrix: MatrixData) {
         return (
             MatrixOperations.isMatrixFull(matrix)
             && MatrixOperations.isMatrixSquare(matrix)
         ) 
             ? MatrixOperations.partialGaussianElimination({
                 matrixA: matrix,
-                matrixB: MatrixOperations.identity(matrix.dimensions().rows),
-                acceptVariables: true,
+                matrixB: MatrixOperations.identity(matrix.dimensions().rows)
             }).determinant
             : null;
     }
@@ -408,7 +404,7 @@ class MatrixOperations {
         de matrixA, assim como retorna o determinante da matriz.
         OBS: verticalElimination deve ser verdadeiro se a ordem da equação a ser escalonada é X*A=B.
     */
-    static partialGaussianElimination({ matrixA, matrixB, eliminateBelowMainDiagonal=true, acceptVariables=false }) {
+    static partialGaussianElimination({ matrixA, matrixB, eliminateBelowMainDiagonal=true }: PartialGaussianEliminationParams) {
         let _matrixA = MatrixOperations.copyMatrixData(matrixA);
         let _matrixB = MatrixOperations.copyMatrixData(matrixB);
 
@@ -432,7 +428,7 @@ class MatrixOperations {
         ) {
             let pivot = _matrixA.data[pivotColumn][pivotColumn];
 
-            if (pivot.scalar === 0) {
+            if (pivot instanceof ElementData && pivot.scalar === 0) {
 
                 let testRow = pivotColumn + 1;
                 while (true) {
@@ -575,7 +571,7 @@ class MatrixOperations {
     }
 
 
-    static getGaussianElimination(matrix) {
+    static getGaussianElimination(matrix: MatrixData) {
         const { matrixA: rowEchelonForm } = MatrixOperations.partialGaussianElimination({
             matrixA: matrix, 
             matrixB: MatrixOperations.emptyMatrix({
@@ -676,12 +672,12 @@ class MatrixOperations {
             let allElementsOfRowNull = true;
 
             for (let column = 0; column < matrixA.dimensions().columns; column++) {
-                if (matrixA.data && matrixA.data[row] && matrixA.data[row][column].scalar !== 0.0) allElementsOfRowNull = false;
+                if (matrixA.data && matrixA.data[row] && matrixA.data[row][column] instanceof ElementData && (matrixA.data[row][column] as ElementData).scalar !== 0.0) allElementsOfRowNull = false;
             }
 
             if (allElementsOfRowNull) {
                 for (let column = 0; column < matrixB.dimensions().columns; column++) {
-                    if (matrixB.data && matrixB.data[row] && matrixB.data[row][column]?.scalar !== 0.0) return SystemSolutionType.SI;
+                    if (matrixB.data && matrixB.data[row] && matrixB.data[row][column] instanceof ElementData && (matrixB.data[row][column] as ElementData).scalar !== 0.0) return SystemSolutionType.SI;
                 }
                 return SystemSolutionType.SPI;
             }
@@ -699,7 +695,7 @@ class MatrixOperations {
                 column < matrixB.dimensions().columns; 
                 column++
             ) {
-                if (matrixB.data && matrixB.data[row] && matrixB.data[row][column].scalar !== 0) return SystemSolutionType.SI;
+                if (matrixB.data && matrixB.data[row] && matrixB.data[row][column] instanceof ElementData && (matrixB.data[row][column] as ElementData).scalar !== 0) return SystemSolutionType.SI;
             }
         }
         
