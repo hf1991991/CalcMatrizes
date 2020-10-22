@@ -3,14 +3,14 @@ import ScalarOperations from "./ScalarOperations";
 
 interface ExpressionDataParams {
     operator: Operator;
-    elements: Array<ElementData>;
+    elements: Array<ElementData | ExpressionData>;
     isSimplified?: boolean;
 }
 
 export class ExpressionData {
 
     operator: Operator;
-    elements: Array<ElementData>;
+    elements: Array<ElementData | ExpressionData>;
     isSimplified: boolean;
 
     constructor({ operator, elements, isSimplified=false }: ExpressionDataParams) {
@@ -34,7 +34,7 @@ export class ExpressionData {
             : string;
     }
 
-    algebraicStringify({ dontFindFraction=false }={}) {
+    algebraicStringify({ dontFindFraction=false }={}): string {
         switch (this.operator) {
             case Operator.Elevate:
                 const base = this.elements[0].algebraicStringify({ dontFindFraction });
@@ -58,7 +58,7 @@ export class ExpressionData {
         }
     }
 
-    stringify() {
+    stringify(): string {
         return `${this.operator}(${this.elements.map(elem => elem.stringify()).join(';')})`
     }
 

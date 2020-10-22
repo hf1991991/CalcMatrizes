@@ -1,14 +1,12 @@
 import React, { createContext, useCallback, useContext, useMemo, useState } from 'react';
 import { CalcState, count, SystemSolutionType, Operator } from '../utilities/constants';
 import MatrixOperations from '../utilities/MatrixOperations';
-import ScalarOperations from '../utilities/ScalarOperations';
-import { simplifyExpression, varOperation } from '../utilities/ExpressionSimplification';
-import { ElementData, VariableData, ExpressionData } from '../utilities/ExpressionClasses';
+import { varOperation } from '../utilities/ExpressionSimplification';
+import { ElementData, VariableData } from '../utilities/ExpressionClasses';
 import MatrixData from '../utilities/MatrixData';
 import SelectedMatrixElement from '../interfaces/SelectedMatrixElement';
 import MatrixDimensions from '../interfaces/MatrixDimensions';
 import FullEquationData from '../interfaces/FullEquationData';
-import ElementDataWithPosition from '../interfaces/ElementDataWithPosition';
 
 interface MatrixHistory {
     history: Array<MatrixData>;
