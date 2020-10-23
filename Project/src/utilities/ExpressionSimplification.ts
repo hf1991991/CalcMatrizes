@@ -1,13 +1,13 @@
 import { count, Operator } from "./constants";
 import { ElementData, ExpressionData, VariableData } from "./ExpressionClasses";
 
-export function simplifyExpression(expression) {
+export function simplifyExpression(expression: ExpressionData) {
     return simplifyExpressionAlgorithm(expression);
     // return fixUnnecessaryScalars(simplifiedList);
 }
 
 
-export function getVariables(string) {
+export function getVariables(string: number | string) {
     for (let variable of [
         'a',
         'b',
@@ -26,11 +26,15 @@ export function getVariables(string) {
     return null;
 }
 
-export function isExpressionInstance(element) {
+export function isExpressionInstance(element: any) {
     return element instanceof ExpressionData;
 }
 
-export function varOperation(element1, operator, element2) {
+export function varOperation(
+    element1: ElementData | ExpressionData, 
+    operator: Operator, 
+    element2: ElementData | ExpressionData
+) {
 
     if (!(element1 instanceof ElementData) && !(element1 instanceof ExpressionData))
         console.log('ERRO em varOperation: element1 não é um ElementData: ' + element1)
@@ -49,8 +53,8 @@ export function varOperation(element1, operator, element2) {
     );
 }
 
-function raiseVariablesExponent(variables, exponent) {
-    newVariables = [];
+function raiseVariablesExponent(variables: Array<VariableData>, exponent: number) {
+    let newVariables: Array<VariableData> = [];
     for (let variableData of variables) {
         newVariables.push(
             new VariableData({
@@ -62,7 +66,10 @@ function raiseVariablesExponent(variables, exponent) {
     return newVariables;
 }
 
-function additionMatches(elements1, elements2) {
+function additionMatches(
+    elements1: ExpressionData | ElementData, 
+    elements2: ExpressionData | ElementData
+) {
     return elements1.stringify() === elements2.stringify();
     // if (elements1.length !== elements2.length) return false;
     // else if (elements1.length === 0) return true;
@@ -80,11 +87,11 @@ function additionMatches(elements1, elements2) {
     // return true;
 }
 
-function normalizeAddition(addition) {
+function normalizeAddition(addition: ExpressionData) {
     
-    const normalizationFactor = addition.elements[0] instanceof ExpressionData
+    const normalizationFactor = (addition.elements[0] instanceof ExpressionData
         ? 1
-        : addition.elements[0].scalar;
+        : addition.elements[0].scalar) as number;
 
     return {
         normalizedAddition: new ExpressionData({
@@ -101,7 +108,7 @@ function normalizeAddition(addition) {
                         ]
                     })
                     : new ElementData({
-                        scalar: elem.scalar / normalizationFactor,
+                        scalar: (elem.scalar as number) / normalizationFactor,
                         variables: elem.variables
                     })
             )
@@ -111,7 +118,7 @@ function normalizeAddition(addition) {
 
 }
 
-function getIndexOfMultipliableAddition(additionElements, additionSearch) {
+function getIndexOfMultipliableAddition(additionElements: Array<ExpressionData>, additionSearch: ExpressionData) {
 
     // console.log(JSON.stringify({previousAdditionSearch: additionSearch.stringify(), previousAdditionElements: additionElements.map(e => e.stringify())}));
 
@@ -136,7 +143,7 @@ function getIndexOfMultipliableAddition(additionElements, additionSearch) {
 
 }
 
-function getIndexOfAddition(additionElements, additionSearch) {
+function getIndexOfAddition(additionElements: Array<ExpressionData>, additionSearch: ExpressionData) {
 
     // console.log(JSON.stringify({additionSearch: additionSearch.stringify(), additionElements: additionElements.map(e => e.stringify())}));
 
@@ -156,7 +163,7 @@ function getIndexOfAddition(additionElements, additionSearch) {
     return -1;
 }
 
-function variablesMatch(variables1, variables2) {
+function variablesMatch(variables1: ExpressionData | ElementData, variables2: ExpressionData | ElementData) {
     return variables1.stringify({ onlyVariables: true }) === variables2.stringify({ onlyVariables: true });
     // if (variables1.length !== variables2.length) return false;
     // else if (variables1.length === 0) return true;
@@ -174,7 +181,7 @@ function variablesMatch(variables1, variables2) {
     // return true;
 }
 
-function getIndexOfVariable(simplifiedElements, variablesSearch) {
+function getIndexOfVariable(simplifiedElements: Array<ExpressionData | ElementData>, variablesSearch: ExpressionData | ElementData) {
 
     // console.log(JSON.stringify({variablesSearch: variablesSearch, simplifiedElements: simplifiedElements}));
 
@@ -189,14 +196,14 @@ function getIndexOfVariable(simplifiedElements, variablesSearch) {
     return -1;
 }
 
-function distributiveMultiplication(distributives) {
+function distributiveMultiplication(distributives: Array<ExpressionData | ElementData>) {
 
     while (distributives.length > 1) {
 
         let biDistribution = []
 
-        const distrib1 = distributives.shift();
-        const distrib2 = distributives.shift();
+        let distrib1 = distributives.shift();
+        let distrib2 = distributives.shift();
 
         distrib1 = distrib1 instanceof ExpressionData
             ? distrib1.elements
@@ -272,12 +279,12 @@ function simpleMultiplication(multipliers) {
     });
 }
 
-function addNumbersWithSameVariables(adders) {
+function addNumbersWithSameVariables(adders: Array<ElementData>) {
     // console.log('start')
 
-    simplifiedElements = [];
+    let simplifiedElements: Array<ElementData> = [];
 
-    for (element of adders) {
+    for (let element of adders) {
 
         if (element.scalar !== 0) {
             const usedVariablesIndex = getIndexOfVariable(simplifiedElements, element);
@@ -288,9 +295,9 @@ function addNumbersWithSameVariables(adders) {
                 simplifiedElements.push(element);
             else
                 simplifiedElements[usedVariablesIndex] = new ElementData({
-                    scalar: Number.parseFloat(simplifiedElements[usedVariablesIndex].scalar) 
-                        + Number.parseFloat(element.scalar),
-                    variables: simplifiedElements[usedVariablesIndex].scalar + element.scalar === 0
+                    scalar: Number.parseFloat(simplifiedElements[usedVariablesIndex].scalar.toString()) 
+                        + Number.parseFloat(element.scalar.toString()),
+                    variables: simplifiedElements[usedVariablesIndex].scalar === 0 && element.scalar === 0
                         ? []
                         : element.variables,
                 });
@@ -625,7 +632,7 @@ function symplifyDenominators(addition) {
 
 }
 
-function doOperation(expression) {
+function doOperation(expression: ExpressionData): ExpressionData | ElementData {
 
     let scalar = null;
     let variables = null;
@@ -647,13 +654,13 @@ function doOperation(expression) {
             }
 
             let base = expression.elements[0];
-            let exponent = expression.elements[1].scalar;
+            let exponent = (expression.elements[1] as ElementData).scalar;
 
             // console.log(JSON.stringify({base, picles: exponent, jacaSeca: expression.elements[1]}))
 
             if (base instanceof ElementData) 
                 return new ElementData({
-                    scalar: Math.pow(base.scalar, exponent),
+                    scalar: Math.pow((base as ElementData).scalar as number, exponent),
                     variables: raiseVariablesExponent(base.variables, exponent)
                 })
 
@@ -664,7 +671,7 @@ function doOperation(expression) {
                         elements: [
                             base.elements[0],
                             new ElementData({
-                                scalar: base.elements[1].scalar * exponent
+                                scalar: ((base.elements[1] as ElementData).scalar as number) * (exponent as number)
                             })
                         ]
                     })
@@ -757,9 +764,9 @@ function doOperation(expression) {
 
         case Operator.Multiply:
 
-            let multipliers = [];
-            let distributives = [];
-            let elevations = [];
+            let multipliers: Array<ExpressionData | ElementData> = [];
+            let distributives: Array<ExpressionData | ElementData> = [];
+            let elevations: Array<ExpressionData | ElementData> = [];
 
             // console.log({jacaGrande: expression.stringify()})
 
@@ -772,7 +779,7 @@ function doOperation(expression) {
                         distributives.push(multiplier)
 
                     else if (multiplier.operator === Operator.Multiply) {
-                        for (elem of multiplier.elements) {
+                        for (let elem of multiplier.elements) {
                             
                             if (elem instanceof ElementData)
                                 multipliers.push(elem)
@@ -794,7 +801,9 @@ function doOperation(expression) {
                         multipliers.push(
                             new ElementData({
                                 variables: [
-                                    'ERRO'
+                                    new VariableData({
+                                        variable: 'ERRO'
+                                    })
                                 ]
                             })
                         );
@@ -1332,15 +1341,16 @@ function doOperation(expression) {
     
 }
 
-function stringifyExpression(expression) {
+function stringifyExpression(expression: any) {
     return isExpressionInstance(expression)
         ? expression.stringify()
         : expression.toString();
 }
 
-function simplifyExpressionAlgorithm(expression) {
+function simplifyExpressionAlgorithm(expression: ExpressionData | ElementData) {
 
-    if (isExpressionInstance(expression) && !expression.isSimplified) {
+    if (isExpressionInstance(expression) && !(expression as ExpressionData).isSimplified) {
+        expression = expression as ExpressionData;
     
         // console.log({
         //     expression: expression.stringify(),
