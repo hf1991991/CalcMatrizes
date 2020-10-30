@@ -20,6 +20,8 @@
 		99FF817F7280A856E6FAB811 /* libPods-calcmatrizes.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6009C5AFF729C8D341B82BDB /* libPods-calcmatrizes.a */; };
 		D86930DC0E51087E27AAEC80 /* libPods-calcmatrizes-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 967CF932F46D56682BE2DD2A /* libPods-calcmatrizes-tvOS.a */; };
 		DBBCC2E2D589DD3EB0B12CBA /* libPods-calcmatrizes-tvOSTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 85C9C35B24AA56C68CFFFF52 /* libPods-calcmatrizes-tvOSTests.a */; };
+		E5213A49254CC2310011ED3B /* assets in Resources */ = {isa = PBXBuildFile; fileRef = E5213A48254CC2310011ED3B /* assets */; };
+		E5A4C7EB2549E87F00714E81 /* main.jsbundle in Resources */ = {isa = PBXBuildFile; fileRef = 008F07F21AC5B25A0029DE68 /* main.jsbundle */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -64,6 +66,7 @@
 		967CF932F46D56682BE2DD2A /* libPods-calcmatrizes-tvOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-calcmatrizes-tvOS.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D05E3708FABB91092E79F415 /* Pods-calcmatrizes.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-calcmatrizes.debug.xcconfig"; path = "Target Support Files/Pods-calcmatrizes/Pods-calcmatrizes.debug.xcconfig"; sourceTree = "<group>"; };
 		DDABFC4DFCD6B74790BBACAB /* Pods-calcmatrizes-calcmatrizesTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-calcmatrizes-calcmatrizesTests.debug.xcconfig"; path = "Target Support Files/Pods-calcmatrizes-calcmatrizesTests/Pods-calcmatrizes-calcmatrizesTests.debug.xcconfig"; sourceTree = "<group>"; };
+		E5213A48254CC2310011ED3B /* assets */ = {isa = PBXFileReference; lastKnownFileType = folder; path = assets; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		ED2971642150620600B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS12.0.sdk/System/Library/Frameworks/JavaScriptCore.framework; sourceTree = DEVELOPER_DIR; };
 		EF90E98C33A71C6837D648DD /* Pods-calcmatrizes-tvOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-calcmatrizes-tvOS.debug.xcconfig"; path = "Target Support Files/Pods-calcmatrizes-tvOS/Pods-calcmatrizes-tvOS.debug.xcconfig"; sourceTree = "<group>"; };
@@ -174,6 +177,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				E5213A48254CC2310011ED3B /* assets */,
 				13B07FAE1A68108700A75B9A /* calcmatrizes */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* calcmatrizesTests */,
@@ -341,7 +345,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E5A4C7EB2549E87F00714E81 /* main.jsbundle in Resources */,
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
+				E5213A49254CC2310011ED3B /* assets in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -660,7 +666,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 16;
 				DEVELOPMENT_TEAM = 82L63Y7JQJ;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = calcmatrizes/Info.plist;
@@ -689,7 +695,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 16;
 				DEVELOPMENT_TEAM = 82L63Y7JQJ;
 				INFOPLIST_FILE = calcmatrizes/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
