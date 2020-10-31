@@ -198,13 +198,6 @@ class MatrixOperations {
     //     return fixed;
     // }
 
-    static parseFloatPreservingDotAndVariables(string: any) {
-        if (ExpressionSimplification.getVariables(string)) return string;
-        return string !== null && (string.toString().endsWith('.') || string.toString().startsWith('0.'))
-            ? string
-            : Number.parseFloat(string);
-    }
-
     static applyFrescuresToMatrixData(matrixData: Array<Array<ElementData | ExpressionData | number>>): Array<MatrixColumnData> {
         if (!matrixData) return [];
 
