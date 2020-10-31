@@ -59,6 +59,7 @@ interface CalculatorContextData {
     // ---- useCallbacks: ----
     undoHistory(): void;
     redoHistory(): void;
+    clearHistory(): void;
     getNumberWritten(params: GetNumberWrittenParams): ElementData | string | null;
     changeNumberWritten(params: ChangeNumberWrittenParams): void;
     changeEditableDimensions(params: MatrixDimensions): void;
@@ -671,7 +672,6 @@ export const CalculatorProvider: React.FC = ({ children }) => {
 
                 if (MatrixOperations.isMatrixEmpty(matrixOnScreen)) {
                     exitEditingMode();
-                    clearHistory();
                     changeSettingsOfSelectedMatrixElement(0);
                 }
             } else {
@@ -1050,6 +1050,7 @@ export const CalculatorProvider: React.FC = ({ children }) => {
                 // ---- useCallbacks: ----
                 undoHistory,
                 redoHistory,
+                clearHistory,
                 getNumberWritten,
                 changeNumberWritten,
                 changeEditableDimensions,

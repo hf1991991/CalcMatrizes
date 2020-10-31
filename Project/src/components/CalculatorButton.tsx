@@ -32,6 +32,7 @@ const CalculatorButton = ({ buttonType }: CalculatorButtonProps) => {
                 selectedOperator,
                 editableOperatorNumber,
                 isRActive,
+                clearHistory,
                 onPressAC,
                 onPressCE,
                 onPressLambdaxA,
@@ -176,6 +177,7 @@ const CalculatorButton = ({ buttonType }: CalculatorButtonProps) => {
                         return {
                             source: require('../../assets/buttons/AC.png'),
                             onPress: onPressAC,
+                            onLongPress: clearHistory
                         };
                     case ButtonType.CE:
                         return {
@@ -398,6 +400,7 @@ const CalculatorButton = ({ buttonType }: CalculatorButtonProps) => {
             }}
             disabled={buttonData.disabled || false}
             onPress={buttonData.onPress}
+            onLongPress={buttonData.onLongPress}
         >
             <Image
                 style={{
