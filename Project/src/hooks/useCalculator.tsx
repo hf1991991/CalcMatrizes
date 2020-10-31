@@ -1000,7 +1000,7 @@ export const CalculatorProvider: React.FC = ({ children }) => {
                     scalarFullEquationSetup({
                         newMatrix: MatrixOperations.multiplyMatrixByScalar({
                             matrixA: readyMatrix,
-                            scalar: editableScalar,
+                            scalar: editableScalar as ElementData,
                         }),
                         scalar: editableScalar,
                     });
