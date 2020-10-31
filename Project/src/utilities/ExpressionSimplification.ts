@@ -1,29 +1,9 @@
-import { count, Operator } from "./constants";
+import { Operator } from "./constants";
 import { ElementData, ExpressionData, VariableData } from "./ExpressionClasses";
 
 export function simplifyExpression(expression: ExpressionData) {
     return simplifyExpressionAlgorithm(expression);
     // return fixUnnecessaryScalars(simplifiedList);
-}
-
-
-export function getVariables(string: number | string) {
-    for (let variable of [
-        'a',
-        'b',
-        'c',
-        'd',
-        'e',
-        'f',
-        'g',
-        'h',
-        'i',
-    ]) {
-        if (!Number.isNaN(string) && (string || '').toString() !== 'Infinity' && count(string || '', variable, true) > 0) {
-            return variable;
-        }
-    }
-    return null;
 }
 
 export function isExpressionInstance(element: any) {
@@ -255,8 +235,8 @@ function simpleMultiplication(multipliers) {
 
     // console.log(JSON.stringify({multipliers}))
 
-    scalar = 1;
-    variables = []
+    let scalar = 1;
+    let variables = []
 
     for (let element of multipliers) {
 
@@ -634,9 +614,6 @@ function symplifyDenominators(addition) {
 
 function doOperation(expression: ExpressionData): ExpressionData | ElementData {
 
-    let scalar = null;
-    let variables = null;
-    let simplifiedElements = null;
     let element = null;
  
     switch (expression.operator) {
@@ -697,7 +674,7 @@ function doOperation(expression: ExpressionData): ExpressionData | ElementData {
 
             first = true;
 
-            for (let element of expression.elements) {
+            for (element of expression.elements) {
 
                 if (first)
                     multiplicationElements.push(element);
@@ -1286,7 +1263,7 @@ function doOperation(expression: ExpressionData): ExpressionData | ElementData {
 
             first = true;
 
-            for (let element of expression.elements) {
+            for (element of expression.elements) {
 
                 if (first)
                     elements.push(element);
