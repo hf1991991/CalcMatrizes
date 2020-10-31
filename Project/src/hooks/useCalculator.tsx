@@ -349,28 +349,21 @@ export const CalculatorProvider: React.FC = ({ children }) => {
     );
 
     const onPressNumberButton = useCallback(
-        (element: string | number) => {
+        (element: string) => {
 
-            const originalValue = getNumberWritten({ doNotStringify: true });
+            const originalValue = getNumberWritten({ doNotStringify: true }) as ElementData;
 
-            console.log({
-                originalValue,
-                string: getNumberWritten()
-            });
-
-            const letters = /^[a-i]+$/;
-
-            if (element.toString().match(letters))
+            if (element.match(/^[a-i]+$/))
                 changeNumberWritten({
                     newNumber: new ElementData({
                         scalar: originalValue !== null
-                            ? (originalValue as ElementData).scalar
+                            ? originalValue.scalar
                             : 1,
                         variables: [
                             new VariableData({
                                 variable: element
                             }),
-                            ...((originalValue !== null && (originalValue as ElementData).variables) || [])
+                            ...((originalValue !== null && originalValue.variables) || [])
                         ]
                     })
                 });
@@ -388,12 +381,12 @@ export const CalculatorProvider: React.FC = ({ children }) => {
                     newNumber: new ElementData({
                         scalar: originalValue === null
                             ? element
-                            : !!(originalValue as ElementData).unfilteredString 
-                                ? ((originalValue as ElementData).unfilteredString as string) + element
-                                : (originalValue as ElementData).variables.length === 0 || (originalValue as ElementData).scalar !== 1
-                                    ? (originalValue as ElementData).scalar.toString() + element
+                            : !!originalValue.unfilteredString 
+                                ? (originalValue.unfilteredString as string) + element
+                                : originalValue.variables.length === 0 || originalValue.scalar !== 1
+                                    ? originalValue.scalar.toString() + element
                                     : element,
-                        variables: (originalValue !== null && (originalValue as ElementData).variables) || []
+                        variables: (originalValue !== null && originalValue.variables) || []
                     })
                 });
             }

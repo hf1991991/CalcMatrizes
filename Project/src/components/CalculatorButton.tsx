@@ -56,61 +56,61 @@ const CalculatorButton = ({ buttonType }: CalculatorButtonProps) => {
                         return {
                             source: require('../../assets/buttons/0.png'),
                             flex: 2,
-                            onPress: () => onPressNumberButton(0),
+                            onPress: () => onPressNumberButton('0'),
                             disabled: !isNumberKeyboardActive || isVariableKeyboardActive,
                         };
                     case ButtonType.One:
                         return {
                             source: require('../../assets/buttons/1.png'),
-                            onPress: () => onPressNumberButton(1),
+                            onPress: () => onPressNumberButton('1'),
                             disabled: !isNumberKeyboardActive,
                         };
                     case ButtonType.Two:
                         return {
                             source: require('../../assets/buttons/2.png'),
-                            onPress: () => onPressNumberButton(2),
+                            onPress: () => onPressNumberButton('2'),
                             disabled: !isNumberKeyboardActive,
                         };
                     case ButtonType.Three:
                         return {
                             source: require('../../assets/buttons/3.png'),
-                            onPress: () => onPressNumberButton(3),
+                            onPress: () => onPressNumberButton('3'),
                             disabled: !isNumberKeyboardActive,
                         };
                     case ButtonType.Four:
                         return {
                             source: require('../../assets/buttons/4.png'),
-                            onPress: () => onPressNumberButton(4),
+                            onPress: () => onPressNumberButton('4'),
                             disabled: !isNumberKeyboardActive,
                         };
                     case ButtonType.Five:
                         return {
                             source: require('../../assets/buttons/5.png'),
-                            onPress: () => onPressNumberButton(5),
+                            onPress: () => onPressNumberButton('5'),
                             disabled: !isNumberKeyboardActive,
                         };
                     case ButtonType.Six:
                         return {
                             source: require('../../assets/buttons/6.png'),
-                            onPress: () => onPressNumberButton(6),
+                            onPress: () => onPressNumberButton('6'),
                             disabled: !isNumberKeyboardActive,
                         };
                     case ButtonType.Seven:
                         return {
                             source: require('../../assets/buttons/7.png'),
-                            onPress: () => onPressNumberButton(7),
+                            onPress: () => onPressNumberButton('7'),
                             disabled: !isNumberKeyboardActive,
                         };
                     case ButtonType.Eight:
                         return {
                             source: require('../../assets/buttons/8.png'),
-                            onPress: () => onPressNumberButton(8),
+                            onPress: () => onPressNumberButton('8'),
                             disabled: !isNumberKeyboardActive,
                         };
                     case ButtonType.Nine:
                         return {
                             source: require('../../assets/buttons/9.png'),
-                            onPress: () => onPressNumberButton(9),
+                            onPress: () => onPressNumberButton('9'),
                             disabled: !isNumberKeyboardActive,
                         };
                     case ButtonType.Comma:

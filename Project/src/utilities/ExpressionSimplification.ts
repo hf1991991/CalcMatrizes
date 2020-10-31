@@ -730,7 +730,9 @@ function doOperation(expression: ExpressionData): ExpressionData | ElementData {
                             console.log('ERRO em doOperation: divisão por zero.')
                             return new ElementData({
                                 variables: [
-                                    'ERRO'
+                                    new VariableData({
+                                        variable: 'ERRO'
+                                    })
                                 ]
                             });
 
