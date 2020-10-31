@@ -381,9 +381,7 @@ export const CalculatorProvider: React.FC = ({ children }) => {
                     newNumber: new ElementData({
                         scalar: originalValue === null
                             ? element
-                            : (originalValue as ElementData).scalar !== 1
-                                ? (originalValue as ElementData).scalar.toString() + element
-                                : element,
+                            : (originalValue as ElementData).scalar.toString() + element,
                         variables: (originalValue !== null && (originalValue as ElementData).variables) || []
                     })
                 });
