@@ -18,6 +18,7 @@ const MatrixArea: React.FC = () => {
     const { 
         calcState,
         matrixOnScreen,
+        matrixOnScreenDeterminant,
         selectedMatrixElement,
         editableDimensions,
         editableScalar,
@@ -154,7 +155,7 @@ const MatrixArea: React.FC = () => {
                                         >
                                             {
                                                 formatDeterminant({
-                                                    determinant: MatrixOperations.determinant(matrixOnScreen),
+                                                    determinant: matrixOnScreenDeterminant,
                                                     overflow: false,
                                                     det: false
                                                 })
@@ -243,7 +244,7 @@ const MatrixArea: React.FC = () => {
                                     : null
                         : !operationHappening
                                 && formatDeterminant({
-                                    determinant: MatrixOperations.determinant(matrixOnScreen)
+                                    determinant: matrixOnScreenDeterminant
                                 })
                 }
                 bottomMiddleText={

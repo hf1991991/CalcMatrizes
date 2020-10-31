@@ -49,6 +49,7 @@ interface CalculatorContextData {
     matrixOnScreen: MatrixData;
     isMatrixSquare: boolean;
     isMatrixFull: boolean;
+    matrixOnScreenDeterminant: ElementData | null;
     isInverseEnabled: boolean;
     isCheckActive: boolean;
     shouldACAppear: boolean;
@@ -178,10 +179,20 @@ export const CalculatorProvider: React.FC = ({ children }) => {
         [matrixOnScreen]
     );
 
+    const matrixOnScreenDeterminant = useMemo(
+        () => isMatrixFull && isMatrixSquare
+            ? MatrixOperations.partialGaussianElimination({
+                matrixA: matrixOnScreen,
+                matrixB: MatrixOperations.identity(matrixOnScreen.dimensions().rows)
+            }).determinant
+            : null,
+        [isMatrixFull, isMatrixSquare, matrixOnScreen]
+    );
+
     const isInverseEnabled = useMemo(
         () => MatrixOperations.isMatrixFull(matrixOnScreen)
             && MatrixOperations.isMatrixSquare(matrixOnScreen)
-            && MatrixOperations.determinant(matrixOnScreen).scalar !== 0,
+            && matrixOnScreenDeterminant?.scalar !== 0,
         [matrixOnScreen]
     );
 
@@ -430,9 +441,9 @@ export const CalculatorProvider: React.FC = ({ children }) => {
                 changeNumberWritten({
                     newNumber: varOperation(
                         notOperatorNumberWritten,
-                        selectedOperator,
+                        selectedOperator as Operator,
                         editableOperatorNumber
-                    ),
+                    ) as ElementData,
                     forceNotOperatorNumber: true,
                 });
         }, [editableOperatorNumber, notOperatorNumberWritten, selectedOperator, resetScalarOperations, changeNumberWritten, getNumberWritten]
@@ -1057,6 +1068,7 @@ export const CalculatorProvider: React.FC = ({ children }) => {
                 matrixOnScreen,
                 isMatrixSquare,
                 isMatrixFull,
+                matrixOnScreenDeterminant,
                 isInverseEnabled,
                 isCheckActive,
                 shouldACAppear,
