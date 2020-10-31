@@ -10,7 +10,7 @@ import { ElementData } from '../utilities/ExpressionClasses';
 const ButtonsArea: React.FC = () => {
     const { 
         calcState, 
-        getNumberWritten,
+        shouldACAppear,
         editableOperatorNumber,
         isNumberKeyboardActive,
         selectedMatrixElement,
@@ -44,7 +44,7 @@ const ButtonsArea: React.FC = () => {
             >
                 <CalculatorButton
                     buttonType={
-                        ((getNumberWritten({ doNotStringify: true }) as ElementData)?.scalar == 0) || calcState === CalcState.ready
+                        shouldACAppear
                             ? ButtonType.AC
                             : ButtonType.CE
                     }

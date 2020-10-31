@@ -13,11 +13,6 @@ interface MatrixHistory {
     currentPosition: number;
 }
 
-interface GetNumberWrittenParams { 
-    forceNotOperatorNumber?: boolean;
-    doNotStringify?: boolean; 
-}
-
 interface ChangeNumberWrittenParams { 
     newNumber: ElementData; 
     forceNotOperatorNumber?: boolean;
@@ -56,11 +51,11 @@ interface CalculatorContextData {
     isMatrixFull: boolean;
     isInverseEnabled: boolean;
     isCheckActive: boolean;
+    shouldACAppear: boolean;
     // ---- useCallbacks: ----
     undoHistory(): void;
     redoHistory(): void;
     clearHistory(): void;
-    getNumberWritten(params: GetNumberWrittenParams): ElementData | string | null;
     changeNumberWritten(params: ChangeNumberWrittenParams): void;
     changeEditableDimensions(params: MatrixDimensions): void;
     changeSelectedMatrixElement(selectedElement: SelectedMatrixElement): void;
@@ -130,7 +125,7 @@ export const CalculatorProvider: React.FC = ({ children }) => {
     const [isRActive, setIsRActive] = useState(false);
     const [columnDirectionActive, setColumnDirectionActive] = useState(true);
     const [isVariableKeyboardActive, setIsVariableKeyboardActive] = useState(false);
-    const [selectedOperator, setSelectedOperator] = useState(null);
+    const [selectedOperator, setSelectedOperator] = useState<Operator | null>(null);
 
     const setReadyMatrix = useCallback(
         (newMatrix: MatrixData) => {
@@ -260,12 +255,7 @@ export const CalculatorProvider: React.FC = ({ children }) => {
     );
 
     const getNumberWritten = useCallback(
-        (
-            { 
-                forceNotOperatorNumber = false, 
-                doNotStringify = false 
-            }: GetNumberWrittenParams = ({} as GetNumberWrittenParams)
-        ): ElementData | string | null => {
+        (forceNotOperatorNumber: boolean, doNotStringify: boolean): ElementData | string | null => {
 
             if (operationHappening && !forceNotOperatorNumber)
                 return editableOperatorNumber === null && !doNotStringify
@@ -288,15 +278,36 @@ export const CalculatorProvider: React.FC = ({ children }) => {
                     )
                 ) && !forceNotOperatorNumber
             )
-                return doNotStringify
-                    ? null
-                    : '';
+                return doNotStringify ? null : '';
 
             return doNotStringify
                 ? matrixNumber as ElementData
                 : (matrixNumber as ElementData)?.commaStringify({ dontFindFraction: true });
 
         }, [calcState, editableMatrix, shouldUserInputOverwriteElement, editableScalar, operationHappening, selectedMatrixElement, editableOperatorNumber]
+    );
+
+    const stringifiedNumberWritten = useMemo(
+        () => getNumberWritten(false, false) as string,
+        [getNumberWritten]
+    );
+
+    const elementDataNumberWritten = useMemo(
+        () => getNumberWritten(false, true) as ElementData,
+        [getNumberWritten]
+    );
+
+    const notOperatorNumberWritten = useMemo(
+        () => getNumberWritten(true, true) as ElementData,
+        [getNumberWritten]
+    );
+
+    const shouldACAppear = useMemo(
+        () => (
+            elementDataNumberWritten?.scalar === 0 
+            || calcState === CalcState.ready
+        ),
+        [elementDataNumberWritten, calcState]
     );
 
     const changeNumberWritten = useCallback(
@@ -351,7 +362,7 @@ export const CalculatorProvider: React.FC = ({ children }) => {
     const onPressNumberButton = useCallback(
         (element: string) => {
 
-            const originalValue = getNumberWritten({ doNotStringify: true }) as ElementData;
+            const originalValue = elementDataNumberWritten;
 
             if (element.match(/^[a-i]+$/))
                 changeNumberWritten({
@@ -368,14 +379,14 @@ export const CalculatorProvider: React.FC = ({ children }) => {
                     })
                 });
 
-            else if ((getNumberWritten() as string).length === 0 && element === '.')
+            else if (stringifiedNumberWritten.length === 0 && element === '.')
                 changeNumberWritten({
                     newNumber: new ElementData({
                         unfilteredString: '0.'
                     })
                 });
 
-            else if (count(getNumberWritten(), /\.|,/, true) === 0 || element !== '.') {
+            else if (count(stringifiedNumberWritten, /\.|,/, true) === 0 || element !== '.') {
 
                 changeNumberWritten({
                     newNumber: new ElementData({
@@ -393,7 +404,7 @@ export const CalculatorProvider: React.FC = ({ children }) => {
 
             setShouldUserInputOverwriteElement(false);
 
-        }, [selectedMatrixElement, getNumberWritten, changeNumberWritten]
+        }, [elementDataNumberWritten, stringifiedNumberWritten, selectedMatrixElement, getNumberWritten, changeNumberWritten]
     );
 
     const changeSettingsOfSelectedMatrixElement = useCallback(
@@ -418,13 +429,13 @@ export const CalculatorProvider: React.FC = ({ children }) => {
             if (editableOperatorNumber !== null)
                 changeNumberWritten({
                     newNumber: varOperation(
-                        getNumberWritten({ forceNotOperatorNumber: true, doNotStringify: true }),
+                        notOperatorNumberWritten,
                         selectedOperator,
                         editableOperatorNumber
                     ),
                     forceNotOperatorNumber: true,
                 });
-        }, [editableOperatorNumber, selectedOperator, resetScalarOperations, changeNumberWritten, getNumberWritten]
+        }, [editableOperatorNumber, notOperatorNumberWritten, selectedOperator, resetScalarOperations, changeNumberWritten, getNumberWritten]
     );
 
     const enterEditingMode = useCallback(
@@ -1048,11 +1059,11 @@ export const CalculatorProvider: React.FC = ({ children }) => {
                 isMatrixFull,
                 isInverseEnabled,
                 isCheckActive,
+                shouldACAppear,
                 // ---- useCallbacks: ----
                 undoHistory,
                 redoHistory,
                 clearHistory,
-                getNumberWritten,
                 changeNumberWritten,
                 changeEditableDimensions,
                 changeSelectedMatrixElement,
