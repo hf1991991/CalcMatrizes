@@ -87,6 +87,9 @@ export function decimalPlaces(number: number | string) {
 const PRECISION = 6;
 
 export function smartToFixed(element: number) {
+
+    if (!element.toString().match(/\./)) return element;
+
     // A precisao define quantos zeros ou noves seguidos apos a virgula a funcao deveria aceitar para que ela arredende o numero:
     function lastDigitIndex(string: string) {
         let index = 0;
@@ -94,12 +97,12 @@ export function smartToFixed(element: number) {
         for (let i = 0; i < string.length - 1; i++) {
             const substring = string.substring(i + 1, i + 2);
             const lastSubstring = string.substring(i, i + 1);
-            if (substring !== lastSubstring || (substring !== "0" && substring !== "9")) {
+            if (substring !== lastSubstring || !substring.match(/0|9/)) {
                 repetitions = 0;
-                index = i;
+                index = i + 1;
             }
             else repetitions += 1;
-            if (repetitions === PRECISION) return index + 1;
+            if (repetitions === PRECISION) return index;
         }
         return null;
     }

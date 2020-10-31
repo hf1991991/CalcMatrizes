@@ -565,7 +565,7 @@ class MatrixOperations {
         return {
             matrixA: MatrixOperations.copyMatrixData(_matrixA),
             matrixB: MatrixOperations.copyMatrixData(_matrixB),
-            determinant: smartToFixed(determinant), 
+            determinant, 
         };
         // return arredondamento_na_raca(determinant, 6);
     }

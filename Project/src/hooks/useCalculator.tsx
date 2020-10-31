@@ -376,7 +376,7 @@ export const CalculatorProvider: React.FC = ({ children }) => {
                     })
                 });
 
-            else if (count(getNumberWritten(), /\./, true) === 0 || element !== '.') {
+            else if (count(getNumberWritten(), /\.|,/, true) === 0 || element !== '.') {
 
                 changeNumberWritten({
                     newNumber: new ElementData({
