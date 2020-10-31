@@ -67,18 +67,18 @@ export class ExpressionData {
 interface ElementDataParams {
     variables?: Array<VariableData>;
     scalar?: number | string;
-    unfilteredString?: boolean;
+    unfilteredString?: string;
 }
 
 export class ElementData {
 
     variables: Array<VariableData>;
-    scalar: number | string;
-    unfilteredString: boolean;
+    scalar: number;
+    unfilteredString: string | undefined;
 
-    constructor({ variables=[], scalar=1, unfilteredString=false }: ElementDataParams) {
+    constructor({ variables=[], scalar=1, unfilteredString }: ElementDataParams) {
         this.variables = variables;
-        this.scalar = (unfilteredString || Number.isNaN(scalar)) ? scalar : smartToFixed(scalar as number);
+        this.scalar = smartToFixed(Number.parseFloat(scalar.toString()));
         this.unfilteredString = unfilteredString;
 
         this.fixVariables()
@@ -122,6 +122,8 @@ export class ElementData {
     }
 
     stringify({ onlyVariables=false, dontFindFraction=false }={}) {
+
+        if (!!this.unfilteredString) return this.unfilteredString;
 
         const findPossibleFraction =
             (number: number | string) => dontFindFraction || Number.isNaN(number)

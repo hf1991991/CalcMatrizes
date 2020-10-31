@@ -284,6 +284,7 @@ export const CalculatorProvider: React.FC = ({ children }) => {
                     || (
                         matrixNumber instanceof ElementData
                         && matrixNumber.scalar === 0
+                        && !matrixNumber.unfilteredString
                     )
                 ) && !forceNotOperatorNumber
             )
@@ -352,6 +353,11 @@ export const CalculatorProvider: React.FC = ({ children }) => {
 
             const originalValue = getNumberWritten({ doNotStringify: true });
 
+            console.log({
+                originalValue,
+                string: getNumberWritten()
+            });
+
             const letters = /^[a-i]+$/;
 
             if (element.toString().match(letters))
@@ -372,7 +378,7 @@ export const CalculatorProvider: React.FC = ({ children }) => {
             else if ((getNumberWritten() as string).length === 0 && element === '.')
                 changeNumberWritten({
                     newNumber: new ElementData({
-                        scalar: '0.'
+                        unfilteredString: '0.'
                     })
                 });
 
@@ -382,9 +388,11 @@ export const CalculatorProvider: React.FC = ({ children }) => {
                     newNumber: new ElementData({
                         scalar: originalValue === null
                             ? element
-                            : (originalValue as ElementData).variables.length === 0 || (originalValue as ElementData).scalar !== 1
-                                ? (originalValue as ElementData).scalar.toString() + element
-                                : element,
+                            : !!(originalValue as ElementData).unfilteredString 
+                                ? ((originalValue as ElementData).unfilteredString as string) + element
+                                : (originalValue as ElementData).variables.length === 0 || (originalValue as ElementData).scalar !== 1
+                                    ? (originalValue as ElementData).scalar.toString() + element
+                                    : element,
                         variables: (originalValue !== null && (originalValue as ElementData).variables) || []
                     })
                 });

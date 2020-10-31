@@ -111,7 +111,7 @@ export function smartToFixed(element: number) {
     
     // console.log({element, lastDig: lastDigitIndex(digits)});
     if (lastDigitIndex(digits) !== null) {
-        return element.toFixed(lastDigitIndex(digits) as number);
+        return Number.parseFloat(element.toFixed(lastDigitIndex(digits) as number));
     }
     else
         return element;
