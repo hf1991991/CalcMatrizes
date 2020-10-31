@@ -42,14 +42,15 @@ const MatrixArea: React.FC = () => {
             return number !== null 
                 ? findFraction(toFixedOnZeroes(number))
                 : null;
-        }, []
+        }, [findFraction, toFixedOnZeroes]
     );
 
     const formatDeterminant = useCallback(
         ({ determinant, overflow=true, det=true }) => {
             if (determinant === null) return null
             let stringDeterminant = determinant?.commaStringify();
-            if (stringDeterminant.length > 8 && overflow) stringDeterminant = stringDeterminant.substring(0, 8 - 3) + '...';
+            if (stringDeterminant.length > 8 && overflow) 
+                stringDeterminant = stringDeterminant.substring(0, 8 - 3) + '...';
             if (stringDeterminant && !ScalarOperations.isNumber(stringDeterminant)) 
                 return det
                     ? `det: ${stringDeterminant}`
