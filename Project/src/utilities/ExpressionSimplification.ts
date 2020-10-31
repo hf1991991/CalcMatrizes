@@ -212,8 +212,8 @@ function distributiveMultiplication(distributives: Array<ExpressionData | Elemen
             ? distrib2.elements
             : distrib2;
     
-        for (distElement1 of distrib1) {
-            for (distElement2 of distrib2) {
+        for (let distElement1 of distrib1) {
+            for (let distElement2 of distrib2) {
                 // console.log('ENTERING MULTIPLICATION SUB-LOOP')
                 // console.log({distElement1: distElement1.stringify(), distElement2: distElement2.stringify()})
                 biDistribution.push(
@@ -258,7 +258,7 @@ function simpleMultiplication(multipliers) {
     scalar = 1;
     variables = []
 
-    for (element of multipliers) {
+    for (let element of multipliers) {
 
         if (element.scalar === 0)
             return new ElementData({
@@ -324,7 +324,7 @@ function symplifyDenominators(addition) {
                 denominators
             };
 
-        for (e of elem.elements) {
+        for (let e of elem.elements) {
             // console.log(JSON.stringify({e}))
             if (e instanceof ExpressionData && e.operator === Operator.Elevate && e.elements[1].scalar < 0) 
                 denominators.push(e);
@@ -357,7 +357,7 @@ function symplifyDenominators(addition) {
 
     function denominatorsMatch(denominators1, denominators2) {
 
-        for (denominator1 of denominators1) {
+        for (let denominator1 of denominators1) {
 
             match = false;
 
@@ -697,7 +697,7 @@ function doOperation(expression: ExpressionData): ExpressionData | ElementData {
 
             first = true;
 
-            for (element of expression.elements) {
+            for (let element of expression.elements) {
 
                 if (first)
                     multiplicationElements.push(element);
@@ -838,7 +838,7 @@ function doOperation(expression: ExpressionData): ExpressionData | ElementData {
 
             let simplifiedElevations = []
 
-            for (elevationElement of elevations) {
+            for (let elevationElement of elevations) {
 
                 base = elevationElement.elements[0];
                 exponent = elevationElement.elements[1].scalar;
@@ -1214,14 +1214,14 @@ function doOperation(expression: ExpressionData): ExpressionData | ElementData {
             let adders = [];
             let notAdders = [];
 
-            for (adderElement of expression.elements) {
+            for (let adderElement of expression.elements) {
 
                 // Se adderElement for um ExpressionData:
                 if (adderElement instanceof ExpressionData) {
 
                     if (adderElement.operator === Operator.Add) {
 
-                        for (elem of adderElement.elements) {
+                        for (let elem of adderElement.elements) {
                             if (elem instanceof ElementData && elem.scalar !== 0) 
                                 adders.push(elem)
 
@@ -1247,7 +1247,7 @@ function doOperation(expression: ExpressionData): ExpressionData | ElementData {
             //     notAdders: notAdders.map(a => a.stringify())
             // });
 
-            simplifiedAdders = addNumbersWithSameVariables(
+            let simplifiedAdders = addNumbersWithSameVariables(
                 addNumbersWithSameVariables(adders)
             );
 
@@ -1286,7 +1286,7 @@ function doOperation(expression: ExpressionData): ExpressionData | ElementData {
 
             first = true;
 
-            for (element of expression.elements) {
+            for (let element of expression.elements) {
 
                 if (first)
                     elements.push(element);

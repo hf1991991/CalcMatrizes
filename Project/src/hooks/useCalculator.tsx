@@ -180,12 +180,16 @@ export const CalculatorProvider: React.FC = ({ children }) => {
     );
 
     const matrixOnScreenDeterminant = useMemo(
-        () => isMatrixFull && isMatrixSquare
-            ? MatrixOperations.partialGaussianElimination({
-                matrixA: matrixOnScreen,
-                matrixB: MatrixOperations.identity(matrixOnScreen.dimensions().rows)
-            }).determinant
-            : null,
+        () => {
+            const determinant = isMatrixFull && isMatrixSquare
+                ? MatrixOperations.partialGaussianElimination({
+                    matrixA: matrixOnScreen,
+                    matrixB: MatrixOperations.identity(matrixOnScreen.dimensions().rows)
+                }).determinant
+                : null
+            console.log({ determinant: determinant?.commaStringify() });
+            return determinant;
+        },
         [isMatrixFull, isMatrixSquare, matrixOnScreen]
     );
 
