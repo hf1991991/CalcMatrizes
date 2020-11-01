@@ -13,8 +13,8 @@ interface MatrixHistory {
     currentPosition: number;
 }
 
-interface ChangeNumberWrittenParams { 
-    newNumber: ElementData; 
+interface ChangeNumberWrittenParams {
+    newNumber: ElementData;
     forceNotOperatorNumber?: boolean;
 }
 
@@ -28,7 +28,6 @@ interface CalculatorContextData {
     matrixHistory: MatrixHistory;
     selectedMatrixElement: SelectedMatrixElement | null;
     shouldUserInputOverwriteElement: boolean;
-    editableDimensions: MatrixDimensions;
     // Estados de escalares:
     editableScalar: ElementData | null;
     fullScreenDeterminant: boolean;
@@ -45,6 +44,8 @@ interface CalculatorContextData {
     isVariableKeyboardActive: boolean;
     selectedOperator: Operator | null;
     // ---- useMemos: ----
+    editableDimensions: MatrixDimensions;
+    editableDimensionsString: string;
     isNumberKeyboardActive: boolean;
     matrixOnScreen: MatrixData;
     isMatrixSquare: boolean;
@@ -77,8 +78,8 @@ interface CalculatorContextData {
     onPressOperator(operator: Operator): void;
     onPressR(): void;
     onPressResolveEquation(newState: CalcState): void;
-    onPressGaussianElimination(): void; 
-    onPressGaussianEliminationReduced(): void; 
+    onPressGaussianElimination(): void;
+    onPressGaussianEliminationReduced(): void;
     onTranspose(): void;
     onInvert(): void;
     onEnter(): void;
@@ -108,7 +109,6 @@ export const CalculatorProvider: React.FC = ({ children }) => {
         column: 0,
     });
     const [shouldUserInputOverwriteElement, setShouldUserInputOverwriteElement] = useState(true);
-    const [editableDimensions, setEditableDimensions] = useState(INITIAL_MATRIX.dimensions());
 
     // Estados de escalares:
     const [editableScalar, setEditableScalar] = useState<ElementData | null>(null);
@@ -139,7 +139,7 @@ export const CalculatorProvider: React.FC = ({ children }) => {
 
             if (!MatrixOperations.compareMatrices(newMatrix, newHistory[newHistory.length - 1]))
                 setMatrixHistory({
-                    history: [ ...newHistory, MatrixOperations.copyMatrixData(newMatrix) ],
+                    history: [...newHistory, MatrixOperations.copyMatrixData(newMatrix)],
                     currentPosition: currentPosition + 1
                 });
 
@@ -156,6 +156,18 @@ export const CalculatorProvider: React.FC = ({ children }) => {
             ? readyMatrix
             : editableMatrix,
         [calcState, readyMatrix, editableMatrix]
+    );
+
+    const editableDimensions = useMemo(
+        () => matrixOnScreen.dimensions(),
+        [matrixOnScreen]
+    );
+
+    const editableDimensionsString = useMemo(
+        () => editableDimensions
+            ? `${editableDimensions.rows}x${editableDimensions.columns}`
+            : '',
+        [editableDimensions]
     );
 
     const changeMatrixOnScreen = useMemo(
@@ -242,7 +254,7 @@ export const CalculatorProvider: React.FC = ({ children }) => {
                     currentPosition: currentPosition - 1
                 }
             );
-            
+
             _setReadyMatrix(
                 MatrixOperations.copyMatrixData(history[currentPosition - 1])
             );
@@ -261,7 +273,7 @@ export const CalculatorProvider: React.FC = ({ children }) => {
                     currentPosition: currentPosition + 1
                 }
             );
-            
+
             _setReadyMatrix(
                 MatrixOperations.copyMatrixData(history[currentPosition + 1])
             );
@@ -319,7 +331,7 @@ export const CalculatorProvider: React.FC = ({ children }) => {
 
     const shouldACAppear = useMemo(
         () => (
-            elementDataNumberWritten?.scalar === 0 
+            elementDataNumberWritten?.scalar === 0
             || calcState === CalcState.ready
         ),
         [elementDataNumberWritten, calcState]
@@ -327,9 +339,9 @@ export const CalculatorProvider: React.FC = ({ children }) => {
 
     const changeNumberWritten = useCallback(
         (
-            { 
-                newNumber, 
-                forceNotOperatorNumber = false 
+            {
+                newNumber,
+                forceNotOperatorNumber = false
             }: ChangeNumberWrittenParams
         ) => {
 
@@ -346,7 +358,7 @@ export const CalculatorProvider: React.FC = ({ children }) => {
                     numberWritten: newNumber
                 }));
 
-        }, 
+        },
         [
             calcState,
             readyMatrix,
@@ -407,7 +419,7 @@ export const CalculatorProvider: React.FC = ({ children }) => {
                     newNumber: new ElementData({
                         scalar: originalValue === null
                             ? element
-                            : !!originalValue.unfilteredString 
+                            : !!originalValue.unfilteredString
                                 ? (originalValue.unfilteredString as string) + element
                                 : originalValue.variables.length === 0 || originalValue.scalar !== 1
                                     ? originalValue.scalar.toString() + element
@@ -459,7 +471,6 @@ export const CalculatorProvider: React.FC = ({ children }) => {
 
             setFullEquation(null);
             setEditableMatrix(newEditableMatrix)
-            setEditableDimensions(newEditableMatrix ? newEditableMatrix.dimensions() : null);
 
             setSolutionType(null);
 
@@ -471,7 +482,6 @@ export const CalculatorProvider: React.FC = ({ children }) => {
             setCalcState,
             setFullEquation,
             setEditableMatrix,
-            setEditableDimensions,
             setSolutionType,
             setEditableScalar,
             changeSettingsOfSelectedMatrixElement
@@ -658,7 +668,6 @@ export const CalculatorProvider: React.FC = ({ children }) => {
 
     const changeEditableDimensions = useCallback(
         ({ rows, columns }: MatrixDimensions) => {
-            setEditableDimensions({ rows, columns });
             setEditableMatrix(
                 MatrixOperations.resizeMatrix({
                     originalMatrix: calcState === CalcState.editing
@@ -681,7 +690,6 @@ export const CalculatorProvider: React.FC = ({ children }) => {
             readyMatrix,
             editableMatrix,
             selectedMatrixElement,
-            setEditableDimensions,
             setEditableMatrix,
             setSelectedMatrixElement,
         ]
@@ -862,8 +870,8 @@ export const CalculatorProvider: React.FC = ({ children }) => {
             editableMatrix,
             isRActive,
             matrixOnScreen,
-            setIsRActive, 
-            setReadyMatrix, 
+            setIsRActive,
+            setReadyMatrix,
             enterEditingMode
         ]
     );
@@ -905,10 +913,6 @@ export const CalculatorProvider: React.FC = ({ children }) => {
 
             else {
                 setEditableMatrix(MatrixOperations.transpose(editableMatrix));
-                setEditableDimensions({
-                    rows: editableDimensions.columns,
-                    columns: editableDimensions.rows,
-                });
 
                 changeSettingsOfSelectedMatrixElement({
                     row: selectedMatrixElement?.column,
@@ -925,9 +929,8 @@ export const CalculatorProvider: React.FC = ({ children }) => {
             editableMatrix,
             selectedMatrixElement,
             editableDimensions,
-            setReadyMatrix, 
-            setEditableMatrix, 
-            setEditableDimensions, 
+            setReadyMatrix,
+            setEditableMatrix,
             changeSettingsOfSelectedMatrixElement,
             singleInputFullEquationSetup
         ]
@@ -959,8 +962,8 @@ export const CalculatorProvider: React.FC = ({ children }) => {
             calcState,
             readyMatrix,
             editableMatrix,
-            setReadyMatrix, 
-            setEditableMatrix, 
+            setReadyMatrix,
+            setEditableMatrix,
             changeSettingsOfSelectedMatrixElement,
             exitEditingMode,
             singleInputFullEquationSetup
@@ -1031,9 +1034,9 @@ export const CalculatorProvider: React.FC = ({ children }) => {
             readyMatrix,
             editableMatrix,
             editableScalar,
-            setReadyMatrix, 
+            setReadyMatrix,
             generalFullEquationSetup,
-            scalarFullEquationSetup, 
+            scalarFullEquationSetup,
             solveOperationsFullEquationSetup,
             exitEditingMode
         ]
@@ -1051,7 +1054,6 @@ export const CalculatorProvider: React.FC = ({ children }) => {
                 matrixHistory,
                 selectedMatrixElement,
                 shouldUserInputOverwriteElement,
-                editableDimensions,
                 // Estados de escalares:
                 editableScalar,
                 fullScreenDeterminant,
@@ -1068,6 +1070,8 @@ export const CalculatorProvider: React.FC = ({ children }) => {
                 isVariableKeyboardActive,
                 selectedOperator,
                 // ---- useMemos: ----
+                editableDimensions,
+                editableDimensionsString,
                 isNumberKeyboardActive,
                 matrixOnScreen,
                 isMatrixSquare,
@@ -1100,8 +1104,8 @@ export const CalculatorProvider: React.FC = ({ children }) => {
                 onPressOperator,
                 onPressR,
                 onPressResolveEquation,
-                onPressGaussianElimination, 
-                onPressGaussianEliminationReduced, 
+                onPressGaussianElimination,
+                onPressGaussianEliminationReduced,
                 onTranspose,
                 onInvert,
                 onEnter,

@@ -15,12 +15,13 @@ const BUTTON_AREAS_CROSS_WIDTH = 70;
 const MatrixArea: React.FC = () => {
     const { isPortrait } = useOrientation();
 
-    const { 
+    const {
         calcState,
         matrixOnScreen,
         matrixOnScreenDeterminant,
         selectedMatrixElement,
         editableDimensions,
+        editableDimensionsString,
         editableScalar,
         changeViewReduced,
         onPressGaussianEliminationReduced,
@@ -34,30 +35,30 @@ const MatrixArea: React.FC = () => {
         viewReduced,
         fullScreenDeterminant
     } = useCalculator();
- 
+
     const [matrixAreaWidth, changeMatrixAreaWidth] = useState(0);
- 
+
     const formatNumberToFraction = useCallback(
         (number) => {
-            return number !== null 
+            return number !== null
                 ? findFraction(toFixedOnZeroes(number))
                 : null;
         }, [findFraction, toFixedOnZeroes]
     );
 
     const formatDeterminant = useCallback(
-        ({ determinant, overflow=true, det=true }) => {
+        ({ determinant, overflow = true, det = true }) => {
             if (determinant === null) return null
             let stringDeterminant = determinant?.commaStringify();
-            if (stringDeterminant.length > 8 && overflow) 
+            if (stringDeterminant.length > 8 && overflow)
                 stringDeterminant = stringDeterminant.substring(0, 8 - 3) + '...';
-            if (stringDeterminant && !ScalarOperations.isNumber(stringDeterminant)) 
+            if (stringDeterminant && !ScalarOperations.isNumber(stringDeterminant))
                 return det
                     ? `det: ${stringDeterminant}`
                     : stringDeterminant;
-            
+
             const formatted = formatNumberToFraction(stringDeterminant);
-            return formatted !== null 
+            return formatted !== null
                 ? det
                     ? `det: ${formatted}`
                     : formatted
@@ -79,29 +80,31 @@ const MatrixArea: React.FC = () => {
         () => {
             switch (fullEquation?.equationType) {
                 case CalcState.AxXeB:
-                    return "A×X=B";
+                    return 'A×X=B';
                 case CalcState.BxXeA:
-                    return "B×X=A";
+                    return 'B×X=A';
                 case CalcState.XxAeB:
-                    return "X×A=B";
+                    return 'X×A=B';
                 case CalcState.XxBeA:
-                    return "X×B=A";
+                    return 'X×B=A';
                 default:
-                    return null;
+                    return '';
             }
         }, [fullEquation]
     );
 
     const bottomLeftText = useMemo(
-        () => (calcState !== CalcState.LambdaxA
-            ? fullEquation !== null && !isPortrait
-                ? equationTypeString
-                : editableDimensions && !fullScreenDeterminant
-                    ? `${editableDimensions.rows}x${editableDimensions.columns}`
-                    : ''
-            : 'Scalar') || '',
-        [equationTypeString, calcState, fullEquation, editableDimensions, isPortrait]
-    )
+        () => (
+            calcState === CalcState.LambdaxA
+                ? 'Scalar'
+                : fullEquation !== null && !isPortrait
+                    ? equationTypeString
+                    : !fullScreenDeterminant
+                        ? editableDimensionsString
+                        : ''
+        ),
+        [equationTypeString, calcState, fullEquation, editableDimensions, isPortrait, fullScreenDeterminant]
+    );
 
     return (
         <View
@@ -115,12 +118,12 @@ const MatrixArea: React.FC = () => {
         >
             <View
                 style={{
-                    flexDirection: 'row', 
+                    flexDirection: 'row',
                     justifyContent: 'space-between',
                     flex: 1,
                 }}
             >
-                <ArrowButtonsArea 
+                <ArrowButtonsArea
                     vertical
                     backHistory
                     hidden
@@ -132,7 +135,7 @@ const MatrixArea: React.FC = () => {
                     calcState !== CalcState.LambdaxA
                         ? fullEquation !== null && !isPortrait
                             ? (
-                                <FullEquation 
+                                <FullEquation
                                     fullEquation={fullEquation}
                                     totalMaxAreaWidth={matrixAreaWidth - 2 * BUTTON_AREAS_CROSS_WIDTH}
                                     viewReduced={viewReduced}
@@ -165,7 +168,7 @@ const MatrixArea: React.FC = () => {
                                     </ScrollView>
                                 )
                                 : (
-                                    <Matrix 
+                                    <Matrix
                                         maxMatrixWidth={matrixAreaWidth - 2 * BUTTON_AREAS_CROSS_WIDTH}
                                         matrixData={matrixOnScreen}
                                         selectedMatrixElement={selectedMatrixElement}
@@ -193,7 +196,7 @@ const MatrixArea: React.FC = () => {
                             </View>
                         )
                 }
-                <ArrowButtonsArea 
+                <ArrowButtonsArea
                     vertical
                     forwardHistory
                     hidden={calcState === CalcState.ready || !editableDimensions}
@@ -205,7 +208,7 @@ const MatrixArea: React.FC = () => {
                             CalcState.XxAeB,
                             CalcState.XxBeA,
                         ]
-                        .includes(calcState)
+                            .includes(calcState)
                         || fullScreenDeterminant
                     }
                     bottomLeftText={bottomLeftText}
@@ -214,7 +217,7 @@ const MatrixArea: React.FC = () => {
                     crossWidth={BUTTON_AREAS_CROSS_WIDTH}
                 />
             </View>
-            <ArrowButtonsArea 
+            <ArrowButtonsArea
                 hidden={calcState === CalcState.ready || !editableDimensions}
                 disabled={
                     [
@@ -224,7 +227,7 @@ const MatrixArea: React.FC = () => {
                         CalcState.AxXeB,
                         CalcState.BxXeA,
                     ]
-                    .includes(calcState)
+                        .includes(calcState)
                     || fullScreenDeterminant
                 }
                 editableDimensions={editableDimensions}
@@ -237,30 +240,30 @@ const MatrixArea: React.FC = () => {
                             CalcState.BxXeA,
                             CalcState.XxAeB,
                             CalcState.XxBeA,
-                        ].includes(fullEquation.equationType) 
+                        ].includes(fullEquation.equationType)
                             && fullEquation.solutionType !== SystemSolutionType.SPD
-                                ? viewReduced ? 'Original' : 'Reduzida'
-                                : fullEquation.equationType === CalcState.gaussianElimination
-                                    ? viewReduced ? 'Não Reduzida' : 'Reduzida'
-                                    : null
+                            ? viewReduced ? 'Original' : 'Reduzida'
+                            : fullEquation.equationType === CalcState.gaussianElimination
+                                ? viewReduced ? 'Não Reduzida' : 'Reduzida'
+                                : null
                         : !operationHappening
-                                && formatDeterminant({
-                                    determinant: matrixOnScreenDeterminant
-                                })
+                        && formatDeterminant({
+                            determinant: matrixOnScreenDeterminant
+                        })
                 }
                 bottomMiddleText={
                     calcState === CalcState.ready ? solutionType : ''
                 }
                 onPressBottomRightText={
                     !isPortrait
-                        ? fullEquation !== null 
+                        ? fullEquation !== null
                             ? fullEquation.equationType === CalcState.gaussianElimination
                                 ? onPressGaussianEliminationReduced
                                 : changeViewReduced
-                            : () => {}
+                            : () => { }
                         : !operationHappening
                             ? changeFullScreenDeterminant
-                            : () => {}
+                            : () => { }
                 }
                 crossWidth={BUTTON_AREAS_CROSS_WIDTH}
             />
