@@ -12,13 +12,31 @@ export class ExpressionData {
     operator: Operator;
     elements: Array<ElementData | ExpressionData>;
     isSimplified: boolean;
+    isZero: boolean;
+    oneElement: ElementData | null;
 
-    constructor({ operator, elements, isSimplified=false }: ExpressionDataParams) {
+    constructor({ operator, elements, isSimplified = false }: ExpressionDataParams) {
         this.operator = operator;
-        this.elements = elements;
+        this.elements = elements.map(
+            e => (
+                (e instanceof ExpressionData && e.elements.length === 1)
+                    ? e.elements[0]
+                    : e
+            )
+        );
         this.isSimplified = isSimplified;
 
         operator === Operator.Add && this.sortElements();
+
+        this.isZero = this.commaStringify() === '0';
+
+        this.oneElement = (
+            this.elements.length === 1
+                && this.elements[0] instanceof ElementData
+                ? this.elements[0]
+                : null
+        );
+
     }
 
     sortElements() {
@@ -27,14 +45,14 @@ export class ExpressionData {
         });
     }
 
-    commaStringify({ dontFindFraction=false }={}) {
+    commaStringify({ dontFindFraction = false } = {}) {
         const string = this.algebraicStringify({ dontFindFraction }).replace('.', ',');
         return parenthesisEnglobe(string)
             ? string.substring(1, string.length - 1)
             : string;
     }
 
-    algebraicStringify({ dontFindFraction=false }={}): string {
+    algebraicStringify({ dontFindFraction = false } = {}): string {
         switch (this.operator) {
             case Operator.Elevate:
                 const base = this.elements[0].algebraicStringify({ dontFindFraction });
@@ -47,14 +65,14 @@ export class ExpressionData {
                         ScalarOperations.superscript(exponent)
                     }`;
             case Operator.Divide:
-                return `${this.elements[0].algebraicStringify({ dontFindFraction })}/(${this.elements.splice(1, this.elements.length - 1).map(a => a.algebraicStringify({ dontFindFraction })).join(')/(')}`;
+                return `${this.elements[0].algebraicStringify({ dontFindFraction })}/(${[...this.elements].splice(1, this.elements.length - 1).map(a => a.algebraicStringify({ dontFindFraction })).join(')/(')}`;
             case Operator.Multiply:
                 return `${this.elements.map(a => a.algebraicStringify({ dontFindFraction })).join('×')}`;
             case Operator.Add:
                 const terms = this.elements.map(a => a.algebraicStringify({ dontFindFraction })).map(a => a.startsWith('-') ? a : '+' + a).join('');
                 return `(${terms.startsWith('+') ? terms.substring(1, terms.length) : terms})`;
             case Operator.Subtract:
-                return `(${this.elements[0].algebraicStringify({ dontFindFraction })}-${this.elements.splice(1, this.elements.length - 1).map(a => a.algebraicStringify({ dontFindFraction })).join('-')})`;
+                return `(${this.elements[0].algebraicStringify({ dontFindFraction })}-${[...this.elements].splice(1, this.elements.length - 1).map(a => a.algebraicStringify({ dontFindFraction })).join('-')})`;
         }
     }
 
@@ -62,9 +80,9 @@ export class ExpressionData {
         return `${this.operator}(${this.elements.map(elem => elem.stringify()).join(';')})`
     }
 
-} 
+}
 
-interface ElementDataParams {
+export interface ElementDataParams {
     variables?: Array<VariableData>;
     scalar?: number | string;
     unfilteredString?: string;
@@ -76,7 +94,7 @@ export class ElementData {
     scalar: number;
     unfilteredString: string | undefined;
 
-    constructor({ variables=[], scalar=1, unfilteredString }: ElementDataParams) {
+    constructor({ variables = [], scalar = 1, unfilteredString }: ElementDataParams) {
         this.variables = variables;
         this.scalar = smartToFixed(Number.parseFloat(scalar.toString()));
         this.unfilteredString = unfilteredString;
@@ -113,15 +131,15 @@ export class ElementData {
         // console.log({varrrrr: this.variables});
     }
 
-    commaStringify({ dontFindFraction=false }={}) {
+    commaStringify({ dontFindFraction = false } = {}) {
         return this.stringify({ dontFindFraction }).replace('.', ',');
     }
 
-    algebraicStringify({ dontFindFraction=false }={}) {
+    algebraicStringify({ dontFindFraction = false } = {}) {
         return this.stringify({ dontFindFraction });
     }
 
-    stringify({ onlyVariables=false, dontFindFraction=false }={}) {
+    stringify({ onlyVariables = false, dontFindFraction = false } = {}) {
 
         if (!!this.unfilteredString) return this.unfilteredString;
 
@@ -130,24 +148,24 @@ export class ElementData {
                 ? toFixedWithThreeDots(number)
                 : findFraction(number as number);
 
-        const formatScalar = 
+        const formatScalar =
             () => (this.scalar === 1 && this.variables.length !== 0) || onlyVariables
                 ? ''
                 : this.scalar === -1 && this.variables.length !== 0
                     ? '-'
                     : findPossibleFraction(this.scalar)
-        const formatExponent = 
+        const formatExponent =
             (exponent: number) => exponent === 1
                 ? ''
                 : ScalarOperations.superscript(findPossibleFraction(exponent))
-        const formatVariables = 
+        const formatVariables =
             () => this.variables.map(
-                    vari => `${vari.variable}${formatExponent(vari.exponent)}`
-                )
+                vari => `${vari.variable}${formatExponent(vari.exponent)}`
+            )
         return [formatScalar(), ...formatVariables()].join('')
     }
 
-} 
+}
 
 interface VariableDataParams {
     variable: string;
@@ -159,10 +177,20 @@ export class VariableData {
     variable: string;
     exponent: number;
 
-    constructor({ variable, exponent=1 }: VariableDataParams) {
+    constructor({ variable, exponent = 1 }: VariableDataParams) {
         this.variable = variable;
         this.exponent = exponent;
     }
 
-} 
+}
+
+export const createMatrixElement = (data: ElementDataParams | ExpressionDataParams): ExpressionData => (
+    !(data as ExpressionDataParams)?.operator
+        ? new ExpressionData({
+            operator: Operator.Add,
+            elements: [new ElementData(data as ElementDataParams)],
+            isSimplified: true
+        })
+        : new ExpressionData(data as ExpressionDataParams)
+);
 

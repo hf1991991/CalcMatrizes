@@ -2,7 +2,7 @@ import MatrixData from "./MatrixData";
 import { smartToFixed, SystemSolutionType, Operator } from "./constants";
 import ScalarOperations from "./ScalarOperations";
 import * as ExpressionSimplification from "./ExpressionSimplification";
-import { ElementData, ExpressionData } from "./ExpressionClasses";
+import { createMatrixElement, ElementData, ExpressionData } from "./ExpressionClasses";
 import ElementDataWithPosition from "../interfaces/ElementDataWithPosition";
 import MatrixColumnWithPosition from "../interfaces/MatrixColumnWithPosition";
 import SelectedMatrixElement from "../interfaces/SelectedMatrixElement";
@@ -21,7 +21,7 @@ interface JoinEditableAndOriginalMatricesParams extends MatrixDimensions {
 
 interface MultiplyMatrixByScalarParams {
     matrixA: MatrixData;
-    scalar: ElementData;
+    scalar: ExpressionData;
 }
 
 interface PartialGaussianEliminationParams {
@@ -135,10 +135,6 @@ class MatrixOperations {
 
         for (let row = 0; row < matrix1.dimensions().rows; row++) {
             for (let column = 0; column < matrix1.dimensions().columns; column++) {
-                console.log({
-                    1: matrix1.data[row][column]?.commaStringify(),
-                    2: matrix2.data[row][column]?.commaStringify()
-                })
                 if (
                     matrix1.data[row][column]?.commaStringify() !== matrix2.data[row][column]?.commaStringify()
                 ) return false;
@@ -198,7 +194,7 @@ class MatrixOperations {
     //     return fixed;
     // }
 
-    static applyFrescuresToMatrixData(matrixData: Array<Array<ElementData | ExpressionData | number>>): Array<MatrixColumnData> {
+    static applyFrescuresToMatrixData(matrixData: Array<Array<ExpressionData | number>>): Array<MatrixColumnData> {
         if (!matrixData) return [];
 
         let converted = [];
@@ -208,9 +204,9 @@ class MatrixOperations {
             for (let column = 0; column < matrixData[0].length; column++) {
                 let element = matrixData[row][column];
 
-                if (!(element instanceof ElementData) && !(element instanceof ExpressionData)) {
+                if (!(element instanceof ExpressionData)) {
                     // console.log('applyFrescuresToMatrixData: elemento não é um ElementData: ' + element);
-                    element = new ElementData({
+                    element = createMatrixElement({
                         scalar: element
                     });
                 }
@@ -300,7 +296,7 @@ class MatrixOperations {
         for (let row = 0; row < matrixA.dimensions().rows; row++) {
             let matrixRow = [];
             for (let column = 0; column < matrixB.dimensions().columns; column++) {
-                let newElement = new ElementData({
+                let newElement = createMatrixElement({
                     scalar: 0,
                 });
                 for (let index = 0; index < matrixA.dimensions().columns; index++) {
@@ -406,7 +402,7 @@ class MatrixOperations {
             dimensionsA.columns,
         );
 
-        let determinant = new ElementData({ scalar: 1 });
+        let determinant = createMatrixElement({ scalar: 1 });
         let noPivotOnColumn = false;
 
         for (
@@ -416,7 +412,7 @@ class MatrixOperations {
         ) {
             let pivot = _matrixA.data[pivotColumn][pivotColumn];
 
-            if (pivot instanceof ElementData && pivot.scalar === 0) {
+            if (pivot.isZero) {
 
                 let testRow = pivotColumn + 1;
                 while (true) {
@@ -428,7 +424,7 @@ class MatrixOperations {
 
                     let possibleNewPivot = _matrixA.data[testRow][pivotColumn];
 
-                    if (possibleNewPivot instanceof ElementData && possibleNewPivot.scalar !== 0.0) break;
+                    if (!possibleNewPivot.isZero) break;
 
                     testRow++;
                 }
@@ -445,7 +441,7 @@ class MatrixOperations {
 
                     pivot = _matrixA.data[pivotColumn][pivotColumn];
 
-                    determinant = ExpressionSimplification.varOperation(determinant, Operator.Multiply, new ElementData({ scalar: -1 }));
+                    determinant = ExpressionSimplification.varOperation(determinant, Operator.Multiply, createMatrixElement({ scalar: -1 }));
                 }
             }
 
@@ -454,9 +450,8 @@ class MatrixOperations {
                 console.log({ pivot: pivot.stringify(), pivotColumn })
 
                 if (
-                    (pivot instanceof ElementData && (pivot.scalar !== 1.0 || pivot.variables.length !== 0))
-                    ||
-                    (pivot instanceof ExpressionData)
+                    (pivot.oneElement?.scalar !== 1.0 || pivot.oneElement?.variables.length !== 0)
+                    || !pivot.oneElement
                 ) {
                     for (let index = 0; index < dimensionsA.columns; index++)
                         _matrixA.data[pivotColumn][index] =
@@ -501,7 +496,7 @@ class MatrixOperations {
                         ExpressionSimplification.varOperation(
                             element,
                             Operator.Multiply,
-                            new ElementData({ scalar: -1 })
+                            createMatrixElement({ scalar: -1 })
                         ),
                         Operator.Divide,
                         pivot,
@@ -542,7 +537,7 @@ class MatrixOperations {
             }
         }
 
-        if (noPivotOnColumn) determinant = new ElementData({
+        if (noPivotOnColumn) determinant = createMatrixElement({
             scalar: 0
         });
 
