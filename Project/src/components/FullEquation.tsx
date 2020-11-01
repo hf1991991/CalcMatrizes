@@ -76,6 +76,8 @@ const FullEquation = ({
 }: FullEquationProps) => {
     const [matrix1Height, changeMatrix1Height] = useState(0);
 
+    console.log({totalMaxAreaWidth})
+
     const equationData = useMemo<EquationData>(
         () => new EquationData({
             fullEquation, 
@@ -92,7 +94,7 @@ const FullEquation = ({
                 - (equationData.hasXOperator() ? X_OPERATOR_WIDTH : 0)
             ) / equationData.getQuantityOfMatrices()
         ),
-        [fullEquation, viewReduced]
+        [totalMaxAreaWidth, equationData]
     );
 
     return (
