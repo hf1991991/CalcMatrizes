@@ -5,7 +5,7 @@ import { useOrientation } from '../hooks/useOrientation';
 import MatrixDimensions from '../interfaces/MatrixDimensions';
 import ArrowButton from './ArrowButton';
 
-interface ArrowButtonsAreaProps { 
+interface ArrowButtonsAreaProps {
     vertical?: boolean;
     hidden: boolean;
     disabled?: boolean;
@@ -22,10 +22,10 @@ interface ArrowButtonsAreaProps {
     backHistory?: boolean;
 }
 
-const ArrowButtonsArea = ({ 
-    vertical=false,
+const ArrowButtonsArea = ({
+    vertical = false,
     hidden,
-    disabled=false,
+    disabled = false,
     editableDimensions,
     changeEditableDimensions,
     crossWidth,
@@ -41,6 +41,7 @@ const ArrowButtonsArea = ({
 
     const {
         matrixHistory,
+        fullScreenDeterminant,
         undoHistory,
         redoHistory
     } = useCalculator();
@@ -48,9 +49,13 @@ const ArrowButtonsArea = ({
     const { isPortrait } = useOrientation();
 
     const historyDisabled = useMemo(
-        () => forwardHistory 
-            ? matrixHistory.currentPosition === matrixHistory.history.length - 1
-            : matrixHistory.currentPosition === 0,
+        () => (
+            (
+                forwardHistory
+                    ? matrixHistory.currentPosition === matrixHistory.history.length - 1
+                    : matrixHistory.currentPosition === 0
+            ) || !!fullScreenDeterminant
+        ),
         [forwardHistory, matrixHistory]
     );
 
@@ -63,7 +68,7 @@ const ArrowButtonsArea = ({
                     ? {
                         width: crossWidth,
                     }
-                    : { 
+                    : {
                         marginHorizontal: 20,
                         flexDirection: 'row',
                         height: crossWidth,
@@ -98,14 +103,14 @@ const ArrowButtonsArea = ({
                         style={{
                             position: 'absolute',
                             top: 0,
-                            opacity: historyDisabled ? 0.5: 1,
+                            opacity: historyDisabled ? 0.5 : 1,
                         }}
                         disabled={historyDisabled}
                     >
                         <Image
                             style={{
-                                width: 18.5*1.3,
-                                height: 18.5*1.3,
+                                width: 18.5 * 1.3,
+                                height: 18.5 * 1.3,
                             }}
                             source={
                                 forwardHistory
@@ -118,11 +123,11 @@ const ArrowButtonsArea = ({
             }
             <View
                 style={{
-                    ...(!vertical && {flexDirection: 'row'}),
+                    ...(!vertical && { flexDirection: 'row' }),
                     opacity: hidden ? 0.0 : 1.0,
                 }}
             >
-                <ArrowButton 
+                <ArrowButton
                     vertical={vertical}
                     source={vertical
                         ? require('../../assets/icons/LeftArrow.png')
@@ -139,15 +144,15 @@ const ArrowButtonsArea = ({
                         })
                     }
                     disabled={
-                        (vertical 
-                            ? editableDimensions?.columns 
+                        (vertical
+                            ? editableDimensions?.columns
                             : editableDimensions?.rows
-                        ) <= 1 
-                        || hidden 
+                        ) <= 1
+                        || hidden
                         || disabled
                     }
                 />
-                <ArrowButton 
+                <ArrowButton
                     vertical={vertical}
                     source={vertical
                         ? require('../../assets/icons/RightArrow.png')

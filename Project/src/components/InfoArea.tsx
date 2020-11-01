@@ -4,10 +4,13 @@ import MatrixArea from './MatrixArea';
 import { useCalculator } from '../hooks/useCalculator';
 
 const InfoArea: React.FC = () => {
-    const { onPressInfoAreaBackground } = useCalculator();
+    const { onPressInfoAreaBackground, fullScreenDeterminant } = useCalculator();
 
     return (
-        <TouchableWithoutFeedback onPress={onPressInfoAreaBackground}>
+        <TouchableWithoutFeedback 
+            onPress={onPressInfoAreaBackground} 
+            disabled={fullScreenDeterminant}
+        >
             <View style={{ flex: 1 }}>
                 <MatrixArea />
             </View>

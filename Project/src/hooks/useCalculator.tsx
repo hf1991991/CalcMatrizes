@@ -187,7 +187,7 @@ export const CalculatorProvider: React.FC = ({ children }) => {
                     matrixB: MatrixOperations.identity(matrixOnScreen.dimensions().rows)
                 }).determinant
                 : null
-            console.log({ determinant: determinant?.commaStringify() });
+            console.log(JSON.stringify({ determinantString: determinant?.commaStringify(), determinant }));
             return determinant;
         },
         [isMatrixFull, isMatrixSquare, matrixOnScreen]

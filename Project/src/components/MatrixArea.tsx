@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, ScrollView } from 'react-native';
 import Matrix from './Matrix';
 import { CalcState, findFraction, toFixedOnZeroes, SystemSolutionType } from '../utilities/constants';
 import ArrowButtonsArea from './ArrowButtonsArea';
@@ -140,18 +140,18 @@ const MatrixArea: React.FC = () => {
                             )
                             : fullScreenDeterminant
                                 ? (
-                                    <View
-                                        style={{
+                                    <ScrollView
+                                        contentContainerStyle={{
                                             justifyContent: 'center',
                                             alignItems: 'center',
-                                            flex: 1,
+                                            flex: 1
                                         }}
                                     >
                                         <Text
                                             style={{
                                                 color: '#fff',
                                                 fontSize: 60,
-                                                textAlign: 'center'
+                                                textAlign: 'center',
                                             }}
                                         >
                                             {
@@ -162,7 +162,7 @@ const MatrixArea: React.FC = () => {
                                                 })
                                             }
                                         </Text>
-                                    </View>
+                                    </ScrollView>
                                 )
                                 : (
                                     <Matrix 
