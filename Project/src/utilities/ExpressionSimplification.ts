@@ -632,25 +632,29 @@ function symplifyDenominators(addition: Array<ExpressionData>): ExpressionData {
         ] 
     )
 
-    newOneElements = addNumbersWithSameVariables(newOneElements).filter(e => !e.isZero);
+    newOneElements = addNumbersWithSameVariables(newOneElements);
 
     const expressionNewOneElements = newOneElements.map(
-        oneElement => new ExpressionData({ oneElement })
-    );
+        elem => new ExpressionData({ 
+            oneElement: new ElementData(elem)
+        })
+    ).filter(e => !e.isZero);
 
     // console.log('ENDED SYMPLIFYDENOMINATORS')
     // console.log(JSON.stringify({
     //     newElements: newElements.map(a => a.stringify())
     // }));
 
-    return new ExpressionData({
+    const result = new ExpressionData({
         operator: Operator.Add,
         elements: [
             ...expressionNewOneElements, 
             ...expressionDatas
         ],
         isSimplified: true
-    })
+    });
+    console.log({result: result.stringify()});
+    return result;
 
 }
 
