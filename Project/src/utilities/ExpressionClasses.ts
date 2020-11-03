@@ -82,7 +82,9 @@ export class ExpressionData {
     }
 
     stringify(): string {
-        return `${this.operator}(${this.elements.map(elem => elem.stringify()).join(';')})`
+        return this.oneElement instanceof ElementData
+            ? this.oneElement.stringify()
+            : `${this.operator}(${this.elements.map(elem => elem.stringify()).join(';')})`
     }
 
 }

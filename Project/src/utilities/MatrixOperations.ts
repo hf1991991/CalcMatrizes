@@ -447,12 +447,9 @@ class MatrixOperations {
 
             if (!noPivotOnColumn) {
 
-                console.log({ pivot: pivot.stringify(), pivotColumn })
+                console.log({ pivot: pivot.stringify(), pivotColumn });
 
-                if (
-                    (pivot.oneElement?.scalar !== 1.0 || pivot.oneElement?.variables.length !== 0)
-                    || !pivot.oneElement
-                ) {
+                if (!pivot.isOne) {
                     for (let index = 0; index < dimensionsA.columns; index++)
                         _matrixA.data[pivotColumn][index] =
                             ExpressionSimplification.varOperation(_matrixA.data[pivotColumn][index], Operator.Divide, pivot);
