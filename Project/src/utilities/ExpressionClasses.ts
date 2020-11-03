@@ -187,9 +187,7 @@ export class VariableData {
 export const createMatrixElement = (data: ElementDataParams | ExpressionDataParams): ExpressionData => (
     !(data as ExpressionDataParams)?.operator
         ? new ExpressionData({
-            operator: Operator.None,
-            elements: [new ElementData(data as ElementDataParams)],
-            isSimplified: true
+            oneElement: new ElementData(data as ElementDataParams)
         })
         : new ExpressionData(data as ExpressionDataParams)
 );
