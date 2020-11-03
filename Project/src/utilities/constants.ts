@@ -22,7 +22,8 @@ export enum Operator {
     Subtract = 'Subtract',
     Multiply = 'Multiply',
     Divide = 'Divide',
-    Elevate = 'Elevate'
+    Elevate = 'Elevate',
+    None = 'None'
 }
 
 export enum ButtonType {

@@ -2,41 +2,41 @@ import { smartToFixed, findFraction, Operator, parenthesisEnglobe, toFixedWithTh
 import ScalarOperations from "./ScalarOperations";
 
 interface ExpressionDataParams {
+    elements: Array<ExpressionData>;
+    oneElement: ElementData;
     operator: Operator;
-    elements: Array<ElementData | ExpressionData>;
     isSimplified?: boolean;
 }
 
 export class ExpressionData {
 
+    elements: Array<ExpressionData>;
+    oneElement: ElementData | undefined;
     operator: Operator;
-    elements: Array<ElementData | ExpressionData>;
     isSimplified: boolean;
     isZero: boolean;
-    oneElement: ElementData | null;
 
-    constructor({ operator, elements, isSimplified = false }: ExpressionDataParams) {
+    constructor({ elements, oneElement, operator = Operator.None, isSimplified = false }: ExpressionDataParams) {
+        if (!!oneElement && !!elements)
+            throw 'oneElement and elements can\'t both be defined';
+
+        if (!!oneElement && operator !== Operator.None)
+            throw 'oneElement should always use Operator.None';
+
+        if (!!oneElement && !isSimplified)
+            throw 'oneElement should always be simplified';
+
         this.operator = operator;
-        this.elements = elements.map(
-            e => (
-                (e instanceof ExpressionData && e.elements.length === 1)
-                    ? e.elements[0]
-                    : e
-            )
-        );
-        this.isSimplified = isSimplified;
 
-        operator === Operator.Add && this.sortElements();
+        this.elements = elements;
+
+        this.oneElement = oneElement;
+
+        this.isSimplified = !oneElement ? isSimplified : true;
 
         this.isZero = this.commaStringify() === '0';
 
-        this.oneElement = (
-            this.elements.length === 1
-                && this.elements[0] instanceof ElementData
-                ? this.elements[0]
-                : null
-        );
-
+        operator === Operator.Add && this.sortElements();
     }
 
     sortElements() {
@@ -187,7 +187,7 @@ export class VariableData {
 export const createMatrixElement = (data: ElementDataParams | ExpressionDataParams): ExpressionData => (
     !(data as ExpressionDataParams)?.operator
         ? new ExpressionData({
-            operator: Operator.Add,
+            operator: Operator.None,
             elements: [new ElementData(data as ElementDataParams)],
             isSimplified: true
         })
