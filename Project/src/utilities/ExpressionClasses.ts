@@ -2,9 +2,9 @@ import { smartToFixed, findFraction, Operator, parenthesisEnglobe, toFixedWithTh
 import ScalarOperations from "./ScalarOperations";
 
 interface ExpressionDataParams {
-    elements: Array<ExpressionData>;
-    oneElement: ElementData;
-    operator: Operator;
+    elements?: Array<ExpressionData>;
+    oneElement?: ElementData;
+    operator?: Operator;
     isSimplified?: boolean;
 }
 
