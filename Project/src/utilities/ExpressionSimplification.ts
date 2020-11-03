@@ -17,6 +17,7 @@ export function varOperation(
     element2: ExpressionData
 ) {
 
+    console.log(3)
     if (!(element1 instanceof ElementData) && !(element1 instanceof ExpressionData))
         console.log('ERRO em varOperation: element1 não é um ElementData: ' + element1)
 
@@ -30,10 +31,13 @@ export function varOperation(
             element2
         ]
     });
+    console.log(4)
+
 
     // console.log(JSON.stringify({expressionData}))
 
     const result = simplifyExpressionAlgorithm(expressionData);
+    console.log(5)
 
     // console.log(JSON.stringify({
     //     element1: element1.stringify(), 
@@ -621,7 +625,7 @@ function symplifyDenominators(addition: ExpressionData) {
 
 }
 
-function doOperation(expression: ExpressionData): ExpressionData | ElementData {
+function doOperation(expression: ExpressionData): ExpressionData {
 
     let element = null;
 
@@ -681,76 +685,36 @@ function doOperation(expression: ExpressionData): ExpressionData | ElementData {
 
         case Operator.Divide:
 
-            let multiplicationElements = []
+            const [numerator, denominator] = expression.elements;
 
-            let first = true;
+            let invertedDenominator;
 
-            for (element of expression.elements) {
+            if (!!denominator.oneElement) {
+                const { scalar, variables } = denominator.oneElement;
 
-                if (first)
-                    multiplicationElements.push(element);
+                if (scalar === 0)
+                    throw 'ERRO em doOperation: divisão por zero.';
 
-                else {
-
-                    // console.log(JSON.stringify({
-                    //     jacaEuropeia: element
-                    // }))
-
-                    if (
-                        element instanceof ElementData
-                        || (element instanceof ExpressionData && !!element.oneElement)
-                    ) {
-
-                        const { scalar, variables } = element instanceof ElementData 
-                            ? element
-                            : element.oneElement as ElementData;
-
-                        if (scalar === 0) {
-
-                            console.log('ERRO em doOperation: divisão por zero.')
-                            return createMatrixElement({
-                                variables: [
-                                    new VariableData({
-                                        variable: 'ERRO'
-                                    })
-                                ]
-                            });
-
-                        }
-
-                        multiplicationElements.push(
-                            createMatrixElement({
-                                scalar: 1 / scalar,
-                                variables: raiseVariablesExponent(variables, -1)
-                            })
-                        );
-                    }
-
-                    else {
-                        multiplicationElements.push(
-                            doOperation(
-                                createMatrixElement({
-                                    operator: Operator.Elevate,
-                                    elements: [
-                                        element,
-                                        createMatrixElement({
-                                            scalar: -1
-                                        })
-                                    ]
-                                })
-                            )
-                        );
-                    }
-
-                    // console.log({jacaJavanesa: multiplicationElements})
-
-                }
-
-                first = false;
-                
+                invertedDenominator = createMatrixElement({
+                    scalar: 1 / scalar,
+                    variables: raiseVariablesExponent(variables, -1)
+                })
             }
 
-            // console.log(JSON.stringify({batata: multiplicationElements}))
+            else
+                invertedDenominator = doOperation(
+                    createMatrixElement({
+                        operator: Operator.Elevate,
+                        elements: [
+                            denominator,
+                            createMatrixElement({
+                                scalar: -1
+                            })
+                        ]
+                    })
+                );
+
+            const multiplicationElements = [numerator, invertedDenominator];
 
             return doOperation(
                 createMatrixElement({
@@ -1353,11 +1317,10 @@ function stringifyExpression(expression: any) {
         : expression.toString();
 }
 
-function simplifyExpressionAlgorithm(expression: ExpressionData | ElementData) {
+function simplifyExpressionAlgorithm(expression: ExpressionData) {
     // console.log(JSON.stringify({expression12: expression}))
 
-    if (isExpressionInstance(expression) && !(expression as ExpressionData).isSimplified) {
-        expression = expression as ExpressionData;
+    if (!expression.isSimplified) {
     
         // console.log({
         //     expression: expression.stringify(),
@@ -1366,7 +1329,7 @@ function simplifyExpressionAlgorithm(expression: ExpressionData | ElementData) {
 
         // Realiza, recursivamente, a simplificação da expressão:
         for (let element of expression.elements) {
-            element instanceof ExpressionData && (element = simplifyExpressionAlgorithm(element));
+            element = simplifyExpressionAlgorithm(element);
         }
 
         // Após isso, ou a expressão será uma ExpressionData simplificada, ou será uma ElementData:
