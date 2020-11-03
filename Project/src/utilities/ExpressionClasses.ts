@@ -16,7 +16,7 @@ export class ExpressionData {
     isSimplified: boolean;
     isZero: boolean;
 
-    constructor({ elements, oneElement, operator = Operator.None, isSimplified = false }: ExpressionDataParams) {
+    constructor({ elements = [], oneElement, operator = Operator.None, isSimplified = false }: ExpressionDataParams) {
         if (!!oneElement && !!elements)
             throw 'oneElement and elements can\'t both be defined';
 
@@ -26,11 +26,11 @@ export class ExpressionData {
         if (!!oneElement && !isSimplified)
             throw 'oneElement should always be simplified';
 
-        this.operator = operator;
-
         this.elements = elements;
 
         this.oneElement = oneElement;
+
+        this.operator = operator;
 
         this.isSimplified = !oneElement ? isSimplified : true;
 
@@ -73,6 +73,10 @@ export class ExpressionData {
                 return `(${terms.startsWith('+') ? terms.substring(1, terms.length) : terms})`;
             case Operator.Subtract:
                 return `(${this.elements[0].algebraicStringify({ dontFindFraction })}-${[...this.elements].splice(1, this.elements.length - 1).map(a => a.algebraicStringify({ dontFindFraction })).join('-')})`;
+            case Operator.None:
+                if (!(this.oneElement instanceof ElementData))
+                    throw `${this}.oneElement is not ElementData`;
+                return this.oneElement.stringify({ dontFindFraction });
         }
     }
 
@@ -133,10 +137,6 @@ export class ElementData {
 
     commaStringify({ dontFindFraction = false } = {}) {
         return this.stringify({ dontFindFraction }).replace('.', ',');
-    }
-
-    algebraicStringify({ dontFindFraction = false } = {}) {
-        return this.stringify({ dontFindFraction });
     }
 
     stringify({ onlyVariables = false, dontFindFraction = false } = {}) {
