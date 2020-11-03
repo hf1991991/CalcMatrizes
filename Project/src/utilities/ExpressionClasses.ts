@@ -100,11 +100,19 @@ export class ElementData {
     variables: Array<VariableData>;
     scalar: number;
     unfilteredString: string | undefined;
+    isZero: boolean;
+    isOne: boolean;
 
     constructor({ variables = [], scalar = 1, unfilteredString }: ElementDataParams) {
         this.variables = variables;
+
         this.scalar = smartToFixed(Number.parseFloat(scalar.toString()));
+
         this.unfilteredString = unfilteredString;
+
+        this.isZero = this.stringify() === '0';
+
+        this.isOne = this.stringify() === '1';
 
         this.fixVariables()
     }

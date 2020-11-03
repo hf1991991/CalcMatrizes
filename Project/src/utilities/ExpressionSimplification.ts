@@ -274,7 +274,7 @@ function addNumbersWithSameVariables(adders: Array<ElementData>) {
                 simplifiedElements[usedVariablesIndex] = new ElementData({
                     scalar: Number.parseFloat(simplifiedElements[usedVariablesIndex].scalar.toString())
                         + Number.parseFloat(element.scalar.toString()),
-                    variables: simplifiedElements[usedVariablesIndex].scalar === 0 && element.scalar === 0
+                    variables: simplifiedElements[usedVariablesIndex].isZero && element.isZero
                         ? []
                         : element.variables,
                 });
@@ -540,7 +540,7 @@ function symplifyDenominators(addition: Array<ExpressionData>): ExpressionData {
 
                 // console.log('ENDED INVERSE DISTRIBUTIVE')
 
-                if (commonElement.scalar === 1 && commonElement.variables.length === 0)
+                if (commonElement.isOne)
                     return finalDenominator;
 
                 return new ExpressionData({
@@ -632,11 +632,11 @@ function symplifyDenominators(addition: Array<ExpressionData>): ExpressionData {
         ] 
     )
 
-    newOneElements = addNumbersWithSameVariables(newOneElements).filter(e => !(e.scalar === 0 && e.variables.length === 0));
+    newOneElements = addNumbersWithSameVariables(newOneElements).filter(e => !e.isZero);
 
     const expressionNewOneElements = newOneElements.map(
         oneElement => new ExpressionData({ oneElement })
-    )
+    );
 
     // console.log('ENDED SYMPLIFYDENOMINATORS')
     // console.log(JSON.stringify({
