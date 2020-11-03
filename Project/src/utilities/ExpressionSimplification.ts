@@ -36,9 +36,7 @@ export function varOperation(
     const result = simplifyExpressionAlgorithm(expressionData);
 
     console.log(JSON.stringify({
-        element1: element1.stringify(),
-        operator,
-        element2: element2.stringify(),
+        initial: expressionData.stringify(),
         RESULT: result.stringify()
     }));
 
@@ -58,54 +56,41 @@ function raiseVariablesExponent(variables: Array<VariableData>, exponent: number
     return newVariables;
 }
 
-function additionMatches(
-    elements1: ExpressionData | ElementData,
-    elements2: ExpressionData | ElementData
-) {
+function additionMatches(elements1: ExpressionData, elements2: ExpressionData) {
     return elements1.stringify() === elements2.stringify();
-    // if (elements1.length !== elements2.length) return false;
-    // else if (elements1.length === 0) return true;
-    // for (let i = 0; i < elements1.length; i++) {
-    //     let found = false
-    //     for (let j = 0; j < elements2.length; j++) {
-    //         if (
-    //             elements1[i].scalar === elements2[j].scalar
-    //             &&
-    //             variablesMatch(elements1[i].variables, elements2[i].variables)
-    //         ) found = true;
-    //     }
-    //     if (!found) return false;
-    // }
-    // return true;
 }
 
 function normalizeAddition(addition: ExpressionData) {
 
-    // console.log({addition});
+    const firstExpression = addition.elements[0]
 
-    const normalizationFactor = (addition.elements[0] instanceof ExpressionData
+    const normalizationFactor = !firstExpression.oneElement
         ? 1
-        : addition.elements[0].scalar) as number;
+        : firstExpression.oneElement.scalar;
+
+    const normalizedElements = addition.elements.map(
+        elem => !elem.oneElement
+            ? new ExpressionData({
+                operator: Operator.Multiply,
+                elements: [
+                    createMatrixElement({
+                        scalar: 1 / normalizationFactor
+                    }),
+                    elem
+                ]
+            })
+            : new ExpressionData({
+                oneElement: new ElementData({
+                    scalar: elem.oneElement.scalar / normalizationFactor,
+                    variables: elem.oneElement.variables
+                })
+            })
+    );
 
     return {
-        normalizedAddition: createMatrixElement({
+        normalizedAddition: new ExpressionData({
             operator: Operator.Add,
-            elements: addition.elements.map(
-                elem => elem instanceof ExpressionData
-                    ? createMatrixElement({
-                        operator: Operator.Multiply,
-                        elements: [
-                            createMatrixElement({
-                                scalar: 1 / normalizationFactor
-                            }),
-                            elem
-                        ]
-                    })
-                    : createMatrixElement({
-                        scalar: (elem.scalar as number) / normalizationFactor,
-                        variables: elem.variables
-                    })
-            )
+            elements: normalizedElements
         }),
         normalizationFactor
     };
@@ -114,16 +99,16 @@ function normalizeAddition(addition: ExpressionData) {
 
 function getIndexOfMultipliableAddition(additionElements: Array<ExpressionData>, additionSearch: ExpressionData) {
 
-    // console.log(JSON.stringify({previousAdditionSearch: additionSearch.stringify(), previousAdditionElements: additionElements.map(e => e.stringify())}));
-
     const normalizedSearchData = normalizeAddition(additionSearch);
 
     const normalizedElementsData = additionElements.map(
         elem => normalizeAddition(elem)
     );
 
-    const index = getIndexOfAddition(
-        normalizedElementsData.map(e => e.normalizedAddition),
+    const normalizedElementsAdditions = normalizedElementsData.map(e => e.normalizedAddition);
+
+    const index = getIndexOfNormalizedAddition(
+        normalizedElementsAdditions,
         normalizedSearchData.normalizedAddition
     );
 
@@ -137,21 +122,15 @@ function getIndexOfMultipliableAddition(additionElements: Array<ExpressionData>,
 
 }
 
-function getIndexOfAddition(additionElements: Array<ExpressionData>, additionSearch: ExpressionData) {
-
-    // console.log(JSON.stringify({additionSearch: additionSearch.stringify(), additionElements: additionElements.map(e => e.stringify())}));
+function getIndexOfNormalizedAddition(additionElements: Array<ExpressionData>, additionSearch: ExpressionData) {
 
     for (let index = 0; index < additionElements.length; index++) {
+        const addition = additionElements[index];
 
-        if (additionElements[index].operator !== Operator.Add) {
-            console.log('ERRO em getIndexOfAddition: operação não é de adição: ' + additionElements[index].operator);
-            return -1;
-        }
+        if (addition.operator !== Operator.Add)
+            throw 'addition should have Add operator: ' + addition.operator;
 
-        // console.log({bbb: additionElements[index], index})
-
-        if (additionMatches(additionElements[index], additionSearch)) return index;
-
+        if (additionMatches(addition, additionSearch)) return index;
     }
 
     return -1;
@@ -190,29 +169,37 @@ function getIndexOfVariable(simplifiedElements: Array<ExpressionData | ElementDa
     return -1;
 }
 
-function distributiveMultiplication(distributives: Array<ExpressionData | ElementData>) {
+function distributiveMultiplication(distributives: Array<ExpressionData>): ExpressionData {
 
     while (distributives.length > 1) {
 
         let biDistribution = []
 
-        let distrib1 = distributives.shift();
-        let distrib2 = distributives.shift();
+        const distrib1 = distributives.shift() as ExpressionData;
+        const distrib2 = distributives.shift() as ExpressionData;
 
-        distrib1 = distrib1 instanceof ExpressionData
+        const distrib1List = !distrib1.oneElement
             ? distrib1.elements
-            : distrib1;
-        distrib2 = distrib2 instanceof ExpressionData
+            : [
+                new ExpressionData({
+                    oneElement: distrib1.oneElement
+                })
+            ];
+        const distrib2List = !distrib2.oneElement
             ? distrib2.elements
-            : distrib2;
+            : [
+                new ExpressionData({
+                    oneElement: distrib2.oneElement
+                })
+            ];
 
-        for (let distElement1 of distrib1) {
-            for (let distElement2 of distrib2) {
+        for (let distElement1 of distrib1List) {
+            for (let distElement2 of distrib2List) {
                 // console.log('ENTERING MULTIPLICATION SUB-LOOP')
                 // console.log({distElement1: distElement1.stringify(), distElement2: distElement2.stringify()})
                 biDistribution.push(
                     doOperation(
-                        createMatrixElement({
+                        new ExpressionData({
                             operator: Operator.Multiply,
                             elements: [
                                 distElement1,
@@ -228,21 +215,22 @@ function distributiveMultiplication(distributives: Array<ExpressionData | Elemen
 
         // console.log('ENTERING ADDITION SUB-LOOP')
 
-        distributives.splice(0, 0, doOperation(
-            createMatrixElement({
+        const result = doOperation(
+            new ExpressionData({
                 operator: Operator.Add,
                 elements: biDistribution
             })
-        ));
+        );
+
+        distributives = [result, ...distributives];
 
         // console.log('ENDED ADDITION SUB-LOOP')
         // console.log({distributives: distributives.map(a => a.stringify())})
 
-
     }
 
     return distributives[0];
-
+    
 }
 
 function simpleMultiplication(multipliers: Array<ElementData>): ElementData {
@@ -620,7 +608,7 @@ function doOperation(expression: ExpressionData): ExpressionData {
 
     let element = null;
 
-    console.log(JSON.stringify({ doOperation: expression }));
+    console.log({ doOperation: expression.stringify() });
 
     switch (expression.operator) {
         case Operator.Elevate:
@@ -747,8 +735,8 @@ function doOperation(expression: ExpressionData): ExpressionData {
                         break;
                     case Operator.Multiply:
                         for (let elem of multiplier.elements) {
-                            if (elem instanceof ElementData)
-                                oneElements.push(elem);
+                            if (!!elem.oneElement)
+                                oneElements.push(elem.oneElement);
 
                             else if (elem.operator === Operator.Elevate)
                                 elevations.push(elem);
@@ -769,22 +757,27 @@ function doOperation(expression: ExpressionData): ExpressionData {
 
             }
 
-            let oneElementsResult = simpleMultiplication(oneElements);
+            let oneElementsMultiplicationResult = simpleMultiplication(oneElements);
 
             if (
                 (distributives.length === 0 && elevations.length === 0)
-                || oneElementsResult.scalar === 0
+                || oneElementsMultiplicationResult.scalar === 0
             )
                 return new ExpressionData({
-                    oneElement: oneElementsResult
+                    oneElement: oneElementsMultiplicationResult
                 });
 
-            let simplifiedElevations = [];
+            let simplifiedElevations: Array<ExpressionData> = [];
 
-            for (let elevationElement of elevations) {
+            for (let elevationExpression of elevations) {
 
-                const baseExpression = elevationElement.elements[0];
-                const exponentExpression = elevationElement.elements[1];
+                if (elevationExpression.elements.length !== 2)
+                    throw 'elevationElement should have two expressions';
+
+                const [
+                    baseExpression,
+                    exponentExpression
+                ] = elevationExpression.elements;
 
                 if (!exponentExpression.oneElement)
                     throw 'exponentExpression is not oneElement';
@@ -792,8 +785,10 @@ function doOperation(expression: ExpressionData): ExpressionData {
                 const exponent = exponentExpression.oneElement.scalar;
 
                 const distributivesCopyData = getIndexOfMultipliableAddition(distributives, baseExpression);
+
+                const elevationsBases = simplifiedElevations.map(elem => elem.elements[0]);
                 const elevationsCopyData = getIndexOfMultipliableAddition(
-                    simplifiedElevations.map(elem => elem.elements[0]),
+                    elevationsBases,
                     baseExpression
                 );
 
@@ -801,9 +796,14 @@ function doOperation(expression: ExpressionData): ExpressionData {
 
                 if (distributivesCopyData.index !== -1) {
 
-                    const multiplier = createMatrixElement({
-                        scalar: distributivesCopyData.searchNormalizationFactor
-                            * Math.pow(distributivesCopyData.elementEliminationFactor, exponent)
+                    const multiplier = new ElementData({
+                        scalar: (
+                            distributivesCopyData.searchNormalizationFactor
+                            * Math.pow(
+                                distributivesCopyData.elementEliminationFactor as number,
+                                exponent
+                            )
+                        )
                     });
 
                     const normalizedDistributive = normalizeAddition(
@@ -813,27 +813,29 @@ function doOperation(expression: ExpressionData): ExpressionData {
                     // console.log({normalizedDistributive: normalizedDistributive.stringify()})
 
                     const normalizedMultipliedBase = doOperation(
-                        createMatrixElement({
+                        new ExpressionData({
                             operator: Operator.Elevate,
                             elements: [
                                 normalizedDistributive,
-                                createMatrixElement({
-                                    scalar: exponent + 1
+                                new ExpressionData({
+                                    oneElement: new ElementData({
+                                        scalar: exponent + 1
+                                    })
                                 }),
                             ]
                         })
                     );
 
-                    if (multiplier.scalar === 1) {
+                    let newElement = normalizedMultipliedBase;
 
-                        const newElement = normalizedMultipliedBase;
+                    if (multiplier.scalar === 1) {
 
                         // console.log({newElement: newElement.stringify()})
 
-                        if (newElement instanceof ElementData)
-                            oneElementsResult = simpleMultiplication([
-                                oneElementsResult,
-                                newElement
+                        if (!!newElement.oneElement)
+                            oneElementsMultiplicationResult = simpleMultiplication([
+                                oneElementsMultiplicationResult,
+                                newElement.oneElement
                             ]);
 
                         else
@@ -843,19 +845,20 @@ function doOperation(expression: ExpressionData): ExpressionData {
 
                     else {
 
-                        if (normalizedMultipliedBase instanceof ElementData)
-                            oneElementsResult = simpleMultiplication([
+                        if (!!newElement.oneElement)
+                            oneElementsMultiplicationResult = simpleMultiplication([
                                 multiplier,
-                                oneElementsResult,
-                                newElement
+                                oneElementsMultiplicationResult,
+                                newElement.oneElement
                             ]);
 
                         else {
-
-                            newElement = createMatrixElement({
+                            newElement = new ExpressionData({
                                 operator: Operator.Multiply,
                                 elements: [
-                                    multiplier,
+                                    new ExpressionData({
+                                        oneElement: multiplier
+                                    }),
                                     normalizedMultipliedBase
                                 ]
                             });
@@ -869,33 +872,40 @@ function doOperation(expression: ExpressionData): ExpressionData {
 
                 if (elevationsCopyData.index !== -1) {
 
-                    multiplier = createMatrixElement({
-                        scalar: elevationsCopyData.searchNormalizationFactor
-                            * Math.pow(elevationsCopyData.elementEliminationFactor, exponent)
+                    const multiplier = new ElementData({
+                        scalar: (
+                            elevationsCopyData.searchNormalizationFactor
+                            * Math.pow(
+                                elevationsCopyData.elementEliminationFactor as number,
+                                exponent
+                            )
+                        )
                     });
 
-                    normalizedMultipliedBase = doOperation(
-                        createMatrixElement({
+                    const normalizedMultipliedBase = doOperation(
+                        new ExpressionData({
                             operator: Operator.Elevate,
                             elements: [
                                 normalizeAddition(
                                     elevations.splice(elevationsCopyData.index)[0].elements[0]
                                 ).normalizedAddition,
-                                createMatrixElement({
-                                    scalar: exponent + 1
-                                }),
+                                new ExpressionData({
+                                    oneElement: new ElementData({
+                                        scalar: exponent + 1
+                                    }),
+                                })
                             ]
                         })
                     );
 
+                    let newElement = normalizedMultipliedBase;
+
                     if (multiplier.scalar === 1) {
 
-                        newElement = normalizedMultipliedBase;
-
-                        if (newElement instanceof ElementData)
-                            oneElementsResult = simpleMultiplication([
-                                oneElementsResult,
-                                newElement
+                        if (!!newElement.oneElement)
+                            oneElementsMultiplicationResult = simpleMultiplication([
+                                oneElementsMultiplicationResult,
+                                newElement.oneElement
                             ]);
 
                         else
@@ -905,19 +915,21 @@ function doOperation(expression: ExpressionData): ExpressionData {
 
                     else {
 
-                        if (normalizedMultipliedBase instanceof ElementData)
-                            oneElementsResult = simpleMultiplication([
+                        if (!!newElement.oneElement)
+                            oneElementsMultiplicationResult = simpleMultiplication([
                                 multiplier,
-                                oneElementsResult,
-                                newElement
+                                oneElementsMultiplicationResult,
+                                newElement.oneElement
                             ]);
 
                         else {
 
-                            newElement = createMatrixElement({
+                            newElement = new ExpressionData({
                                 operator: Operator.Multiply,
                                 elements: [
-                                    multiplier,
+                                    new ExpressionData({
+                                        oneElement: multiplier
+                                    }),
                                     normalizedMultipliedBase
                                 ]
                             });
@@ -930,7 +942,7 @@ function doOperation(expression: ExpressionData): ExpressionData {
                 }
 
                 if (distributivesCopyData.index === -1 && elevationsCopyData.index === -1)
-                    simplifiedElevations.push(elevationElement);
+                    simplifiedElevations.push(elevationExpression);
 
             }
 
@@ -938,14 +950,21 @@ function doOperation(expression: ExpressionData): ExpressionData {
 
                 if (simplifiedElevations.length === 0) {
                     // console.log(2)
-                    return oneElementsResult;
+                    return new ExpressionData({
+                        oneElement: oneElementsMultiplicationResult
+                    });
                 }
 
-                if (!(oneElementsResult.scalar === 1 && oneElementsResult.variables.length === 0)) {
+                if (!(oneElementsMultiplicationResult.scalar === 1 && oneElementsMultiplicationResult.variables.length === 0)) {
                     // console.log(3)
-                    return createMatrixElement({
+                    return new ExpressionData({
                         operator: Operator.Multiply,
-                        elements: [oneElementsResult, ...simplifiedElevations],
+                        elements: [
+                            new ExpressionData({
+                                oneElement: oneElementsMultiplicationResult
+                            }),
+                            ...simplifiedElevations
+                        ],
                         isSimplified: true
                     });
                 }
@@ -956,7 +975,7 @@ function doOperation(expression: ExpressionData): ExpressionData {
                 }
 
                 // console.log(5)
-                return createMatrixElement({
+                return new ExpressionData({
                     operator: Operator.Multiply,
                     elements: simplifiedElevations,
                     isSimplified: true
@@ -971,8 +990,8 @@ function doOperation(expression: ExpressionData): ExpressionData {
             // console.log(JSON.stringify({simplifiedDistributives: simplifiedDistributives.stringify()}))
 
             // Se simplifiedDistributives for um ExpressionData, com operador Add:
-            if (simplifiedDistributives instanceof ExpressionData) {
-                let finalResult = []
+            if (!simplifiedDistributives.oneElement) {
+                let finalResult: Array<ExpressionData> = []
                 for (let distr of simplifiedDistributives.elements) {
 
                     // console.log('ENTERING MULT MULTIPLICATION SUB-LOOP')
@@ -981,14 +1000,17 @@ function doOperation(expression: ExpressionData): ExpressionData {
                     //     distr: distr.stringify()
                     // });
                     const mult = doOperation(
-                        createMatrixElement({
+                        new ExpressionData({
                             operator: Operator.Multiply,
                             elements: [
-                                oneElementsResult,
+                                new ExpressionData({
+                                    oneElement: oneElementsMultiplicationResult
+                                }),
                                 distr
                             ]
                         })
                     );
+
                     // console.log('ENDED MULT MULTIPLICATION SUB-LOOP')
                     // console.log({
                     //     mult: mult.stringify()
@@ -999,18 +1021,20 @@ function doOperation(expression: ExpressionData): ExpressionData {
 
                     else {
 
-                        if (mult.scalar === 0)
-                            return createMatrixElement({
-                                scalar: 0,
+                        if (mult.isZero)
+                            return new ExpressionData({
+                                oneElement: new ElementData({
+                                    scalar: 0,
+                                })
                             });
 
-                        else if (mult.scalar === 1 && mult.variables.length === 0) {
+                        else if (mult.isOne) {
                             if (simplifiedElevations.length === 1)
                                 return simplifiedElevations[0];
 
                             else
                                 finalResult.push(
-                                    createMatrixElement({
+                                    new ExpressionData({
                                         operator: Operator.Multiply,
                                         elements: simplifiedElevations,
                                         isSimplified: true
@@ -1020,7 +1044,7 @@ function doOperation(expression: ExpressionData): ExpressionData {
 
                         else {
                             finalResult.push(
-                                createMatrixElement({
+                                new ExpressionData({
                                     operator: Operator.Multiply,
                                     elements: [
                                         mult,
@@ -1036,48 +1060,55 @@ function doOperation(expression: ExpressionData): ExpressionData {
                 }
 
                 // console.log(6)
-                return createMatrixElement({
+                return new ExpressionData({
                     operator: Operator.Add,
                     elements: finalResult,
                     isSimplified: true
                 });
             }
 
-            oneElementsResult = simpleMultiplication([
-                oneElementsResult,
-                simplifiedDistributives
-            ]);
+            else {
 
-            if (simplifiedElevations.length === 0) {
-                // console.log(7)
-                return oneElementsResult;
-            }
-
-            if (oneElementsResult === 1) {
-
-                if (simplifiedElevations.length === 1) {
-                    // console.log(8)
-                    return simplifiedElevations[0];
+                oneElementsMultiplicationResult = simpleMultiplication([
+                    oneElementsMultiplicationResult,
+                    simplifiedDistributives.oneElement
+                ]);
+    
+                if (simplifiedElevations.length === 0) {
+                    // console.log(7)
+                    return new ExpressionData({
+                        oneElement: oneElementsMultiplicationResult
+                    });
                 }
-
-                // console.log(9)
-                return createMatrixElement({
-                    operator: operator.Multiply,
-                    elements: simplifiedElevations,
+    
+                if (oneElementsMultiplicationResult.stringify() === '1') {
+    
+                    if (simplifiedElevations.length === 1) {
+                        // console.log(8)
+                        return simplifiedElevations[0];
+                    }
+    
+                    // console.log(9)
+                    return new ExpressionData({
+                        operator: Operator.Multiply,
+                        elements: simplifiedElevations,
+                        isSimplified: true
+                    })
+    
+                }
+    
+                // console.log(10)
+                return new ExpressionData({
+                    operator: Operator.Multiply,
+                    elements: [
+                        new ExpressionData({
+                            oneElement: oneElementsMultiplicationResult
+                        }),
+                        ...simplifiedElevations
+                    ],
                     isSimplified: true
-                })
-
+                });
             }
-
-            // console.log(10)
-            return createMatrixElement({
-                operator: operator.Multiply,
-                elements: [
-                    oneElementsResult,
-                    ...simplifiedElevations
-                ],
-                isSimplified: true
-            })
 
         case Operator.Add:
 
@@ -1225,7 +1256,7 @@ function stringifyExpression(expression: any) {
 }
 
 function simplifyExpressionAlgorithm(expression: ExpressionData) {
-    console.log(JSON.stringify({ expression12: expression }));
+    console.log(JSON.stringify({ expression12: expression.stringify() }));
 
     if (!expression.isSimplified) {
 
@@ -1241,3 +1272,7 @@ function simplifyExpressionAlgorithm(expression: ExpressionData) {
 
     return expression;
 }
+
+// a  2  5 
+// 5  2  8 
+// 4  0  3
