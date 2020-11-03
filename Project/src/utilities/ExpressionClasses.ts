@@ -16,17 +16,14 @@ export class ExpressionData {
     isSimplified: boolean;
     isZero: boolean;
 
-    constructor({ elements = [], oneElement, operator = Operator.None, isSimplified = false }: ExpressionDataParams) {
+    constructor({ elements, oneElement, operator = Operator.None, isSimplified = false }: ExpressionDataParams) {
         if (!!oneElement && !!elements)
             throw 'oneElement and elements can\'t both be defined';
 
         if (!!oneElement && operator !== Operator.None)
             throw 'oneElement should always use Operator.None';
 
-        if (!!oneElement && !isSimplified)
-            throw 'oneElement should always be simplified';
-
-        this.elements = elements;
+        this.elements = elements || [];
 
         this.oneElement = oneElement;
 
