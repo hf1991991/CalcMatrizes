@@ -629,7 +629,7 @@ function doOperation(expression: ExpressionData): ExpressionData {
 
     let element = null;
 
-    // console.log(JSON.stringify({expression}));
+    console.log(JSON.stringify({expression}));
  
     switch (expression.operator) {
         case Operator.Elevate:
@@ -687,6 +687,8 @@ function doOperation(expression: ExpressionData): ExpressionData {
 
             const [numerator, denominator] = expression.elements;
 
+            console.log({numerator, denominator})
+
             let invertedDenominator;
 
             if (!!denominator.oneElement) {
@@ -698,7 +700,7 @@ function doOperation(expression: ExpressionData): ExpressionData {
                 invertedDenominator = createMatrixElement({
                     scalar: 1 / scalar,
                     variables: raiseVariablesExponent(variables, -1)
-                })
+                });
             }
 
             else
@@ -1318,28 +1320,19 @@ function stringifyExpression(expression: any) {
 }
 
 function simplifyExpressionAlgorithm(expression: ExpressionData) {
-    // console.log(JSON.stringify({expression12: expression}))
+    console.log(JSON.stringify({expression12: expression}));
 
     if (!expression.isSimplified) {
-    
-        // console.log({
-        //     expression: expression.stringify(),
-        //     simplified: expression.isSimplified,
-        // });
 
         // Realiza, recursivamente, a simplificação da expressão:
         for (let element of expression.elements) {
             element = simplifyExpressionAlgorithm(element);
         }
-
-        // Após isso, ou a expressão será uma ExpressionData simplificada, ou será uma ElementData:
+        
+        // Após isso, realiza a operação:
         expression = doOperation(expression);
-
-        // console.log(JSON.stringify({
-        //     finalExpression: expression.stringify()
-        // }))
 
     }
     
-    return createMatrixElement(expression);
+    return expression;
 }
