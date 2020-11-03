@@ -288,45 +288,40 @@ function addNumbersWithSameVariables(adders: Array<ElementData>) {
 
 }
 
-function symplifyDenominators(addition: ExpressionData) {
+function symplifyDenominators(addition: Array<ExpressionData>): ExpressionData {
 
-    function separateNumeratorsAndDenominators(elem) {
+    function separateNumeratorsAndDenominators(elem: ExpressionData) {
 
-        numerator = null;
-        denominators = [];
+        let numerator: ExpressionData | null = null;
+        let denominators: Array<ExpressionData> = [];
 
-        if (!(elem instanceof ExpressionData && elem.operator === Operator.Multiply))
+        if (elem.operator !== Operator.Multiply)
             return {
-                numerator,
-                denominators
+                numerator: elem,
+                denominators: [] as Array<ExpressionData>
             };
 
         for (let e of elem.elements) {
             // console.log(JSON.stringify({e}))
-            if (e instanceof ExpressionData && e.operator === Operator.Elevate && e.elements[1].scalar < 0)
-                denominators.push(e);
+            if (e.operator === Operator.Elevate) {
+                const exponentElement = e.elements[1];
+
+                if (!exponentElement.oneElement)
+                    throw 'exponentElement should be oneElement'
+
+                if (exponentElement.oneElement.scalar < 0)
+                    denominators.push(e);
+            }
             else {
+                if (numerator !== null)
+                    throw 'elem should be a multiplication of an expression and an elevation expression: ' + elem.stringify();
 
-                if (numerator !== null) {
-                    console.log('ERRO em separateNumeratorsAndDenominators: há mais de um numerador em ' + elem.stringify())
-                    numerator = createMatrixElement({
-                        variables: [
-                            new VariableData({
-                                variable: 'ERRO'
-                            })
-                        ]
-                    });
-                }
-
-                else {
-                    numerator = e;
-                }
-
+                numerator = e;
             }
         }
 
         return {
-            numerator,
+            numerator: numerator as ExpressionData,
             denominators
         };
 
@@ -334,14 +329,23 @@ function symplifyDenominators(addition: ExpressionData) {
 
     function denominatorsMatch(denominators1: Array<ExpressionData>, denominators2: Array<ExpressionData>) {
 
+        // denominator1 e denominator2 são Elevations:
         for (let denominator1 of denominators1) {
+
+            const [base1, exponent1] = denominator1.elements;
 
             let match = false;
 
             for (let denominator2 of denominators2) {
+
+                const [base2, exponent2] = denominator2.elements;
+
+                if (!exponent1.oneElement || !exponent2.oneElement)
+                    throw 'exponent1 and exponent2 should be oneElements';
+
                 if (
-                    additionMatches(denominator1.elements[0], denominator2.elements[0])
-                    && (denominator1.elements[1] as ElementData).scalar === (denominator2.elements[1] as ElementData).scalar
+                    additionMatches(base1, base2)
+                    && exponent1.oneElement.scalar === exponent2.oneElement.scalar
                 ) match = true;
             }
 
@@ -353,13 +357,10 @@ function symplifyDenominators(addition: ExpressionData) {
 
     }
 
-    function inverseDistributive(numerator1: ElementData, numerator2: ElementData, denominator: ExpressionData) {
+    function inverseDistributive(numerator1: ExpressionData, numerator2: ExpressionData, denominator: ExpressionData): ExpressionData | null {
 
         function addToExponent(variableData: VariableData, add: number) {
-            return new VariableData({
-                variable: variableData.variable,
-                exponent: variableData.exponent + add
-            });
+            variableData.exponent += add;
         }
 
         function insertNotExistingVariables(element: ElementData, allVariables: Array<string>) {
@@ -372,10 +373,10 @@ function symplifyDenominators(addition: ExpressionData) {
                         exponent: getVariableFromElement(
                             v,
                             element
-                        ) || 0
+                        )?.exponent || 0
                     })
                 )
-            };
+            } as ElementData;
         }
 
         function getVariableFromElement(variable: string, element: ElementData) {
@@ -387,14 +388,18 @@ function symplifyDenominators(addition: ExpressionData) {
                 : null;
         }
 
-        function getVariableIndex(search: string, variables: Array<VariableData>) {
-            return variables.some(v => v.variable === search);
+        function searchVariable(search: string, variables: Array<VariableData>) {
+            return variables.find(v => v.variable === search);
         }
 
         // console.log('STARTED INVERSE DISTRIBUTIVE')
 
-        const denominatorBase = denominator.elements[0] as ExpressionData;
-        const denominatorExponent = (denominator.elements[1] as ElementData).scalar;
+        const [denominatorBase, denominatorExponent] = denominator.elements;
+
+        if (!denominatorExponent.oneElement)
+            throw 'denominatorExponent should be oneElement';
+        
+        const exponent = denominatorExponent.oneElement.scalar;
 
         // console.log({
         //     numerator1: numerator1.stringify(),
@@ -402,11 +407,22 @@ function symplifyDenominators(addition: ExpressionData) {
         //     denominatorBase: denominatorBase.stringify()
         // });
 
+        if (denominatorBase.elements.length !== 2)
+            throw 'erro de preguiça do programador: programa só funciona com denominador de duas variáveis';
+        
+        const [baseExpression1, baseExpression2] = denominatorBase.elements;
+
+        if (!baseExpression1.oneElement || !baseExpression2.oneElement)
+            throw 'baseExpression1 and baseExpression2 should be oneElements';
+
+        if (!numerator1.oneElement || !numerator2.oneElement)
+            throw 'numerator1 and numerator2 should be oneElements';
+
         let allVariables = [
-            ...numerator1.variables,
-            ...numerator2.variables,
-            ...(denominatorBase.elements[0] as ElementData).variables,
-            ...(denominatorBase.elements[1] as ElementData).variables
+            ...numerator1.oneElement.variables,
+            ...numerator2.oneElement.variables,
+            ...baseExpression1.oneElement.variables,
+            ...baseExpression2.oneElement.variables
         ].map(v => v.variable);
 
         allVariables = allVariables.filter(
@@ -414,13 +430,13 @@ function symplifyDenominators(addition: ExpressionData) {
         );
 
         let denominatorBaseElementsCopy = denominatorBase.elements.map(
-            e => insertNotExistingVariables(e, allVariables)
+            e => insertNotExistingVariables(e.oneElement as ElementData, allVariables)
         );
 
         for (let denominatorElement of denominatorBaseElementsCopy) {
 
-            let numerator1Copy = insertNotExistingVariables(numerator1, allVariables);
-            let numerator2Copy = insertNotExistingVariables(numerator2, allVariables);
+            let numerator1Copy = insertNotExistingVariables(numerator1.oneElement, allVariables);
+            let numerator2Copy = insertNotExistingVariables(numerator2.oneElement, allVariables);
 
             // console.log(JSON.stringify({
             //     numerator1Copy: createMatrixElement(numerator1Copy).stringify(),
@@ -433,7 +449,7 @@ function symplifyDenominators(addition: ExpressionData) {
 
             let common = {
                 scalar: numerator1Copy.scalar / denominatorElement.scalar,
-                variables: []
+                variables: [] as Array<VariableData>
             };
 
             numerator1Copy.scalar = numerator1Copy.scalar * Math.pow(common.scalar, -1);
@@ -443,24 +459,25 @@ function symplifyDenominators(addition: ExpressionData) {
 
                 let denominatorVariable = getVariableFromElement(variable, denominatorElement);
 
-                let i = getVariableIndex(variable, numerator1Copy.variables);
-                let j = getVariableIndex(variable, numerator2Copy.variables);
+                if (!denominatorVariable)
+                    throw 'denominatorVariable is for some reason null';
 
-                if (i === -1 || j === -1) {
-                    console.log('ERRO em inverseDistributive: índice não existe.')
-                    console.log({ i, j });
-                }
+                let numeratorVariable1 = searchVariable(variable, numerator1Copy.variables);
+                let numeratorVariable2 = searchVariable(variable, numerator2Copy.variables);
 
-                while (numerator1Copy.variables[i].exponent !== denominatorVariable.exponent) {
+                if (!numeratorVariable1 || !numeratorVariable2)
+                    throw 'ERRO em inverseDistributive: índice não existe: ' + { numeratorVariable1, numeratorVariable2 };
 
-                    const numberToAdd = numerator1Copy.variables[i].exponent < denominatorVariable.exponent
+                while (numeratorVariable1.exponent !== denominatorVariable.exponent) {
+
+                    const numberToAdd = numeratorVariable1.exponent < denominatorVariable.exponent
                         ? 1
                         : -1;
 
-                    numerator1Copy.variables[i] = addToExponent(numerator1Copy.variables[i], numberToAdd);
-                    numerator2Copy.variables[j] = addToExponent(numerator2Copy.variables[j], numberToAdd);
+                    addToExponent(numeratorVariable1, numberToAdd);
+                    addToExponent(numeratorVariable2, numberToAdd);
 
-                    (common as ElementDataParams).variables?.push(new VariableData({
+                    common.variables.push(new VariableData({
                         variable,
                         exponent: -1 * numberToAdd
                     }));
@@ -478,11 +495,15 @@ function symplifyDenominators(addition: ExpressionData) {
             //     common: createMatrixElement(common).stringify()
             // }));
 
-            const newNumerator = createMatrixElement({
+            const newNumerator = new ExpressionData({
                 operator: Operator.Add,
                 elements: [
-                    createMatrixElement(numerator1Copy),
-                    createMatrixElement(numerator2Copy)
+                    new ExpressionData({
+                        oneElement: new ElementData(numerator1Copy)
+                    }),
+                    new ExpressionData({
+                        oneElement: new ElementData(numerator2Copy)
+                    }),
                 ]
             });
 
@@ -493,13 +514,20 @@ function symplifyDenominators(addition: ExpressionData) {
 
                 const commonElement = new ElementData(common);
 
+                if (1 + exponent === 0)
+                    return new ExpressionData({
+                        oneElement: commonElement
+                    });
+
                 const finalDenominator = doOperation(
-                    createMatrixElement({
+                    new ExpressionData({
                         operator: Operator.Elevate,
                         elements: [
                             denominatorBase,
-                            createMatrixElement({
-                                scalar: 1 + denominatorExponent
+                            new ExpressionData({
+                                oneElement: new ElementData({
+                                    scalar: 1 + exponent
+                                })
                             })
                         ]
                     })
@@ -512,16 +540,15 @@ function symplifyDenominators(addition: ExpressionData) {
 
                 // console.log('ENDED INVERSE DISTRIBUTIVE')
 
-                if (1 + denominatorExponent === 0)
-                    return commonElement;
-
                 if (commonElement.scalar === 1 && commonElement.variables.length === 0)
                     return finalDenominator;
 
-                return createMatrixElement({
+                return new ExpressionData({
                     operator: Operator.Multiply,
                     elements: [
-                        commonElement,
+                        new ExpressionData({
+                            oneElement: commonElement
+                        }),
                         finalDenominator
                     ]
                 });
@@ -538,7 +565,7 @@ function symplifyDenominators(addition: ExpressionData) {
 
     }
 
-    let newElements: Array<ElementData> = [];
+    let newElements: Array<ExpressionData> = [];
     let addedIndexes: Array<number> = [];
 
     // console.log('STARTING SYMPLIFYDENOMINATORS')
@@ -546,16 +573,16 @@ function symplifyDenominators(addition: ExpressionData) {
     //     elementsss: addition.elements.map(a => a.stringify())
     // }));
 
-    for (let i = 0; i < addition.elements.length; i++) {
+    for (let i = 0; i < addition.length; i++) {
 
-        const fraction1 = separateNumeratorsAndDenominators(addition.elements[i]);
+        const fraction1 = separateNumeratorsAndDenominators(addition[i]);
 
         // Testa todos os elementos de newElements antes e depois do índice i:
-        for (let j = i + 1; j < addition.elements.length; j++) {
+        for (let j = i + 1; j < addition.length; j++) {
 
             if (!addedIndexes.includes(i) && !addedIndexes.includes(j)) {
 
-                const fraction2 = separateNumeratorsAndDenominators(addition.elements[j]);
+                const fraction2 = separateNumeratorsAndDenominators(addition[j]);
 
                 // Verifica se os denominadores são iguais:
                 if (
@@ -564,9 +591,8 @@ function symplifyDenominators(addition: ExpressionData) {
                     && fraction2.denominators.length > 0
                 ) {
 
-                    if (fraction1.denominators.length > 1) {
-                        console.log('ERRO em inverseDistributive: fraction1.denominators muito longo: ' + fraction1.denominators)
-                    }
+                    if (fraction1.denominators.length > 1)
+                        throw 'preguiça do desenvolvedor: fraction1.denominators muito longo: ' + fraction1.denominators;
 
                     const divisionResult = inverseDistributive(fraction1.numerator, fraction2.numerator, fraction1.denominators[0])
 
@@ -584,21 +610,45 @@ function symplifyDenominators(addition: ExpressionData) {
 
     }
 
-    for (let index = 0; index < addition.elements.length; index++) {
+    for (let index = 0; index < addition.length; index++) {
         if (!addedIndexes.includes(index))
-            newElements.push(addition.elements[index]);
+            newElements.push(addition[index]);
     }
 
-    newElements = addNumbersWithSameVariables(newElements).filter(e => !(e.scalar === 0 && e.variables.length === 0));
+    let [
+        newOneElements,
+        expressionDatas
+    ] = newElements.reduce(
+        (separationAccumulator, expression) => {
+            if (!expression.oneElement)
+                separationAccumulator[1].push(expression);
+            else
+                separationAccumulator[0].push(expression.oneElement);
+            return separationAccumulator;
+        },
+        [
+            [] as Array<ElementData>,
+            [] as Array<ExpressionData>
+        ] 
+    )
+
+    newOneElements = addNumbersWithSameVariables(newOneElements).filter(e => !(e.scalar === 0 && e.variables.length === 0));
+
+    const expressionNewOneElements = newOneElements.map(
+        oneElement => new ExpressionData({ oneElement })
+    )
 
     // console.log('ENDED SYMPLIFYDENOMINATORS')
     // console.log(JSON.stringify({
     //     newElements: newElements.map(a => a.stringify())
     // }));
 
-    return createMatrixElement({
+    return new ExpressionData({
         operator: Operator.Add,
-        elements: newElements,
+        elements: [
+            ...expressionNewOneElements, 
+            ...expressionDatas
+        ],
         isSimplified: true
     })
 
@@ -1175,16 +1225,10 @@ function doOperation(expression: ExpressionData): ExpressionData {
                 })
             );
 
-            return symplifyDenominators(
-                new ExpressionData({
-                    operator: expression.operator,
-                    elements: [
-                        ...expressionAdders,
-                        ...notAdders
-                    ],
-                    isSimplified: true
-                })
-            );
+            return symplifyDenominators([
+                ...expressionAdders,
+                ...notAdders
+            ]);
 
         case Operator.Subtract:
 
