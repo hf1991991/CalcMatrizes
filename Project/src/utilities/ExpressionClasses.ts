@@ -15,10 +15,14 @@ export class ExpressionData {
     operator: Operator;
     isSimplified: boolean;
     isZero: boolean;
+    isOne: boolean;
 
     constructor({ elements, oneElement, operator = Operator.None, isSimplified = false }: ExpressionDataParams) {
-        if (!!oneElement && !!elements)
+        if (!!oneElement && !!elements) {
+            console.log(oneElement.stringify());
+            console.log(elements.map(e => e.algebraicStringify()));
             throw 'oneElement and elements can\'t both be defined';
+        }
 
         if (!!oneElement && operator !== Operator.None)
             throw 'oneElement should always use Operator.None';
@@ -32,6 +36,8 @@ export class ExpressionData {
         this.isSimplified = !oneElement ? isSimplified : true;
 
         this.isZero = this.commaStringify() === '0';
+
+        this.isOne = this.commaStringify() === '1';
 
         operator === Operator.Add && this.sortElements();
     }
@@ -54,12 +60,10 @@ export class ExpressionData {
             case Operator.Elevate:
                 const base = this.elements[0].algebraicStringify({ dontFindFraction });
                 const exponent = this.elements[1].algebraicStringify({ dontFindFraction });
-                return `(${
-                        parenthesisEnglobe(base)
-                            ? base.substring(1, base.length - 1)
-                            : base
-                    })${
-                        ScalarOperations.superscript(exponent)
+                return `(${parenthesisEnglobe(base)
+                        ? base.substring(1, base.length - 1)
+                        : base
+                    })${ScalarOperations.superscript(exponent)
                     }`;
             case Operator.Divide:
                 return `${this.elements[0].algebraicStringify({ dontFindFraction })}/(${[...this.elements].splice(1, this.elements.length - 1).map(a => a.algebraicStringify({ dontFindFraction })).join(')/(')}`;
