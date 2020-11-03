@@ -35,12 +35,12 @@ export function varOperation(
 
     const result = simplifyExpressionAlgorithm(expressionData);
 
-    // console.log(JSON.stringify({
-    //     element1: element1.stringify(), 
-    //     operator, 
-    //     element2: element2.stringify(),
-    //     result: result.stringify()
-    // }));
+    console.log(JSON.stringify({
+        element1: element1.stringify(),
+        operator,
+        element2: element2.stringify(),
+        RESULT: result.stringify()
+    }));
 
     return result;
 }
@@ -620,59 +620,75 @@ function doOperation(expression: ExpressionData): ExpressionData {
 
     let element = null;
 
-    console.log(JSON.stringify({ expression }));
+    console.log(JSON.stringify({ doOperation: expression }));
 
     switch (expression.operator) {
         case Operator.Elevate:
 
-            if (expression.elements.length !== 2) {
-                console.log('ERRO em doOperation: expressão de elevado não possui dois elementos.');
-                return createMatrixElement({
-                    variables: [
-                        new VariableData({
-                            variable: 'ERRO'
-                        })
-                    ]
+            if (expression.elements.length !== 2)
+                throw 'Elevation should only have two expressions';
+
+            const baseExpression = expression.elements[0];
+            const exponentExpression = expression.elements[1];
+
+            if (!exponentExpression.oneElement)
+                throw 'exponentExpression is not oneElement';
+
+            const exponent = exponentExpression.oneElement.scalar;
+
+            if (!!baseExpression.oneElement)
+                return new ExpressionData({
+                    oneElement: new ElementData({
+                        scalar: Math.pow(
+                            baseExpression.oneElement.scalar,
+                            exponent
+                        ),
+                        variables: raiseVariablesExponent(
+                            baseExpression.oneElement.variables,
+                            exponent
+                        )
+                    })
                 });
-            }
 
-            let base = expression.elements[0];
-            let exponent = (expression.elements[1] as ElementData).scalar;
+            if (baseExpression.operator === Operator.Elevate) {
 
-            // console.log(JSON.stringify({base, picles: exponent, jacaSeca: expression.elements[1]}))
+                const [
+                    newBaseExpression,
+                    newExponentExpression
+                ] = baseExpression.elements;
 
-            if (base instanceof ElementData)
-                return createMatrixElement({
-                    scalar: Math.pow((base as ElementData).scalar as number, exponent),
-                    variables: raiseVariablesExponent(base.variables, exponent)
-                })
+                if (!newExponentExpression.oneElement)
+                    throw 'newExponentExpression is not oneElement';
 
-            if (base.operator === Operator.Elevate)
                 return doOperation(
-                    createMatrixElement({
+                    new ExpressionData({
                         operator: Operator.Elevate,
                         elements: [
-                            base.elements[0],
+                            newBaseExpression,
                             createMatrixElement({
-                                scalar: ((base.elements[1] as ElementData).scalar as number) * (exponent as number)
+                                scalar: newExponentExpression.oneElement.scalar * exponent
                             })
                         ]
                     })
                 );
 
+            }
+
             if (exponent === 0)
-                return createMatrixElement({
-                    scalar: 1
+                return new ExpressionData({
+                    oneElement: new ElementData({
+                        scalar: 1
+                    })
                 });
 
             if (exponent === 1)
-                return base;
+                return baseExpression;
 
-            return createMatrixElement({
+            return new ExpressionData({
                 operator: expression.operator,
                 elements: expression.elements,
                 isSimplified: true,
-            })
+            });
 
         case Operator.Divide:
 
