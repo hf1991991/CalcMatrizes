@@ -1259,7 +1259,7 @@ export function doOperation(expression: ExpressionData): ExpressionData {
                     new ExpressionData({
                         operator: Operator.Multiply,
                         elements: [
-                            denominator,
+                            second,
                             new ExpressionData({
                                 oneElement: new ElementData({
                                     scalar: -1
