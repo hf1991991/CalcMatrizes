@@ -652,12 +652,12 @@ class MatrixOperations {
             let allElementsOfRowNull = true;
 
             for (let column = 0; column < matrixA.dimensions().columns; column++) {
-                if (matrixA.data && matrixA.data[row] && matrixA.data[row][column] instanceof ElementData && (matrixA.data[row][column] as ElementData).scalar !== 0.0) allElementsOfRowNull = false;
+                if (!matrixA.data[row][column].isZero) allElementsOfRowNull = false;
             }
 
             if (allElementsOfRowNull) {
                 for (let column = 0; column < matrixB.dimensions().columns; column++) {
-                    if (matrixB.data && matrixB.data[row] && matrixB.data[row][column] instanceof ElementData && (matrixB.data[row][column] as ElementData).scalar !== 0.0) return SystemSolutionType.SI;
+                    if (!matrixB.data[row][column].isZero) return SystemSolutionType.SI;
                 }
                 return SystemSolutionType.SPI;
             }
@@ -675,7 +675,7 @@ class MatrixOperations {
                 column < matrixB.dimensions().columns;
                 column++
             ) {
-                if (matrixB.data && matrixB.data[row] && matrixB.data[row][column] instanceof ElementData && (matrixB.data[row][column] as ElementData).scalar !== 0) return SystemSolutionType.SI;
+                if (!matrixB.data[row][column].isZero) return SystemSolutionType.SI;
             }
         }
 
