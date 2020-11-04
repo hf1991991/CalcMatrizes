@@ -1277,8 +1277,7 @@ function doOperation(expression: ExpressionData): ExpressionData {
             );
 
         default:
-            console.log('ERRO em doOperation: não foi selecionado um operador: ' + expression.operator)
-            return 'ERRO';
+            throw 'ERRO em doOperation: não foi selecionado um operador: ' + expression.operator;
     }
 
 }
