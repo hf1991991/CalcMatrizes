@@ -86,11 +86,10 @@ interface CalculatorContextData {
     onCheck(): void;
 }
 
-const INITIAL_MATRIX = new MatrixData([
-    [0, 0, 5],
-    [5, 2, 8],
-    [4, 0, 3]
-]);
+const INITIAL_MATRIX = MatrixOperations.emptyMatrix({
+    rows: 3,
+    columns: 1
+});
 
 const CalculatorContext = createContext<CalculatorContextData>({} as CalculatorContextData);
 
