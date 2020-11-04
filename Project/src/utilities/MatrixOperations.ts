@@ -361,21 +361,17 @@ class MatrixOperations {
     }
 
     static transpose(matrix: MatrixData) {
-        function _transpose() {
-            let transposedData = [];
+        let transposedData = [];
 
-            for (let column = 0; column < matrix.dimensions().columns; column++) {
-                let transposedRow = [];
-                for (let row = 0; row < matrix.dimensions().rows; row++) {
-                    transposedRow.push(matrix.data[row][column]);
-                }
-                transposedData.push(transposedRow);
+        for (let column = 0; column < matrix.dimensions().columns; column++) {
+            let transposedRow = [];
+            for (let row = 0; row < matrix.dimensions().rows; row++) {
+                transposedRow.push(matrix.data[row][column]);
             }
-
-            return new MatrixData(transposedData);
+            transposedData.push(transposedRow);
         }
 
-        return addErrorTreatment(_transpose, matrix);
+        return new MatrixData(transposedData);
     }
 
     static invert(matrix: MatrixData) {
@@ -401,21 +397,18 @@ class MatrixOperations {
             return MatrixOperations.copyMatrixData(secondElimination.matrixB);
         }
 
-        return addErrorTreatment(_invert, matrix);
+        return addErrorTreatment(_invert, 'inverted');
     }
 
     static determinant(matrix: MatrixData) {
-        return addErrorTreatment<DeterminantData>(
+        return addErrorTreatment(
             () => (
-                {
-                    determinant: MatrixOperations.partialGaussianElimination({
-                        matrixA: matrix,
-                        matrixB: MatrixOperations.identity(matrix.dimensions().rows)
-                    }).determinant,
-                    error: false
-                }
+                MatrixOperations.partialGaussianElimination({
+                    matrixA: matrix,
+                    matrixB: MatrixOperations.identity(matrix.dimensions().rows)
+                }).determinant
             ),
-            { error: true } as DeterminantData
+            'determinant'
         );
     }
 
@@ -588,7 +581,7 @@ class MatrixOperations {
 
 
     static getGaussianElimination(matrix: MatrixData) {
-        function _getGaussianElimination() {
+        function _getGaussianElimination(): GetGaussianEliminationData {
             const { matrixA: rowEchelonForm } = MatrixOperations.partialGaussianElimination({
                 matrixA: matrix,
                 matrixB: MatrixOperations.emptyMatrix({
@@ -614,10 +607,7 @@ class MatrixOperations {
             };
         }
 
-        return addErrorTreatment(
-            _getGaussianElimination,
-            { error: true } as GetGaussianEliminationData
-        ) ;
+        return addErrorTreatment(_getGaussianElimination, 'gaussianElimination');
     }
 
 
@@ -701,7 +691,7 @@ class MatrixOperations {
 
         return addErrorTreatment(
             _findSolutionForMatrixEquation,
-            { error: true } as FindSolutionMatrixEquationData
+            'result'
         );
     }
 

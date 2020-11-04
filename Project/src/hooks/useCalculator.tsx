@@ -196,9 +196,9 @@ export const CalculatorProvider: React.FC = ({ children }) => {
         () => {
             if (isMatrixFull && isMatrixSquare) {
 
-                const { 
-                    determinant, 
-                    error 
+                const {
+                    determinant,
+                    error
                 } = MatrixOperations.determinant(matrixOnScreen);
 
                 if (!error) return determinant;
@@ -566,10 +566,7 @@ export const CalculatorProvider: React.FC = ({ children }) => {
         () => {
 
             const {
-                partiallyEliminatedOriginal,
-                solution,
-                systemSolutionsType,
-                solutionWithIndependentVariables,
+                result,
                 error
             } = MatrixOperations.findSolutionForMatrixEquation(
                 isAFirst ? readyMatrix : editableMatrix,
@@ -581,6 +578,13 @@ export const CalculatorProvider: React.FC = ({ children }) => {
             );
 
             if (!error) {
+                const {
+                    partiallyEliminatedOriginal,
+                    solution,
+                    systemSolutionsType,
+                    solutionWithIndependentVariables
+                } = result;
+
                 setViewReduced(false);
                 setFullEquation({
                     equationType: calcState,
@@ -886,12 +890,17 @@ export const CalculatorProvider: React.FC = ({ children }) => {
         () => {
 
             const {
-                rowEchelonForm,
-                reducedRowEchelonForm,
+                gaussianElimination,
                 error
             } = MatrixOperations.getGaussianElimination(matrixOnScreen);
 
             if (!error) {
+
+                const {
+                    rowEchelonForm,
+                    reducedRowEchelonForm
+                } = gaussianElimination;
+
                 setViewReduced(false);
                 setFullEquation({
                     equationType: CalcState.gaussianElimination,
@@ -899,7 +908,7 @@ export const CalculatorProvider: React.FC = ({ children }) => {
                     matrixC: rowEchelonForm,
                     matrixD: reducedRowEchelonForm
                 });
-    
+
                 setReadyMatrix(rowEchelonForm);
             }
 
@@ -950,19 +959,24 @@ export const CalculatorProvider: React.FC = ({ children }) => {
     const onInvert = useCallback(
         () => {
 
-            const inverted = MatrixOperations.invert(matrixOnScreen);
+            const {
+                inverted,
+                error
+            } = MatrixOperations.invert(matrixOnScreen);
 
-            if (calcState === CalcState.ready) {
-                setReadyMatrix(inverted);
+            if (!error) {
+                if (calcState === CalcState.ready) {
+                    setReadyMatrix(inverted);
+                }
+    
+                else {
+                    setEditableMatrix(inverted);
+                    changeSettingsOfSelectedMatrixElement(null);
+                    exitEditingMode();
+                }
+    
+                singleInputFullEquationSetup(CalcState.invert, inverted);
             }
-
-            else {
-                setEditableMatrix(inverted);
-                changeSettingsOfSelectedMatrixElement(null);
-                exitEditingMode();
-            }
-
-            singleInputFullEquationSetup(CalcState.invert, inverted);
 
         },
         [
