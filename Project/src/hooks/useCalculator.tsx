@@ -303,7 +303,11 @@ export const CalculatorProvider: React.FC = ({ children }) => {
                     ? '' as string
                     : editableOperatorNumber;
 
+            if (!selectedMatrixElement) return null;
+
             const { row, column } = selectedMatrixElement || {} as SelectedMatrixElement;
+            console.log({calcState, row, column})
+            MatrixOperations.printMatrix(editableMatrix)
             const matrixNumber = calcState === CalcState.LambdaxA
                 ? editableScalar
                 : editableMatrix?.data[row] && editableMatrix.data[row][column];
