@@ -342,17 +342,21 @@ class MatrixOperations {
     }
 
     static transpose(matrix: MatrixData) {
-        let transposedData = [];
-
-        for (let column = 0; column < matrix.dimensions().columns; column++) {
-            let transposedRow = [];
-            for (let row = 0; row < matrix.dimensions().rows; row++) {
-                transposedRow.push(matrix.data[row][column]);
+        function _transpose() {
+            let transposedData = [];
+    
+            for (let column = 0; column < matrix.dimensions().columns; column++) {
+                let transposedRow = [];
+                for (let row = 0; row < matrix.dimensions().rows; row++) {
+                    transposedRow.push(matrix.data[row][column]);
+                }
+                transposedData.push(transposedRow);
             }
-            transposedData.push(transposedRow);
+    
+            return new MatrixData(transposedData);
         }
 
-        return new MatrixData(transposedData);
+        return addErrorTreatment(_transpose, matrix);
     }
 
     static invert(matrix: MatrixData) {
