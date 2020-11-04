@@ -2,34 +2,7 @@ import { Operator, count } from "./constants";
 
 class ScalarOperations {
 
-    static applyOperation({ operation, scalar1, scalar2 }) {
-
-        scalar1 = Number.parseFloat(scalar1);
-        scalar2 = Number.parseFloat(scalar2);
-
-        switch (operation) {
-            case Operator.Add:
-                return scalar1 + scalar2;
-            case Operator.Subtract:
-                return scalar1 - scalar2;
-            case Operator.Multiply:
-                return scalar1 * scalar2;
-            case Operator.Divide:
-                return scalar1 / scalar2;
-            default:
-                return scalar1;
-        }
-
-    }
-
-    static parseFloatWithoutNaN(string) {
-        const scalar = Number.parseFloat(string);
-        return Number.isNaN(scalar) ? null : scalar;
-    }
-
-    
-
-    static isNumber(element) {
+    static isNumber(element: string) {
         const letters = /[a-i]/;
         if (count(element, letters, true) > 0) return false;
         return !Number.isNaN(element) 
@@ -37,11 +10,11 @@ class ScalarOperations {
             && count(element.toString(), '\\)', true) === 0;
     }
 
-    static superscript(number) {
-        number = number.toString();
+    static superscript(number: number) {
+        const string = number.toString();
         let newNumber = '';
-        for (let index = 0; index < number.length; index++) {
-            switch (number[index]) {
+        for (let index = 0; index < string.length; index++) {
+            switch (string[index]) {
                 case '0':
                     newNumber += '\u2070';
                     break;
@@ -88,18 +61,18 @@ class ScalarOperations {
                     newNumber += '\u207E';
                     break;
                 default:
-                    newNumber += number[index];
+                    newNumber += string[index];
                     break;
             }
         }
         return newNumber;
     }
 
-    static subscript(number) {
-        number = number.toString();
+    static subscript(number: number) {
+        const string = number.toString();
         let newNumber = '';
-        for (let index = 0; index < number.length; index++) {
-            switch (number[index]) {
+        for (let index = 0; index < string.length; index++) {
+            switch (string[index]) {
                 case '0':
                     newNumber += '\u2080';
                     break;
@@ -146,7 +119,7 @@ class ScalarOperations {
                     newNumber += '\u208E';
                     break;
                 default:
-                    newNumber += number[index];
+                    newNumber += string[index];
                     break;
             }
         }
