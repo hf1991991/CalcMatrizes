@@ -648,12 +648,14 @@ class MatrixOperations {
         elementos nulos e, na mesma linha da matriz B, houver 
         algum elemento não nulo, a expressão é um SI. */
 
-        for (let row = 0; row < matrixA.dimensions().columns; row++) {
+        for (let row = 0; row < matrixA.dimensions().rows; row++) {
             let allElementsOfRowNull = true;
 
             for (let column = 0; column < matrixA.dimensions().columns; column++) {
                 if (!matrixA.data[row][column].isZero) allElementsOfRowNull = false;
             }
+
+            console.log({ row, allElementsOfRowNull });
 
             if (allElementsOfRowNull) {
                 for (let column = 0; column < matrixB.dimensions().columns; column++) {
