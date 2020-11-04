@@ -10,7 +10,7 @@ class ScalarOperations {
             && count(element.toString(), '\\)', true) === 0;
     }
 
-    static superscript(number: number) {
+    static superscript(number: number | string) {
         const string = number.toString();
         let newNumber = '';
         for (let index = 0; index < string.length; index++) {
@@ -68,7 +68,7 @@ class ScalarOperations {
         return newNumber;
     }
 
-    static subscript(number: number) {
+    static subscript(number: number | string) {
         const string = number.toString();
         let newNumber = '';
         for (let index = 0; index < string.length; index++) {
