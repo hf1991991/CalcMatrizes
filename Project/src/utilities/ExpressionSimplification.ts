@@ -1236,57 +1236,43 @@ function doOperation(expression: ExpressionData): ExpressionData {
 
         case Operator.Subtract:
 
-            elements = []
+            if (expression.elements.length !== 2)
+                throw 'Subtraction should only be applied to two elements';
 
-            first = true;
+            const [first, second] = expression.elements;
 
-            for (element of expression.elements) {
+            let negativeSecond;
 
-                if (first)
-                    elements.push(element);
+            if (!!second.oneElement) {
+                const { scalar, variables } = second.oneElement;
 
-                else {
-
-                    if (element instanceof ExpressionData)
-                        elements.push(
-                            doOperation(
-                                createMatrixElement({
-                                    operator: Operator.Multiply,
-                                    elements: [
-                                        element,
-                                        createMatrixElement({
-                                            scalar: -1
-                                        })
-                                    ]
-                                })
-                            )
-                        );
-
-                    else {
-
-                        if (element.scalar !== 0) {
-
-                            elements.push(
-                                createMatrixElement({
-                                    scalar: -1 * element.scalar,
-                                    variables: element.variables
-                                })
-                            );
-
-                        }
-
-                    }
-
-                }
-
-                first = false;
-
+                negativeSecond = new ExpressionData({
+                    oneElement: new ElementData({
+                        scalar: -1 * scalar,
+                        variables
+                    })
+                });
             }
+
+            else
+                negativeSecond = doOperation(
+                    new ExpressionData({
+                        operator: Operator.Multiply,
+                        elements: [
+                            denominator,
+                            new ExpressionData({
+                                oneElement: new ElementData({
+                                    scalar: -1
+                                })
+                            })
+                        ]
+                    })
+                );
 
             return doOperation(
                 createMatrixElement({
                     operator: Operator.Add,
-                    elements,
+                    elements: [first, negativeSecond]
                 })
             );
 
