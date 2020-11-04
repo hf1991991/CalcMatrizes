@@ -655,8 +655,8 @@ class MatrixOperations {
 
     static findGeneralVectorForSPIEquation(matrixA: MatrixData, matrixB: MatrixData) {
 
-        const letters = 'abcdefghijklmnopqrstuvwxyz'.split('');
-
+        const letters = 'klmnopqrstuvwxyz'.split('');
+        
         let matrixXData = MatrixOperations.copyMatrixData(matrixB).data.map(e => e[0]);
 
         // Definição das variáveis independentes:
