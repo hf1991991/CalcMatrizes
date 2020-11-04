@@ -194,14 +194,17 @@ export const CalculatorProvider: React.FC = ({ children }) => {
 
     const matrixOnScreenDeterminant = useMemo(
         () => {
-            const determinant = isMatrixFull && isMatrixSquare
-                ? MatrixOperations.partialGaussianElimination({
-                    matrixA: matrixOnScreen,
-                    matrixB: MatrixOperations.identity(matrixOnScreen.dimensions().rows)
-                }).determinant
-                : null
-            console.log(JSON.stringify({ determinantString: determinant?.commaStringify(), determinant }));
-            return determinant;
+            if (isMatrixFull && isMatrixSquare) {
+
+                const { 
+                    determinant, 
+                    error 
+                } = MatrixOperations.determinant(matrixOnScreen);
+
+                if (!error) return determinant;
+            }
+
+            return null;
         },
         [isMatrixFull, isMatrixSquare, matrixOnScreen]
     );

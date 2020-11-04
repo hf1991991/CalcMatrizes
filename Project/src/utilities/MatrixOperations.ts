@@ -35,13 +35,18 @@ interface FindSolutionMatrixEquationData {
     partiallyEliminatedOriginal: MatrixData;
     solution: MatrixData;
     systemSolutionsType: SystemSolutionType;
-    solutionWithIndependentVariables: MatrixData;
+    solutionWithIndependentVariables: MatrixData | undefined;
     error: boolean;
 }
 
 interface GetGaussianEliminationData {
     rowEchelonForm: MatrixData;
     reducedRowEchelonForm: MatrixData;
+    error: boolean;
+}
+
+interface DeterminantData {
+    determinant: ExpressionData;
     error: boolean;
 }
 
@@ -400,12 +405,17 @@ class MatrixOperations {
     }
 
     static determinant(matrix: MatrixData) {
-        return addErrorTreatment(
-            () => MatrixOperations.partialGaussianElimination({
-                matrixA: matrix,
-                matrixB: MatrixOperations.identity(matrix.dimensions().rows)
-            }).determinant,
-            matrix
+        return addErrorTreatment<DeterminantData>(
+            () => (
+                {
+                    determinant: MatrixOperations.partialGaussianElimination({
+                        matrixA: matrix,
+                        matrixB: MatrixOperations.identity(matrix.dimensions().rows)
+                    }).determinant,
+                    error: false
+                }
+            ),
+            { error: true } as DeterminantData
         );
     }
 
@@ -577,7 +587,7 @@ class MatrixOperations {
     }
 
 
-    static getGaussianElimination(matrix: MatrixData): GetGaussianEliminationData {
+    static getGaussianElimination(matrix: MatrixData) {
         function _getGaussianElimination() {
             const { matrixA: rowEchelonForm } = MatrixOperations.partialGaussianElimination({
                 matrixA: matrix,
@@ -587,7 +597,7 @@ class MatrixOperations {
                 }),
                 eliminateBelowMainDiagonal: true
             });
-    
+
             const { matrixA: reducedRowEchelonForm } = MatrixOperations.partialGaussianElimination({
                 matrixA: rowEchelonForm,
                 matrixB: MatrixOperations.emptyMatrix({
@@ -596,7 +606,7 @@ class MatrixOperations {
                 }),
                 eliminateBelowMainDiagonal: false
             });
-    
+
             return {
                 rowEchelonForm,
                 reducedRowEchelonForm,
@@ -605,9 +615,9 @@ class MatrixOperations {
         }
 
         return addErrorTreatment(
-            _getGaussianElimination, 
-            { error: true }
-        ) as GetGaussianEliminationData;
+            _getGaussianElimination,
+            { error: true } as GetGaussianEliminationData
+        ) ;
     }
 
 
@@ -616,8 +626,8 @@ class MatrixOperations {
         ou o sistema X * A = B, quando a incognita precede a matriz A conhecida.
         OBS: verticalElimination deve ser verdadeiro se a ordem da equação a ser escalonada é X*A=B.
     */
-    static findSolutionForMatrixEquation(matrixA: MatrixData, matrixB: MatrixData, verticalElimination: boolean = false): FindSolutionMatrixEquationData {
-        function _findSolutionForMatrixEquation() {
+    static findSolutionForMatrixEquation(matrixA: MatrixData, matrixB: MatrixData, verticalElimination: boolean = false) {
+        function _findSolutionForMatrixEquation(): FindSolutionMatrixEquationData {
             let matrixACopy = MatrixOperations.copyMatrixData(matrixA);
             let matrixX = MatrixOperations.copyMatrixData(matrixB);
 
@@ -691,8 +701,8 @@ class MatrixOperations {
 
         return addErrorTreatment(
             _findSolutionForMatrixEquation,
-            { error: true }
-        ) as FindSolutionMatrixEquationData;
+            { error: true } as FindSolutionMatrixEquationData
+        );
     }
 
     static findGeneralVectorForSPIEquation(matrixA: MatrixData, matrixB: MatrixData) {
