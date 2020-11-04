@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, Image } from 'react-native';
 import { useCalculator } from '../hooks/useCalculator';
 import { useOrientation } from '../hooks/useOrientation';
 import MatrixDimensions from '../interfaces/MatrixDimensions';
+import { CalcState } from '../utilities/constants';
 import ArrowButton from './ArrowButton';
 
 interface ArrowButtonsAreaProps {
@@ -42,6 +43,7 @@ const ArrowButtonsArea = ({
     const {
         matrixHistory,
         fullScreenDeterminant,
+        calcState,
         undoHistory,
         redoHistory
     } = useCalculator();
@@ -55,8 +57,9 @@ const ArrowButtonsArea = ({
                     ? matrixHistory.currentPosition === matrixHistory.history.length - 1
                     : matrixHistory.currentPosition === 0
             ) || !!fullScreenDeterminant
+            || calcState !== CalcState.ready
         ),
-        [forwardHistory, matrixHistory]
+        [forwardHistory, matrixHistory, calcState, fullScreenDeterminant]
     );
 
     return (
