@@ -812,8 +812,6 @@ export const CalculatorProvider: React.FC = ({ children }) => {
 
             enterEditingMode({
                 newCalcState: CalcState.LambdaxA,
-                newEditableMatrix: null,
-                newSelectedElement: null,
                 newScalar: createMatrixElement({
                     scalar: 0
                 }),
