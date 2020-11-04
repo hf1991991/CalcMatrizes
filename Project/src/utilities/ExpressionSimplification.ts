@@ -1297,7 +1297,7 @@ function simplifyExpressionAlgorithm(expression: ExpressionData) {
         for (let element of expression.elements) {
             element = simplifyExpressionAlgorithm(element);
         }
-
+        
         // Após isso, realiza a operação:
         expression = doOperation(expression);
 

@@ -208,7 +208,7 @@ export const CalculatorProvider: React.FC = ({ children }) => {
 
     const isInverseEnabled = useMemo(
         () => {
-            console.log({a: matrixOnScreenDeterminant?.isZero, b: matrixOnScreenDeterminant?.commaStringify()})
+            console.log({ a: matrixOnScreenDeterminant?.isZero, b: matrixOnScreenDeterminant?.commaStringify() })
             return MatrixOperations.isMatrixFull(matrixOnScreen)
                 && MatrixOperations.isMatrixSquare(matrixOnScreen)
                 && !matrixOnScreenDeterminant?.isZero
@@ -598,12 +598,8 @@ export const CalculatorProvider: React.FC = ({ children }) => {
     );
 
     const singleInputFullEquationSetup = useCallback(
-        (matrixOperation) => {
+        (matrixOperation: CalcState, newMatrix: MatrixData) => {
             const oldMatrix = matrixOnScreen;
-
-            const newMatrix = matrixOperation === CalcState.transpose
-                ? MatrixOperations.transpose(oldMatrix)
-                : MatrixOperations.invert(oldMatrix);
 
             setFullEquation({
                 equationType: matrixOperation,
@@ -912,11 +908,13 @@ export const CalculatorProvider: React.FC = ({ children }) => {
     const onTranspose = useCallback(
         () => {
 
+            const transposed = MatrixOperations.transpose(matrixOnScreen);
+
             if (calcState === CalcState.ready)
-                setReadyMatrix(MatrixOperations.transpose(readyMatrix));
+                setReadyMatrix(transposed);
 
             else {
-                setEditableMatrix(MatrixOperations.transpose(editableMatrix));
+                setEditableMatrix(transposed);
 
                 changeSettingsOfSelectedMatrixElement({
                     row: selectedMatrixElement?.column,
@@ -924,7 +922,7 @@ export const CalculatorProvider: React.FC = ({ children }) => {
                 });
             }
 
-            singleInputFullEquationSetup(CalcState.transpose);
+            singleInputFullEquationSetup(CalcState.transpose, transposed);
 
         },
         [
@@ -943,23 +941,19 @@ export const CalculatorProvider: React.FC = ({ children }) => {
     const onInvert = useCallback(
         () => {
 
-            try {
+            const inverted = MatrixOperations.invert(matrixOnScreen);
 
-                if (calcState === CalcState.ready) {
-                    setReadyMatrix(MatrixOperations.invert(readyMatrix));
-                }
-
-                else {
-                    setEditableMatrix(MatrixOperations.invert(readyMatrix));
-                    changeSettingsOfSelectedMatrixElement(null);
-                    exitEditingMode();
-                }
-
-                singleInputFullEquationSetup(CalcState.invert);
-
-            } catch (e) {
-                console.log(e);
+            if (calcState === CalcState.ready) {
+                setReadyMatrix(inverted);
             }
+
+            else {
+                setEditableMatrix(inverted);
+                changeSettingsOfSelectedMatrixElement(null);
+                exitEditingMode();
+            }
+
+            singleInputFullEquationSetup(CalcState.invert, inverted);
 
         },
         [

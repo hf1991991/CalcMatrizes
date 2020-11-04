@@ -8,6 +8,7 @@ import MatrixColumnWithPosition from "../interfaces/MatrixColumnWithPosition";
 import SelectedMatrixElement from "../interfaces/SelectedMatrixElement";
 import MatrixColumnData from "../interfaces/MatrixColumnData";
 import MatrixDimensions from "../interfaces/MatrixDimensions";
+import addErrorTreatment from "./addErrorTreatment";
 
 interface ChangeElementParams extends SelectedMatrixElement {
     matrix: MatrixData;
@@ -355,25 +356,29 @@ class MatrixOperations {
     }
 
     static invert(matrix: MatrixData) {
-        console.log('STARTING BELOW MAIN DIAGONAL')
-        let firstElimination = MatrixOperations.partialGaussianElimination({
-            matrixA: matrix,
-            matrixB: MatrixOperations.identity(matrix.dimensions().rows),
-            eliminateBelowMainDiagonal: true,
-        });
-        console.log('ENDED BELOW MAIN DIAGONAL')
+        function _invert() {
+            console.log('STARTING BELOW MAIN DIAGONAL')
+            let firstElimination = MatrixOperations.partialGaussianElimination({
+                matrixA: matrix,
+                matrixB: MatrixOperations.identity(matrix.dimensions().rows),
+                eliminateBelowMainDiagonal: true,
+            });
+            console.log('ENDED BELOW MAIN DIAGONAL')
+    
+            MatrixOperations.printMatrix(firstElimination.matrixA)
+            MatrixOperations.printMatrix(firstElimination.matrixB)
+    
+            console.log('STARTING ABOVE MAIN DIAGONAL')
+            let secondElimination = MatrixOperations.partialGaussianElimination({
+                ...firstElimination,
+                eliminateBelowMainDiagonal: false,
+            });
+            console.log('ENDED ABOVE MAIN DIAGONAL')
+    
+            return MatrixOperations.copyMatrixData(secondElimination.matrixB);
+        }
 
-        MatrixOperations.printMatrix(firstElimination.matrixA)
-        MatrixOperations.printMatrix(firstElimination.matrixB)
-
-        console.log('STARTING ABOVE MAIN DIAGONAL')
-        let secondElimination = MatrixOperations.partialGaussianElimination({
-            ...firstElimination,
-            eliminateBelowMainDiagonal: false,
-        });
-        console.log('ENDED ABOVE MAIN DIAGONAL')
-
-        return MatrixOperations.copyMatrixData(secondElimination.matrixB);
+        return addErrorTreatment(_invert, matrix);
     }
 
     static determinant(matrix: MatrixData) {
