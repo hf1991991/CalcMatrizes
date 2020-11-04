@@ -31,6 +31,20 @@ interface PartialGaussianEliminationParams {
     eliminateBelowMainDiagonal?: boolean;
 }
 
+interface FindSolutionMatrixEquationData {
+    partiallyEliminatedOriginal: MatrixData;
+    solution: MatrixData;
+    systemSolutionsType: SystemSolutionType;
+    solutionWithIndependentVariables: MatrixData;
+    error: boolean;
+}
+
+interface GetGaussianEliminationData {
+    rowEchelonForm: MatrixData;
+    reducedRowEchelonForm: MatrixData;
+    error: boolean;
+}
+
 class MatrixOperations {
 
     static changeElement({ matrix, column, row, numberWritten }: ChangeElementParams) {
@@ -344,7 +358,7 @@ class MatrixOperations {
     static transpose(matrix: MatrixData) {
         function _transpose() {
             let transposedData = [];
-    
+
             for (let column = 0; column < matrix.dimensions().columns; column++) {
                 let transposedRow = [];
                 for (let row = 0; row < matrix.dimensions().rows; row++) {
@@ -352,7 +366,7 @@ class MatrixOperations {
                 }
                 transposedData.push(transposedRow);
             }
-    
+
             return new MatrixData(transposedData);
         }
 
@@ -368,17 +382,17 @@ class MatrixOperations {
                 eliminateBelowMainDiagonal: true,
             });
             console.log('ENDED BELOW MAIN DIAGONAL')
-    
+
             MatrixOperations.printMatrix(firstElimination.matrixA)
             MatrixOperations.printMatrix(firstElimination.matrixB)
-    
+
             console.log('STARTING ABOVE MAIN DIAGONAL')
             let secondElimination = MatrixOperations.partialGaussianElimination({
                 ...firstElimination,
                 eliminateBelowMainDiagonal: false,
             });
             console.log('ENDED ABOVE MAIN DIAGONAL')
-    
+
             return MatrixOperations.copyMatrixData(secondElimination.matrixB);
         }
 
@@ -386,10 +400,13 @@ class MatrixOperations {
     }
 
     static determinant(matrix: MatrixData) {
-        return MatrixOperations.partialGaussianElimination({
-            matrixA: matrix,
-            matrixB: MatrixOperations.identity(matrix.dimensions().rows)
-        }).determinant;
+        return addErrorTreatment(
+            () => MatrixOperations.partialGaussianElimination({
+                matrixA: matrix,
+                matrixB: MatrixOperations.identity(matrix.dimensions().rows)
+            }).determinant,
+            matrix
+        );
     }
 
     /* 
@@ -560,29 +577,37 @@ class MatrixOperations {
     }
 
 
-    static getGaussianElimination(matrix: MatrixData) {
-        const { matrixA: rowEchelonForm } = MatrixOperations.partialGaussianElimination({
-            matrixA: matrix,
-            matrixB: MatrixOperations.emptyMatrix({
-                rows: matrix.dimensions().rows,
-                columns: 1,
-            }),
-            eliminateBelowMainDiagonal: true
-        });
+    static getGaussianElimination(matrix: MatrixData): GetGaussianEliminationData {
+        function _getGaussianElimination() {
+            const { matrixA: rowEchelonForm } = MatrixOperations.partialGaussianElimination({
+                matrixA: matrix,
+                matrixB: MatrixOperations.emptyMatrix({
+                    rows: matrix.dimensions().rows,
+                    columns: 1,
+                }),
+                eliminateBelowMainDiagonal: true
+            });
+    
+            const { matrixA: reducedRowEchelonForm } = MatrixOperations.partialGaussianElimination({
+                matrixA: rowEchelonForm,
+                matrixB: MatrixOperations.emptyMatrix({
+                    rows: matrix.dimensions().rows,
+                    columns: 1,
+                }),
+                eliminateBelowMainDiagonal: false
+            });
+    
+            return {
+                rowEchelonForm,
+                reducedRowEchelonForm,
+                error: false
+            };
+        }
 
-        const { matrixA: reducedRowEchelonForm } = MatrixOperations.partialGaussianElimination({
-            matrixA: rowEchelonForm,
-            matrixB: MatrixOperations.emptyMatrix({
-                rows: matrix.dimensions().rows,
-                columns: 1,
-            }),
-            eliminateBelowMainDiagonal: false
-        });
-
-        return {
-            rowEchelonForm,
-            reducedRowEchelonForm
-        };
+        return addErrorTreatment(
+            _getGaussianElimination, 
+            { error: true }
+        ) as GetGaussianEliminationData;
     }
 
 
@@ -591,81 +616,89 @@ class MatrixOperations {
         ou o sistema X * A = B, quando a incognita precede a matriz A conhecida.
         OBS: verticalElimination deve ser verdadeiro se a ordem da equação a ser escalonada é X*A=B.
     */
-    static findSolutionForMatrixEquation(matrixA: MatrixData, matrixB: MatrixData, verticalElimination: boolean = false) {
-        let matrixACopy = MatrixOperations.copyMatrixData(matrixA);
-        let matrixX = MatrixOperations.copyMatrixData(matrixB);
+    static findSolutionForMatrixEquation(matrixA: MatrixData, matrixB: MatrixData, verticalElimination: boolean = false): FindSolutionMatrixEquationData {
+        function _findSolutionForMatrixEquation() {
+            let matrixACopy = MatrixOperations.copyMatrixData(matrixA);
+            let matrixX = MatrixOperations.copyMatrixData(matrixB);
 
-        if (verticalElimination) {
-            matrixACopy = MatrixOperations.transpose(matrixACopy);
-            matrixX = MatrixOperations.transpose(matrixX);
-        }
+            if (verticalElimination) {
+                matrixACopy = MatrixOperations.transpose(matrixACopy);
+                matrixX = MatrixOperations.transpose(matrixX);
+            }
 
-        /* if showSteps:
-            exibicao_passos_resolver_equacao_matricial(matrixACopy, matrixX, None, None, None, verticalElimination, "Equação inicial:\n") */
+            /* if showSteps:
+                exibicao_passos_resolver_equacao_matricial(matrixACopy, matrixX, None, None, None, verticalElimination, "Equação inicial:\n") */
 
-        const firstElimination = MatrixOperations.partialGaussianElimination({
-            matrixA: matrixACopy,
-            matrixB: matrixX,
-            eliminateBelowMainDiagonal: true
-        });
+            const firstElimination = MatrixOperations.partialGaussianElimination({
+                matrixA: matrixACopy,
+                matrixB: matrixX,
+                eliminateBelowMainDiagonal: true
+            });
 
-        const secondElimination = MatrixOperations.partialGaussianElimination({
-            ...firstElimination,
-            eliminateBelowMainDiagonal: false
-        });
+            const secondElimination = MatrixOperations.partialGaussianElimination({
+                ...firstElimination,
+                eliminateBelowMainDiagonal: false
+            });
 
-        matrixACopy = secondElimination.matrixA;
-        matrixX = secondElimination.matrixB;
+            matrixACopy = secondElimination.matrixA;
+            matrixX = secondElimination.matrixB;
 
-        const systemSolutionsType = MatrixOperations.systemSolutionTypesVerification(
-            matrixACopy,
-            matrixX
-        );
-
-        let partiallyEliminatedOriginal = matrixACopy;
-        let solution = matrixX;
-
-        if (systemSolutionsType === SystemSolutionType.SPD) {
-            solution = MatrixOperations.resizeMatrixAfterPartialElimination(
-                matrixA,
-                matrixB,
-                matrixX,
-                verticalElimination
-            );
-        }
-
-        let solutionWithIndependentVariables: MatrixData | undefined = undefined;
-
-        // Se matrixB for um vetor, achar vetor com variáveis independentes:
-        if (systemSolutionsType === SystemSolutionType.SPI && matrixX.dimensions().columns === 1)
-            solutionWithIndependentVariables = MatrixOperations.findGeneralVectorForSPIEquation(
-                partiallyEliminatedOriginal,
+            const systemSolutionsType = MatrixOperations.systemSolutionTypesVerification(
+                matrixACopy,
                 matrixX
             );
 
-        if (verticalElimination) {
-            solution = MatrixOperations.transpose(solution);
-            partiallyEliminatedOriginal = MatrixOperations.transpose(partiallyEliminatedOriginal);
+            let partiallyEliminatedOriginal = matrixACopy;
+            let solution = matrixX;
+
+            if (systemSolutionsType === SystemSolutionType.SPD) {
+                solution = MatrixOperations.resizeMatrixAfterPartialElimination(
+                    matrixA,
+                    matrixB,
+                    matrixX,
+                    verticalElimination
+                );
+            }
+
+            let solutionWithIndependentVariables: MatrixData | undefined = undefined;
+
+            // Se matrixB for um vetor, achar vetor com variáveis independentes:
+            if (systemSolutionsType === SystemSolutionType.SPI && matrixX.dimensions().columns === 1)
+                solutionWithIndependentVariables = MatrixOperations.findGeneralVectorForSPIEquation(
+                    partiallyEliminatedOriginal,
+                    matrixX
+                );
+
+            if (verticalElimination) {
+                solution = MatrixOperations.transpose(solution);
+                partiallyEliminatedOriginal = MatrixOperations.transpose(partiallyEliminatedOriginal);
+            }
+
+            // console.log({
+            //     partiallyEliminatedOriginal,
+            //     solution,
+            //     systemSolutionsType,
+            // });
+
+            return {
+                partiallyEliminatedOriginal,
+                solution,
+                systemSolutionsType,
+                solutionWithIndependentVariables,
+                error: false
+            };
         }
 
-        // console.log({
-        //     partiallyEliminatedOriginal,
-        //     solution,
-        //     systemSolutionsType,
-        // });
-
-        return {
-            partiallyEliminatedOriginal,
-            solution,
-            systemSolutionsType,
-            solutionWithIndependentVariables
-        };
+        return addErrorTreatment(
+            _findSolutionForMatrixEquation,
+            { error: true }
+        ) as FindSolutionMatrixEquationData;
     }
 
     static findGeneralVectorForSPIEquation(matrixA: MatrixData, matrixB: MatrixData) {
 
         const letters = 'klmnopqrstuvwxyz'.split('');
-        
+
         let matrixXData = MatrixOperations.copyMatrixData(matrixB).data.map(e => e[0]);
 
         // Definição das variáveis independentes:
@@ -690,7 +723,7 @@ class MatrixOperations {
         // Começa no último elemento antes da variável independente:
         for (let rowIndex = matrixA.dimensions().rows - 1; rowIndex >= 0; rowIndex--) {
 
-            for (let columnIndex = matrixA.dimensions().columns - 1; columnIndex > rowIndex; columnIndex--) 
+            for (let columnIndex = matrixA.dimensions().columns - 1; columnIndex > rowIndex; columnIndex--)
                 matrixXData[rowIndex] = ExpressionSimplification.varOperation(
                     matrixXData[rowIndex],
                     Operator.Subtract,

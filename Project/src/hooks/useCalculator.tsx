@@ -566,7 +566,8 @@ export const CalculatorProvider: React.FC = ({ children }) => {
                 partiallyEliminatedOriginal,
                 solution,
                 systemSolutionsType,
-                solutionWithIndependentVariables
+                solutionWithIndependentVariables,
+                error
             } = MatrixOperations.findSolutionForMatrixEquation(
                 isAFirst ? readyMatrix : editableMatrix,
                 isAFirst ? editableMatrix : readyMatrix,
@@ -576,23 +577,25 @@ export const CalculatorProvider: React.FC = ({ children }) => {
                 ].includes(calcState),
             );
 
-            setViewReduced(false);
-            setFullEquation({
-                equationType: calcState,
-                solutionType: systemSolutionsType,
-                matrixA: readyMatrix,
-                matrixB: editableMatrix,
-                matrixC: solution,
-                matrixD: partiallyEliminatedOriginal,
-                solutionWithIndependentVariables
-            });
-            setSolutionType(systemSolutionsType);
+            if (!error) {
+                setViewReduced(false);
+                setFullEquation({
+                    equationType: calcState,
+                    solutionType: systemSolutionsType,
+                    matrixA: readyMatrix,
+                    matrixB: editableMatrix,
+                    matrixC: solution,
+                    matrixD: partiallyEliminatedOriginal,
+                    solutionWithIndependentVariables
+                });
+                setSolutionType(systemSolutionsType);
 
-            setReadyMatrix(
-                systemSolutionsType == SystemSolutionType.SPD
-                    ? solution
-                    : readyMatrix
-            );
+                setReadyMatrix(
+                    systemSolutionsType == SystemSolutionType.SPD
+                        ? solution
+                        : readyMatrix
+                );
+            }
 
         }, [isAFirst, calcState, readyMatrix, editableMatrix, setViewReduced, setFullEquation, setSolutionType, setReadyMatrix]
     );
@@ -881,18 +884,21 @@ export const CalculatorProvider: React.FC = ({ children }) => {
 
             const {
                 rowEchelonForm,
-                reducedRowEchelonForm
+                reducedRowEchelonForm,
+                error
             } = MatrixOperations.getGaussianElimination(matrixOnScreen);
 
-            setViewReduced(false);
-            setFullEquation({
-                equationType: CalcState.gaussianElimination,
-                matrixA: matrixOnScreen,
-                matrixC: rowEchelonForm,
-                matrixD: reducedRowEchelonForm
-            });
-
-            setReadyMatrix(rowEchelonForm);
+            if (!error) {
+                setViewReduced(false);
+                setFullEquation({
+                    equationType: CalcState.gaussianElimination,
+                    matrixA: matrixOnScreen,
+                    matrixC: rowEchelonForm,
+                    matrixD: reducedRowEchelonForm
+                });
+    
+                setReadyMatrix(rowEchelonForm);
+            }
 
         }, [matrixOnScreen, setViewReduced, setFullEquation, setReadyMatrix]
     );
