@@ -76,8 +76,6 @@ const FullEquation = ({
 }: FullEquationProps) => {
     const [matrix1Height, changeMatrix1Height] = useState(0);
 
-    console.log({totalMaxAreaWidth})
-
     const equationData = useMemo<EquationData>(
         () => new EquationData({
             fullEquation, 

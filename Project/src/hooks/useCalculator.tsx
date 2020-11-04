@@ -86,10 +86,11 @@ interface CalculatorContextData {
     onCheck(): void;
 }
 
-const INITIAL_MATRIX = MatrixOperations.emptyMatrix({
-    rows: 3,
-    columns: 1
-});
+const INITIAL_MATRIX = new MatrixData([
+    [1, 2, 3],
+    [4, 5, 6],
+    [7, 8, 9]
+]);
 
 const CalculatorContext = createContext<CalculatorContextData>({} as CalculatorContextData);
 
@@ -565,6 +566,7 @@ export const CalculatorProvider: React.FC = ({ children }) => {
                 partiallyEliminatedOriginal,
                 solution,
                 systemSolutionsType,
+                solutionWithIndependentVariables
             } = MatrixOperations.findSolutionForMatrixEquation(
                 isAFirst ? readyMatrix : editableMatrix,
                 isAFirst ? editableMatrix : readyMatrix,
@@ -581,7 +583,8 @@ export const CalculatorProvider: React.FC = ({ children }) => {
                 matrixA: readyMatrix,
                 matrixB: editableMatrix,
                 matrixC: solution,
-                matrixD: partiallyEliminatedOriginal
+                matrixD: partiallyEliminatedOriginal,
+                solutionWithIndependentVariables
             });
             setSolutionType(systemSolutionsType);
 

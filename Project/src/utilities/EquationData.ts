@@ -26,6 +26,7 @@ class EquationData {
                     this.firstOperator = '×';
                     this.variablePosition = 2;
                     this.secondOperator = '=';
+                    this.matrix2 = fullEquation.solutionWithIndependentVariables;
                     if (viewReduced) {
                         this.matrix1 = fullEquation.matrixD;
                         this.matrix3 = fullEquation.matrixC;
@@ -47,6 +48,7 @@ class EquationData {
                     this.firstOperator = '×';
                     this.variablePosition = 2;
                     this.secondOperator = '=';
+                    this.matrix2 = fullEquation.solutionWithIndependentVariables;
                     if (viewReduced) {
                         this.matrix1 = fullEquation.matrixC;
                         this.matrix3 = fullEquation.matrixD;
@@ -68,6 +70,7 @@ class EquationData {
                     this.firstOperator = '×';
                     this.variablePosition = 1;
                     this.secondOperator = '=';
+                    this.matrix1 = fullEquation.solutionWithIndependentVariables;
                     if (viewReduced) {
                         this.matrix2 = fullEquation.matrixD;
                         this.matrix3 = fullEquation.matrixC;
@@ -89,6 +92,7 @@ class EquationData {
                     this.firstOperator = '×';
                     this.variablePosition = 1;
                     this.secondOperator = '=';
+                    this.matrix1 = fullEquation.solutionWithIndependentVariables;
                     if (viewReduced) {
                         this.matrix2 = fullEquation.matrixC;
                         this.matrix3 = fullEquation.matrixD;

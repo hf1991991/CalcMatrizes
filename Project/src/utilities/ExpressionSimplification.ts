@@ -658,7 +658,7 @@ function symplifyDenominators(addition: Array<ExpressionData>): ExpressionData {
 
 }
 
-function doOperation(expression: ExpressionData): ExpressionData {
+export function doOperation(expression: ExpressionData): ExpressionData {
 
     let element = null;
 

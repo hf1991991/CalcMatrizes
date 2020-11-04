@@ -2,7 +2,7 @@ import MatrixData from "./MatrixData";
 import { smartToFixed, SystemSolutionType, Operator } from "./constants";
 import ScalarOperations from "./ScalarOperations";
 import * as ExpressionSimplification from "./ExpressionSimplification";
-import { createMatrixElement, ElementData, ExpressionData } from "./ExpressionClasses";
+import { createMatrixElement, ElementData, ExpressionData, VariableData } from "./ExpressionClasses";
 import ElementDataWithPosition from "../interfaces/ElementDataWithPosition";
 import MatrixColumnWithPosition from "../interfaces/MatrixColumnWithPosition";
 import SelectedMatrixElement from "../interfaces/SelectedMatrixElement";
@@ -625,6 +625,15 @@ class MatrixOperations {
             );
         }
 
+        let solutionWithIndependentVariables: MatrixData | undefined = undefined;
+
+        // Se matrixB for um vetor, achar vetor com variáveis independentes:
+        if (systemSolutionsType === SystemSolutionType.SPI && matrixX.dimensions().columns === 1)
+            solutionWithIndependentVariables = MatrixOperations.findGeneralVectorForSPIEquation(
+                partiallyEliminatedOriginal,
+                matrixX
+            );
+
         if (verticalElimination) {
             solution = MatrixOperations.transpose(solution);
             partiallyEliminatedOriginal = MatrixOperations.transpose(partiallyEliminatedOriginal);
@@ -640,7 +649,52 @@ class MatrixOperations {
             partiallyEliminatedOriginal,
             solution,
             systemSolutionsType,
+            solutionWithIndependentVariables
         };
+    }
+
+    static findGeneralVectorForSPIEquation(matrixA: MatrixData, matrixB: MatrixData) {
+
+        const letters = 'abcdefghijklmnopqrstuvwxyz'.split('');
+
+        let matrixXData = MatrixOperations.copyMatrixData(matrixB).data.map(e => e[0]);
+
+        // Definição das variáveis independentes:
+        for (let row = 0; row < matrixA.dimensions().rows; row++) {
+            let allElementsOfRowNull = true;
+
+            for (let column = 0; column < matrixA.dimensions().columns; column++) {
+                if (!matrixA.data[row][column].isZero) allElementsOfRowNull = false;
+            }
+
+            if (allElementsOfRowNull)
+                matrixXData[row] = new ExpressionData({
+                    oneElement: new ElementData({
+                        variables: [new VariableData({
+                            variable: letters.splice(0, 1)[0]
+                        })]
+                    })
+                });
+        }
+
+        // Definição das variáveis dependentes:
+        // Começa no último elemento antes da variável independente:
+        for (let rowIndex = matrixA.dimensions().rows - 1; rowIndex >= 0; rowIndex--) {
+
+            for (let columnIndex = matrixA.dimensions().columns - 1; columnIndex > rowIndex; columnIndex--) 
+                matrixXData[rowIndex] = ExpressionSimplification.varOperation(
+                    matrixXData[rowIndex],
+                    Operator.Subtract,
+                    ExpressionSimplification.varOperation(
+                        matrixA.data[rowIndex][columnIndex],
+                        Operator.Multiply,
+                        matrixXData[columnIndex]
+                    )
+                );
+
+        }
+
+        return new MatrixData(matrixXData.map(e => [e]));
     }
 
     static systemSolutionTypesVerification(matrixA: MatrixData, matrixB: MatrixData) {
@@ -654,8 +708,6 @@ class MatrixOperations {
             for (let column = 0; column < matrixA.dimensions().columns; column++) {
                 if (!matrixA.data[row][column].isZero) allElementsOfRowNull = false;
             }
-
-            console.log({ row, allElementsOfRowNull });
 
             if (allElementsOfRowNull) {
                 for (let column = 0; column < matrixB.dimensions().columns; column++) {
