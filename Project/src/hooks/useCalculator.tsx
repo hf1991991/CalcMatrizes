@@ -18,6 +18,13 @@ interface ChangeNumberWrittenParams {
     forceNotOperatorNumber?: boolean;
 }
 
+interface EnterEditingModeParams { 
+    newCalcState: CalcState; 
+    newEditableMatrix?: MatrixData; 
+    newSelectedElement?: SelectedMatrixElement; 
+    newScalar?: ExpressionData;
+}
+
 interface CalculatorContextData {
     // ---- useStates: ----
     // Estado geral da calculadora:
@@ -471,15 +478,15 @@ export const CalculatorProvider: React.FC = ({ children }) => {
     );
 
     const enterEditingMode = useCallback(
-        ({ newEditableMatrix, newCalcState, newSelectedElement = undefined, newScalar }) => {
+        ({ newEditableMatrix, newCalcState, newSelectedElement = undefined, newScalar }: EnterEditingModeParams) => {
             setCalcState(newCalcState);
 
             setFullEquation(null);
-            setEditableMatrix(newEditableMatrix)
+            newEditableMatrix && setEditableMatrix(newEditableMatrix)
 
             setSolutionType(null);
 
-            setEditableScalar(newScalar);
+            newScalar && setEditableScalar(newScalar);
 
             newSelectedElement !== undefined && changeSettingsOfSelectedMatrixElement(newSelectedElement);
         },
