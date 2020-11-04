@@ -2,7 +2,7 @@ import React, { createContext, useCallback, useContext, useMemo, useState } from
 import { CalcState, count, SystemSolutionType, Operator } from '../utilities/constants';
 import MatrixOperations from '../utilities/MatrixOperations';
 import { varOperation } from '../utilities/ExpressionSimplification';
-import { createMatrixElement, ElementData, ExpressionData, VariableData } from '../utilities/ExpressionClasses';
+import { createMatrixElement, ExpressionData, VariableData } from '../utilities/ExpressionClasses';
 import MatrixData from '../utilities/MatrixData';
 import SelectedMatrixElement from '../interfaces/SelectedMatrixElement';
 import MatrixDimensions from '../interfaces/MatrixDimensions';
@@ -29,11 +29,11 @@ interface CalculatorContextData {
     selectedMatrixElement: SelectedMatrixElement | null;
     shouldUserInputOverwriteElement: boolean;
     // Estados de escalares:
-    editableScalar: ElementData | null;
+    editableScalar: ExpressionData | null;
     fullScreenDeterminant: boolean;
     // Estados de operações:
     operationHappening: boolean;
-    editableOperatorNumber: ElementData | null;
+    editableOperatorNumber: ExpressionData | null;
     solutionType: SystemSolutionType | null;
     fullEquation: FullEquationData | null;
     viewReduced: boolean;
@@ -50,7 +50,7 @@ interface CalculatorContextData {
     matrixOnScreen: MatrixData;
     isMatrixSquare: boolean;
     isMatrixFull: boolean;
-    matrixOnScreenDeterminant: ElementData | null;
+    matrixOnScreenDeterminant: ExpressionData | null;
     isInverseEnabled: boolean;
     isCheckActive: boolean;
     shouldACAppear: boolean;
@@ -461,7 +461,7 @@ export const CalculatorProvider: React.FC = ({ children }) => {
                         notOperatorNumberWritten,
                         selectedOperator as Operator,
                         editableOperatorNumber
-                    ) as ElementData,
+                    ),
                     forceNotOperatorNumber: true,
                 });
         }, [editableOperatorNumber, notOperatorNumberWritten, selectedOperator, resetScalarOperations, changeNumberWritten, getNumberWritten]
