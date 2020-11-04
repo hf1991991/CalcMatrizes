@@ -1,4 +1,4 @@
-const addErrorTreatment = (funct: () => any, defaultValue: any) => {
+const addErrorTreatment = <T>(funct: () => T, defaultValue: T) => {
     try {
         return funct();
     } catch (e) {
