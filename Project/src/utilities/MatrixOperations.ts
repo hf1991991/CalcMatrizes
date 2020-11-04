@@ -11,7 +11,7 @@ import MatrixDimensions from "../interfaces/MatrixDimensions";
 
 interface ChangeElementParams extends SelectedMatrixElement {
     matrix: MatrixData;
-    numberWritten: ElementData;
+    numberWritten: ExpressionData;
 }
 
 interface JoinEditableAndOriginalMatricesParams extends MatrixDimensions {
