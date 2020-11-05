@@ -36,13 +36,11 @@ interface FindSolutionMatrixEquationData {
     solution: MatrixData;
     systemSolutionsType: SystemSolutionType;
     solutionWithIndependentVariables: MatrixData | undefined;
-    error: boolean;
 }
 
 interface GetGaussianEliminationData {
     rowEchelonForm: MatrixData;
     reducedRowEchelonForm: MatrixData;
-    error: boolean;
 }
 
 interface PartialGaussianEliminationData {
@@ -603,8 +601,7 @@ class MatrixOperations {
 
             return {
                 rowEchelonForm,
-                reducedRowEchelonForm,
-                error: false
+                reducedRowEchelonForm
             };
         }
 
@@ -685,8 +682,7 @@ class MatrixOperations {
                 partiallyEliminatedOriginal,
                 solution,
                 systemSolutionsType,
-                solutionWithIndependentVariables,
-                error: false
+                solutionWithIndependentVariables
             };
         }
 
