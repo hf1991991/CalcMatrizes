@@ -36,7 +36,7 @@ interface FindSolutionMatrixEquationData {
     solution: MatrixData;
     systemSolutionsType: SystemSolutionType;
     solutionWithIndependentVariables: MatrixData | undefined;
-    lettersUsed: Array<string>;
+    lettersUsed: Array<string> | undefined;
 }
 
 interface GetGaussianEliminationData {
@@ -686,7 +686,7 @@ class MatrixOperations {
             let partiallyEliminatedOriginal = matrixACopy;
             let solution = matrixX;
             let solutionWithIndependentVariables: MatrixData | undefined = undefined;
-            let lettersUsed: Array<string> = [];
+            let lettersUsed: Array<string> | undefined = undefined;
 
             if (systemSolutionsType === SystemSolutionType.SPDOrSPI) {
 
