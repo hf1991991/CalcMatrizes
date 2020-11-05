@@ -697,7 +697,7 @@ class MatrixOperations {
                 // Sendo _matrixB um vetor, achar vetor com variáveis independentes:
                 // Aqui deveria ser separado também se é SPD, ou SPI: 
                 if (solution.dimensions().columns === 1)
-                    solutionWithIndependentVariables = MatrixOperations.findGeneralVectorForSPIEquation(
+                    solutionWithIndependentVariables = MatrixOperations.findGeneralVectorForSPDOrSPIEquation(
                         partiallyEliminatedOriginal,
                         solution
                     );
@@ -786,7 +786,7 @@ class MatrixOperations {
         return new MatrixData(matrix.map(e => [e]));
     }
 
-    static findGeneralVectorForSPIEquation(matrixA: MatrixData, matrixB: MatrixData) {
+    static findGeneralVectorForSPDOrSPIEquation(matrixA: MatrixData, matrixB: MatrixData) {
 
         const letters = 'klmnopqrstuvwxyz'.split('');
 
