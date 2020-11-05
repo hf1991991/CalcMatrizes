@@ -565,10 +565,10 @@ class MatrixOperations {
                     }
                     MatrixOperations.printMatrix(_matrixA);
                 }
-            
+
             }
 
-            else 
+            else
                 determinant = createMatrixElement({ scalar: 0 });
 
         }
@@ -682,10 +682,17 @@ class MatrixOperations {
 
             if (systemSolutionsType === SystemSolutionType.SPDOrSPI) {
 
-                // Implementar aqui um método de transformar A(mxo) * X(oxn) = B(mxn) 
-                // em A((m*n)x(o*n)) * X((o*n)x1) = B((m*n)x1).
-                //
-                // Ideia: cada linha de A((m*n)x(o*n)) é
+                // Método de transformar A(mxo) * X(oxn) = B(mxn) 
+                // em A((m*n)x(o*n)) * X((o*n)x1) = B((m*n)x1):
+                const vectorEquation = MatrixOperations.transformEquationToVectorForm(
+                    partiallyEliminatedOriginal,
+                    resizedMatrixX,
+                    solution
+                );
+
+                MatrixOperations.printMatrix(vectorEquation.matrixA);
+                MatrixOperations.printMatrix(vectorEquation.matrixX);
+                MatrixOperations.printMatrix(vectorEquation.matrixB);
 
                 // Sendo _matrixB um vetor, achar vetor com variáveis independentes:
                 // Aqui deveria ser separado também se é SPD, ou SPI: 
@@ -696,9 +703,6 @@ class MatrixOperations {
                     );
 
                 solution = resizedMatrixX;
-
-                // Erro que não altera em nada o funcionamento do código que devo implementar
-                // acima: a matrix reduzida por vezes não tem zeros acima dos pivôts
 
             }
 
@@ -730,11 +734,63 @@ class MatrixOperations {
         );
     }
 
+    static transformEquationToVectorForm(matrixA: MatrixData, matrixX: MatrixData, matrixB: MatrixData) {
+
+        const dimensionsA = matrixA.dimensions();
+        const dimensionsX = matrixX.dimensions();
+
+        const newMatrixAData = MatrixOperations.emptyMatrix({
+            rows: dimensionsA.rows * dimensionsX.columns,
+            columns: dimensionsA.columns * dimensionsX.columns,
+        });
+
+        const dimensionsNewA = newMatrixAData.dimensions();
+
+        const vectorizedX = MatrixOperations.vectorizeMatrix(matrixX);
+        const vectorizedB = MatrixOperations.vectorizeMatrix(matrixB);
+
+        for (let newRowA = 0; newRowA < dimensionsNewA.rows; newRowA++) {
+
+            const rowA = Math.floor(newRowA / dimensionsX.columns);
+            const columnX = newRowA % dimensionsX.columns;
+
+            for (let vectorXIndex = 0; vectorXIndex < vectorizedX.length; vectorXIndex++) {
+
+                if (vectorXIndex % dimensionsX.columns === columnX) {
+                    const rowX = Math.floor(vectorXIndex / dimensionsX.columns);
+                    const columnA = rowX;
+                    newMatrixAData.data[newRowA][vectorXIndex] = matrixA.data[rowA][columnA];
+                }
+
+            }
+
+        }
+
+        return {
+            matrixA: newMatrixAData,
+            matrixX: MatrixOperations.devectorizeVector(vectorizedX),
+            matrixB: MatrixOperations.devectorizeVector(vectorizedB)
+        }
+
+    }
+
+    static vectorizeMatrix(matrix: MatrixData) {
+        const vector = matrix.data.reduce(
+            (elementsAccumulator, elementRow) => [...elementsAccumulator, ...elementRow],
+            [] as MatrixColumnData
+        );
+        return vector;
+    }
+
+    static devectorizeVector(matrix: MatrixColumnData) {
+        return new MatrixData(matrix.map(e => [e]));
+    }
+
     static findGeneralVectorForSPIEquation(matrixA: MatrixData, matrixB: MatrixData) {
 
         const letters = 'klmnopqrstuvwxyz'.split('');
 
-        let matrixXData = MatrixOperations.copyMatrixData(matrixB).data.map(e => e[0]);
+        let matrixXData = MatrixOperations.vectorizeMatrix(matrixB);
 
         // Definição das variáveis independentes:
         for (let row = 0; row < matrixA.dimensions().rows; row++) {
@@ -771,7 +827,7 @@ class MatrixOperations {
 
         }
 
-        return new MatrixData(matrixXData.map(e => [e]));
+        return MatrixOperations.devectorizeVector(matrixXData);
     }
 
     static systemSolutionTypesVerification(
