@@ -158,7 +158,8 @@ export function toFixedOnZeroes(number: string | number) {
 export enum SystemSolutionType {
     SPI = 'SPI',
     SPD = 'SPD',
-    SI = 'SI'
+    SI = 'SI',
+    MaybeSPI = 'SPI?'
 };
 
 export function toFixedWithThreeDots(number: string | number) {

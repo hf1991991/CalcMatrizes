@@ -749,9 +749,18 @@ class MatrixOperations {
             }
 
             if (allElementsOfRowNull) {
+                let onlyHasZeroesOrVariables = false;
                 for (let column = 0; column < matrixB.dimensions().columns; column++) {
-                    if (!matrixB.data[row][column].isZero) return SystemSolutionType.SI;
+                    if (!matrixB.data[row][column].isZero) {
+                        if (!matrixB.data[row][column].hasVariables) 
+                            return SystemSolutionType.SI;
+
+                        onlyHasZeroesOrVariables = true;
+                    }
                 }
+                if (onlyHasZeroesOrVariables) 
+                    return SystemSolutionType.MaybeSPI;
+
                 return SystemSolutionType.SPI;
             }
         }
