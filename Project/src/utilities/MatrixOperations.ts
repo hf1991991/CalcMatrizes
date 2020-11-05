@@ -648,12 +648,31 @@ class MatrixOperations {
                 verticalElimination
             );
 
+            let multiplication: MatrixData;
+
+            console.log({verticalElimination});
+    
+            if (verticalElimination) {
+                multiplication = MatrixOperations.multiplyMatrix(resizedMatrixX, matrixACopy);
+                MatrixOperations.printMatrix(resizedMatrixX);
+                MatrixOperations.printMatrix(matrixACopy);
+                MatrixOperations.printMatrix(multiplication);
+                MatrixOperations.printMatrix(matrixB);
+            }
+            else {
+                multiplication = MatrixOperations.multiplyMatrix(matrixACopy, resizedMatrixX);
+                MatrixOperations.printMatrix(resizedMatrixX);
+                MatrixOperations.printMatrix(matrixACopy);
+                MatrixOperations.printMatrix(multiplication);
+                MatrixOperations.printMatrix(matrixB);
+            }
+
+
             const systemSolutionsType = MatrixOperations.systemSolutionTypesVerification(
                 matrixB,
                 matrixACopy,
                 matrixX,
-                resizedMatrixX,
-                verticalElimination
+                multiplication
             );
 
             let partiallyEliminatedOriginal = matrixACopy;
@@ -757,8 +776,7 @@ class MatrixOperations {
         matrixB: MatrixData,
         matrixACopy: MatrixData,
         matrixX: MatrixData,
-        resizedMatrixX: MatrixData,
-        verticalElimination: boolean
+        multiplication: MatrixData
     ) {
 
         /* Se, na expressão, houver uma igualdade de um número nulo com 
@@ -776,13 +794,6 @@ class MatrixOperations {
                 if (!matrixX.data[row][column].isZero) return SystemSolutionType.SI;
             }
         }
-
-        let multiplication: MatrixData;
-
-        if (verticalElimination)
-            multiplication = MatrixOperations.multiplyMatrix(resizedMatrixX, matrixACopy);
-        else
-            multiplication = MatrixOperations.multiplyMatrix(matrixACopy, resizedMatrixX);
 
         let isMaybeSPI = false;
 
