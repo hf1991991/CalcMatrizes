@@ -16,6 +16,7 @@ export class ExpressionData {
     isSimplified: boolean;
     isZero: boolean;
     isOne: boolean;
+    hasVariables: boolean;
 
     constructor({ elements, oneElement, operator = Operator.None, isSimplified = false }: ExpressionDataParams) {
         if (!!oneElement && !!elements) {
@@ -35,9 +36,13 @@ export class ExpressionData {
 
         this.isSimplified = !oneElement ? isSimplified : true;
 
-        this.isZero = this.commaStringify() === '0';
+        const stringified = this.commaStringify();
 
-        this.isOne = this.commaStringify() === '1';
+        this.isZero = stringified === '0';
+
+        this.isOne = stringified === '1';
+
+        this.hasVariables = !!stringified.match(/[a-i]/);
 
         operator === Operator.Add && this.sortElements();
     }
@@ -102,6 +107,7 @@ export class ElementData {
     unfilteredString: string | undefined;
     isZero: boolean;
     isOne: boolean;
+    hasVariables: boolean;
 
     constructor({ variables = [], scalar = 1, unfilteredString }: ElementDataParams) {
         this.scalar = smartToFixed(Number.parseFloat(scalar.toString()));
@@ -110,9 +116,13 @@ export class ElementData {
 
         this.unfilteredString = unfilteredString;
 
-        this.isZero = this.stringify() === '0';
+        const stringified = this.stringify();
 
-        this.isOne = this.stringify() === '1';
+        this.isZero = stringified === '0';
+
+        this.isOne = stringified === '1';
+
+        this.hasVariables = !!stringified.match(/[a-i]/);
 
         this.fixVariables()
     }
