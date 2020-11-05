@@ -705,7 +705,10 @@ class MatrixOperations {
                 const generalVectorData = MatrixOperations.findGeneralVectorForSPDOrSPIEquation(vectorEquation);
 
                 systemSolutionsType = generalVectorData.solutionType;
-                lettersUsed = generalVectorData.lettersUsed;
+                
+                generalVectorData.lettersUsed.length > 0 && (
+                    lettersUsed = generalVectorData.lettersUsed
+                );
 
                 const devectorizedMatrixX = MatrixOperations.devectorizeVector(
                     generalVectorData.vectorizedX, 
