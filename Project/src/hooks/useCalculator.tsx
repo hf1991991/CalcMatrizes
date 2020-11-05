@@ -7,6 +7,7 @@ import MatrixData from '../utilities/MatrixData';
 import SelectedMatrixElement from '../interfaces/SelectedMatrixElement';
 import MatrixDimensions from '../interfaces/MatrixDimensions';
 import FullEquationData from '../interfaces/FullEquationData';
+import ScalarOperations from '../utilities/ScalarOperations';
 
 interface MatrixHistory {
     history: Array<MatrixData>;
@@ -162,9 +163,13 @@ export const CalculatorProvider: React.FC = ({ children }) => {
         (withVariables: boolean) => (
             fullEquation?.solutionType
                 ? fullEquation?.solutionType + (
-                    fullEquation?.lettersUsed && withVariables
-                        ? ` (${fullEquation.lettersUsed.join(', ')} \u2208 R)`
-                        : ''
+                    !fullEquation.lettersUsed || !withVariables
+                        ? ''
+                        : ` (${
+                            fullEquation.lettersUsed.length > 3
+                                ? 'n' + ScalarOperations.subscript('i')
+                                : fullEquation.lettersUsed.join(', ')
+                        } \u2208 R)`
                 )
                 : ''
         ),

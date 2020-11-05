@@ -705,7 +705,7 @@ class MatrixOperations {
                 const generalVectorData = MatrixOperations.findGeneralVectorForSPDOrSPIEquation(vectorEquation);
 
                 systemSolutionsType = generalVectorData.solutionType;
-                
+
                 generalVectorData.lettersUsed.length > 0 && (
                     lettersUsed = generalVectorData.lettersUsed
                 );
@@ -824,9 +824,9 @@ class MatrixOperations {
             vectorizedX
         } = vectorEquation;
 
-        const letters = 'mnopqrstuvwxyz'.split('');
-
         let lettersUsed: Array<string> = [];
+
+        const getLetter = () => 'n' + ScalarOperations.subscript(lettersUsed.length + 1)
 
         let solutionType = SystemSolutionType.SPD;
 
@@ -841,7 +841,7 @@ class MatrixOperations {
             if (allElementsOfRowNull) {
                 solutionType = SystemSolutionType.SPI;
 
-                const variable = letters.splice(0, 1)[0];
+                const variable = getLetter();
 
                 lettersUsed.push(variable);
 

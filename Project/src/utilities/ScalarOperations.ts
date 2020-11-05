@@ -118,6 +118,9 @@ class ScalarOperations {
                 case ')':
                     newNumber += '\u208E';
                     break;
+                case 'i':
+                    newNumber += '\u1D62';
+                    break;
                 default:
                     newNumber += string[index];
                     break;
