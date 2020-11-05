@@ -50,8 +50,8 @@ class EquationData {
                     this.secondOperator = '=';
                     this.matrix2 = fullEquation.solutionWithIndependentVariables;
                     if (viewReduced) {
-                        this.matrix1 = fullEquation.matrixC;
-                        this.matrix3 = fullEquation.matrixD;
+                        this.matrix1 = fullEquation.matrixD;
+                        this.matrix3 = fullEquation.matrixC;
                     } else {
                         this.matrix1 = fullEquation.matrixB;
                         this.matrix3 = fullEquation.matrixA;
@@ -94,8 +94,8 @@ class EquationData {
                     this.secondOperator = '=';
                     this.matrix1 = fullEquation.solutionWithIndependentVariables;
                     if (viewReduced) {
-                        this.matrix2 = fullEquation.matrixC;
-                        this.matrix3 = fullEquation.matrixD;
+                        this.matrix2 = fullEquation.matrixD;
+                        this.matrix3 = fullEquation.matrixC;
                     } else {
                         this.matrix2 = fullEquation.matrixB;
                         this.matrix3 = fullEquation.matrixA;
