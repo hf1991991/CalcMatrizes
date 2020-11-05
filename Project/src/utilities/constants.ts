@@ -159,6 +159,7 @@ export enum SystemSolutionType {
     SPI = 'SPI',
     SPD = 'SPD',
     SI = 'SI',
+    SPDOrSPI = 'SPD ou SPI',
     MaybeSPI = 'SPI?'
 };
 

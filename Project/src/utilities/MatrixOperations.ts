@@ -641,35 +641,52 @@ class MatrixOperations {
             matrixACopy = secondElimination.matrixA;
             matrixX = secondElimination.matrixB;
 
+            const resizedMatrixX = MatrixOperations.resizeMatrixAfterPartialElimination(
+                matrixA,
+                matrixB,
+                matrixX,
+                verticalElimination
+            );
+
             const systemSolutionsType = MatrixOperations.systemSolutionTypesVerification(
+                matrixB,
                 matrixACopy,
-                matrixX
+                matrixX,
+                resizedMatrixX,
+                verticalElimination
             );
 
             let partiallyEliminatedOriginal = matrixACopy;
             let solution = matrixX;
-
-            if (systemSolutionsType === SystemSolutionType.SPD) {
-                solution = MatrixOperations.resizeMatrixAfterPartialElimination(
-                    matrixA,
-                    matrixB,
-                    matrixX,
-                    verticalElimination
-                );
-            }
-
             let solutionWithIndependentVariables: MatrixData | undefined = undefined;
 
-            // Se matrixB for um vetor, achar vetor com variáveis independentes:
-            if (systemSolutionsType === SystemSolutionType.SPI && matrixX.dimensions().columns === 1)
-                solutionWithIndependentVariables = MatrixOperations.findGeneralVectorForSPIEquation(
-                    partiallyEliminatedOriginal,
-                    matrixX
-                );
+            if (systemSolutionsType === SystemSolutionType.SPDOrSPI) {
+
+                // Implementar aqui um método de transformar A(mxo) * X(oxn) = B(mxn) 
+                // em A((m*n)x(o*n)) * X((o*n)x1) = B((m*n)x1).
+                //
+                // Ideia: cada linha de A((m*n)x(o*n)) é
+
+                // Sendo matrixB um vetor, achar vetor com variáveis independentes:
+                // Aqui deveria ser separado também se é SPD, ou SPI: 
+                if (solution.dimensions().columns === 1)
+                    solutionWithIndependentVariables = MatrixOperations.findGeneralVectorForSPIEquation(
+                        partiallyEliminatedOriginal,
+                        solution
+                    );
+                    solution = resizedMatrixX;
+
+                // Erro que não altera em nada o funcionamento do código que devo implementar
+                // acima: a matrix reduzida por vezes não tem zeros acima dos pivôts
+
+            }
 
             if (verticalElimination) {
                 solution = MatrixOperations.transpose(solution);
                 partiallyEliminatedOriginal = MatrixOperations.transpose(partiallyEliminatedOriginal);
+                solutionWithIndependentVariables && (
+                    solutionWithIndependentVariables = MatrixOperations.transpose(solutionWithIndependentVariables)
+                );
             }
 
             // console.log({
@@ -736,52 +753,62 @@ class MatrixOperations {
         return new MatrixData(matrixXData.map(e => [e]));
     }
 
-    static systemSolutionTypesVerification(matrixA: MatrixData, matrixB: MatrixData) {
-        /* Se na matriz A houver uma linha completa de 
-        elementos nulos e, na mesma linha da matriz B, houver 
-        algum elemento não nulo, a expressão é um SI. */
-
-        for (let row = 0; row < matrixA.dimensions().rows; row++) {
-            let allElementsOfRowNull = true;
-
-            for (let column = 0; column < matrixA.dimensions().columns; column++) {
-                if (!matrixA.data[row][column].isZero) allElementsOfRowNull = false;
-            }
-
-            if (allElementsOfRowNull) {
-                let onlyHasZeroesOrVariables = false;
-                for (let column = 0; column < matrixB.dimensions().columns; column++) {
-                    if (!matrixB.data[row][column].isZero) {
-                        if (!matrixB.data[row][column].hasVariables) 
-                            return SystemSolutionType.SI;
-
-                        onlyHasZeroesOrVariables = true;
-                    }
-                }
-                if (onlyHasZeroesOrVariables) 
-                    return SystemSolutionType.MaybeSPI;
-
-                return SystemSolutionType.SPI;
-            }
-        }
+    static systemSolutionTypesVerification(
+        matrixB: MatrixData,
+        matrixACopy: MatrixData,
+        matrixX: MatrixData,
+        resizedMatrixX: MatrixData,
+        verticalElimination: boolean
+    ) {
 
         /* Se, na expressão, houver uma igualdade de um número nulo com 
         um não nulo fora das dimensoes da matrix final, ela é um SI: */
         for (
-            let row = matrixA.dimensions().columns;
-            row < matrixB.dimensions().rows;
+            let row = matrixACopy.dimensions().columns;
+            row < matrixX.dimensions().rows;
             row++
         ) {
             for (
                 let column = 0;
-                column < matrixB.dimensions().columns;
+                column < matrixX.dimensions().columns;
                 column++
             ) {
-                if (!matrixB.data[row][column].isZero) return SystemSolutionType.SI;
+                if (!matrixX.data[row][column].isZero) return SystemSolutionType.SI;
             }
         }
 
-        return SystemSolutionType.SPD;
+        let multiplication: MatrixData;
+
+        if (verticalElimination)
+            multiplication = MatrixOperations.multiplyMatrix(resizedMatrixX, matrixACopy);
+        else
+            multiplication = MatrixOperations.multiplyMatrix(matrixACopy, resizedMatrixX);
+
+        let isMaybeSPI = false;
+
+        for (let row = 0; row < matrixB.dimensions().rows; row++) {
+
+            for (let column = 0; column < matrixB.dimensions().columns; column++) {
+                if (
+                    matrixB.data[row][column].commaStringify()
+                    !== multiplication.data[row][column].commaStringify()
+                ) {
+                    if (
+                        !matrixB.data[row][column].hasVariables
+                        && !multiplication.data[row][column].hasVariables
+                    )
+                        return SystemSolutionType.SI;
+                    
+                    isMaybeSPI = true;
+                }
+            }
+            
+        }
+
+        if (isMaybeSPI) 
+            return SystemSolutionType.MaybeSPI;
+        
+        return SystemSolutionType.SPDOrSPI;
     }
 
     static resizeMatrixAfterPartialElimination(matrixA: MatrixData, matrixB: MatrixData, matrixX: MatrixData, verticalElimination: boolean = false) {
