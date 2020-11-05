@@ -13,7 +13,7 @@ import { useOrientation } from '../hooks/useOrientation';
 const BUTTON_AREAS_CROSS_WIDTH = 70;
 
 const MatrixArea: React.FC = () => {
-    const { isPortrait } = useOrientation();
+    const { isPortrait, setLandscape } = useOrientation();
 
     const {
         calcState,
@@ -254,6 +254,7 @@ const MatrixArea: React.FC = () => {
                 bottomMiddleText={
                     calcState === CalcState.ready ? getSolutionTypeString(!isPortrait) : ''
                 }
+                onPressBottomMiddleText={() => setLandscape()}
                 onPressBottomRightText={
                     !isPortrait
                         ? fullEquation !== null

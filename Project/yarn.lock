@@ -5707,6 +5707,11 @@ react-is@^16.12.0, react-is@^16.8.1, react-is@^16.8.4, react-is@^16.8.6:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.13.1.tgz#789729a4dc36de2999dc156dd6c1d9c18cea56a4"
   integrity sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==
 
+react-native-change-orientation@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/react-native-change-orientation/-/react-native-change-orientation-0.1.0.tgz#49b0222953731c73ecdcad978c82a1393fb464af"
+  integrity sha512-iNOuEM3QWfWChtUkgmfP4KRQ5t3iAMpv2NF3Uzdkm7BiBDMT/wiDyCuLWUk0FaxdsT3nsX36byJThQho3enkWg==
+
 react-native-typescript-transformer@^1.2.13:
   version "1.2.13"
   resolved "https://registry.yarnpkg.com/react-native-typescript-transformer/-/react-native-typescript-transformer-1.2.13.tgz#be92a3d110dbb2cf2f4aebe60a935be124cfb7ed"

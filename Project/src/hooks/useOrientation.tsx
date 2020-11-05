@@ -1,7 +1,24 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { Dimensions } from 'react-native';
 
-interface OrientationContextData {
+import ChangeOrientation from 'react-native-change-orientation';
+
+// Copiado de react-native-change-orientation:
+interface ChangeOrientationType {
+    multiply(a: number, b: number): Promise<number>;
+    /**
+     * Para rodar `setLandscape` em modo de desenvolvimento,
+     * é necessário definir `__DEV__` como false em index.tsx.
+     */
+    setLandscape(): Promise<void>;
+    /**
+     * Para rodar `setPortrait` em modo de desenvolvimento,
+     * é necessário definir `__DEV__` como false em index.tsx.
+     */
+    setPortrait(): Promise<void>;
+};
+
+interface OrientationContextData extends ChangeOrientationType {
     isPortrait: boolean;
 }
 
@@ -24,7 +41,7 @@ export const OrientionProvider: React.FC = ({ children }) => {
     )
 
     return (
-        <OrientationContext.Provider value={{ isPortrait }}>
+        <OrientationContext.Provider value={{ isPortrait, ...ChangeOrientation }}>
             {children}
         </OrientationContext.Provider>
     )
