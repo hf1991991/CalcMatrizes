@@ -616,13 +616,17 @@ class MatrixOperations {
     */
     static findSolutionForMatrixEquation(matrixA: MatrixData, matrixB: MatrixData, verticalElimination: boolean = false) {
         function _findSolutionForMatrixEquation(): FindSolutionMatrixEquationData {
-            let matrixACopy = MatrixOperations.copyMatrixData(matrixA);
-            let matrixX = MatrixOperations.copyMatrixData(matrixB);
+
+            let _matrixA = matrixA;
+            let _matrixB = matrixB;
 
             if (verticalElimination) {
-                matrixACopy = MatrixOperations.transpose(matrixACopy);
-                matrixX = MatrixOperations.transpose(matrixX);
+                _matrixA = MatrixOperations.transpose(matrixA);
+                _matrixB = MatrixOperations.transpose(matrixB);
             }
+
+            let matrixACopy = MatrixOperations.copyMatrixData(_matrixA);
+            let matrixX = MatrixOperations.copyMatrixData(_matrixB);
 
             /* if showSteps:
                 exibicao_passos_resolver_equacao_matricial(matrixACopy, matrixX, None, None, None, verticalElimination, "Equação inicial:\n") */
@@ -642,34 +646,20 @@ class MatrixOperations {
             matrixX = secondElimination.matrixB;
 
             const resizedMatrixX = MatrixOperations.resizeMatrixAfterPartialElimination(
-                matrixA,
-                matrixB,
-                matrixX,
-                verticalElimination
+                _matrixA,
+                _matrixB,
+                matrixX
             );
-
-            let multiplication: MatrixData;
     
-            if (verticalElimination) {
-                multiplication = MatrixOperations.multiplyMatrix(resizedMatrixX, matrixA);
-                console.log({verticalElimination});
-                MatrixOperations.printMatrix(resizedMatrixX);
-                MatrixOperations.printMatrix(matrixA);
-                MatrixOperations.printMatrix(multiplication);
-                MatrixOperations.printMatrix(matrixB);
-            }
-            else {
-                multiplication = MatrixOperations.multiplyMatrix(matrixA, resizedMatrixX);
-                console.log({verticalElimination});
-                MatrixOperations.printMatrix(resizedMatrixX);
-                MatrixOperations.printMatrix(matrixA);
-                MatrixOperations.printMatrix(multiplication);
-                MatrixOperations.printMatrix(matrixB);
-            }
-
+            const multiplication = MatrixOperations.multiplyMatrix(_matrixA, resizedMatrixX);
+            console.log({verticalElimination});
+            MatrixOperations.printMatrix(resizedMatrixX);
+            MatrixOperations.printMatrix(_matrixA);
+            MatrixOperations.printMatrix(multiplication);
+            MatrixOperations.printMatrix(_matrixB);
 
             const systemSolutionsType = MatrixOperations.systemSolutionTypesVerification(
-                matrixB,
+                _matrixB,
                 matrixACopy,
                 matrixX,
                 multiplication
@@ -686,7 +676,7 @@ class MatrixOperations {
                 //
                 // Ideia: cada linha de A((m*n)x(o*n)) é
 
-                // Sendo matrixB um vetor, achar vetor com variáveis independentes:
+                // Sendo _matrixB um vetor, achar vetor com variáveis independentes:
                 // Aqui deveria ser separado também se é SPD, ou SPI: 
                 if (solution.dimensions().columns === 1)
                     solutionWithIndependentVariables = MatrixOperations.findGeneralVectorForSPIEquation(
@@ -823,12 +813,12 @@ class MatrixOperations {
         return SystemSolutionType.SPDOrSPI;
     }
 
-    static resizeMatrixAfterPartialElimination(matrixA: MatrixData, matrixB: MatrixData, matrixX: MatrixData, verticalElimination: boolean = false) {
+    static resizeMatrixAfterPartialElimination(matrixA: MatrixData, matrixB: MatrixData, matrixX: MatrixData) {
         return MatrixOperations.resizeMatrix({
             originalMatrix: MatrixOperations.emptyMatrix(matrixX.dimensions()),
             editableMatrix: matrixX,
-            rows: verticalElimination ? matrixA.dimensions().rows : matrixA.dimensions().columns,
-            columns: verticalElimination ? matrixB.dimensions().rows : matrixB.dimensions().columns,
+            rows: matrixA.dimensions().columns,
+            columns: matrixB.dimensions().columns,
         });
     }
 }
