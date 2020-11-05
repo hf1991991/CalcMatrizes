@@ -254,7 +254,7 @@ const MatrixArea: React.FC = () => {
                 bottomMiddleText={
                     calcState === CalcState.ready ? getSolutionTypeString(!isPortrait) : ''
                 }
-                onPressBottomMiddleText={() => setLandscape()}
+                onPressBottomMiddleText={() => isPortrait && setLandscape()}
                 onPressBottomRightText={
                     !isPortrait
                         ? fullEquation !== null
