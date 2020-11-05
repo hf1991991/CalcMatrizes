@@ -788,8 +788,8 @@ class MatrixOperations {
         return MatrixOperations.resizeMatrix({
             originalMatrix: MatrixOperations.emptyMatrix(matrixX.dimensions()),
             editableMatrix: matrixX,
-            rows: verticalElimination ? matrixB.dimensions().rows : matrixA.dimensions().columns,
-            columns: verticalElimination ? matrixA.dimensions().rows : matrixB.dimensions().columns,
+            rows: verticalElimination ? matrixA.dimensions().rows : matrixA.dimensions().columns,
+            columns: verticalElimination ? matrixB.dimensions().rows : matrixB.dimensions().columns,
         });
     }
 }
