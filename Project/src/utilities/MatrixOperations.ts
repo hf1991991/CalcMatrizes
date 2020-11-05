@@ -797,7 +797,7 @@ class MatrixOperations {
             }
         }
 
-        let isMaybeSPI = false;
+        let isSPIorSI = false;
 
         for (let row = 0; row < matrixB.dimensions().rows; row++) {
 
@@ -812,14 +812,14 @@ class MatrixOperations {
                     )
                         return SystemSolutionType.SI;
 
-                    isMaybeSPI = true;
+                    isSPIorSI = true;
                 }
             }
 
         }
 
-        if (isMaybeSPI)
-            return SystemSolutionType.MaybeSPI;
+        if (isSPIorSI)
+            return SystemSolutionType.SPIOrSI;
 
         return SystemSolutionType.SPDOrSPI;
     }

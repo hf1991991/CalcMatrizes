@@ -177,7 +177,7 @@ export enum SystemSolutionType {
     SPD = 'SPD',
     SI = 'SI',
     SPDOrSPI = 'SPD ou SPI',
-    MaybeSPI = 'SPI?'
+    SPIOrSI = 'SPI ou SI'
 };
 
 export function toFixedWithThreeDots(number: string | number) {
