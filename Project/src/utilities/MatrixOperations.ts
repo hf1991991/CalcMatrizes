@@ -49,6 +49,12 @@ interface PartialGaussianEliminationData {
     determinant: ExpressionData;
 }
 
+interface TransformEquationToVectorFormData {
+    matrixA: MatrixData;
+    vectorizedX: Array<ExpressionData>;
+    vectorizedB: Array<ExpressionData>;
+}
+
 class MatrixOperations {
 
     static changeElement({ matrix, column, row, numberWritten }: ChangeElementParams) {
@@ -669,7 +675,7 @@ class MatrixOperations {
             MatrixOperations.printMatrix(multiplication);
             MatrixOperations.printMatrix(_matrixB);
 
-            const systemSolutionsType = MatrixOperations.systemSolutionTypesVerification(
+            let systemSolutionsType = MatrixOperations.systemSolutionTypesVerification(
                 _matrixB,
                 matrixACopy,
                 matrixX,
@@ -691,18 +697,22 @@ class MatrixOperations {
                 );
 
                 MatrixOperations.printMatrix(vectorEquation.matrixA);
-                MatrixOperations.printMatrix(vectorEquation.matrixX);
-                MatrixOperations.printMatrix(vectorEquation.matrixB);
 
-                // Sendo _matrixB um vetor, achar vetor com variáveis independentes:
-                // Aqui deveria ser separado também se é SPD, ou SPI: 
-                if (solution.dimensions().columns === 1)
-                    solutionWithIndependentVariables = MatrixOperations.findGeneralVectorForSPDOrSPIEquation(
-                        partiallyEliminatedOriginal,
-                        solution
-                    );
+                // Sendo matrixX um vetor, achar vetor com variáveis independentes:
+                // Aqui é feita a separação entre SPD e SPI: 
+                const generalVectorData = MatrixOperations.findGeneralVectorForSPDOrSPIEquation(vectorEquation);
 
-                solution = resizedMatrixX;
+                systemSolutionsType = generalVectorData.solutionType;
+
+                const devectorizedMatrixX = MatrixOperations.devectorizeVector(
+                    generalVectorData.vectorizedX, 
+                    resizedMatrixX.dimensions()
+                );
+
+                if (systemSolutionsType === SystemSolutionType.SPI)
+                    solutionWithIndependentVariables = devectorizedMatrixX;
+                else
+                    solution = devectorizedMatrixX;
 
             }
 
@@ -734,7 +744,7 @@ class MatrixOperations {
         );
     }
 
-    static transformEquationToVectorForm(matrixA: MatrixData, matrixX: MatrixData, matrixB: MatrixData) {
+    static transformEquationToVectorForm(matrixA: MatrixData, matrixX: MatrixData, matrixB: MatrixData): TransformEquationToVectorFormData {
 
         const dimensionsA = matrixA.dimensions();
         const dimensionsX = matrixX.dimensions();
@@ -768,10 +778,28 @@ class MatrixOperations {
 
         return {
             matrixA: newMatrixAData,
-            matrixX: MatrixOperations.devectorizeVector(vectorizedX),
-            matrixB: MatrixOperations.devectorizeVector(vectorizedB)
+            vectorizedX,
+            vectorizedB
         }
 
+    }
+
+    static devectorizeVector(matrix: Array<ExpressionData>, matrixDimensions: MatrixDimensions) {
+        const newData =  matrix.reduce(
+            (dataAccumulator, element) => {
+                console.log(JSON.stringify({ dataAccumulator }));
+                let lastElement = dataAccumulator.pop();
+                if (!lastElement)
+                    return [[element]]
+                if (lastElement.length < matrixDimensions.columns)
+                    return [...dataAccumulator, [...lastElement, element]];
+                else
+                    return [...dataAccumulator, lastElement, [element]];
+            },
+            [] as Array<MatrixColumnData>
+        );
+
+        return new MatrixData(newData);
     }
 
     static vectorizeMatrix(matrix: MatrixData) {
@@ -782,52 +810,59 @@ class MatrixOperations {
         return vector;
     }
 
-    static devectorizeVector(matrix: MatrixColumnData) {
-        return new MatrixData(matrix.map(e => [e]));
-    }
+    static findGeneralVectorForSPDOrSPIEquation(vectorEquation: TransformEquationToVectorFormData) {
 
-    static findGeneralVectorForSPDOrSPIEquation(matrixA: MatrixData, matrixB: MatrixData) {
+        const {
+            matrixA,
+            vectorizedX
+        } = vectorEquation;
 
         const letters = 'klmnopqrstuvwxyz'.split('');
 
-        let matrixXData = MatrixOperations.vectorizeMatrix(matrixB);
+        let solutionType = SystemSolutionType.SPD;
 
         // Definição das variáveis independentes:
-        for (let row = 0; row < matrixA.dimensions().rows; row++) {
+        for (let row = 0; row < vectorizedX.length; row++) {
             let allElementsOfRowNull = true;
 
             for (let column = 0; column < matrixA.dimensions().columns; column++) {
                 if (!matrixA.data[row][column].isZero) allElementsOfRowNull = false;
             }
 
-            if (allElementsOfRowNull)
-                matrixXData[row] = new ExpressionData({
-                    oneElement: new ElementData({
-                        variables: [new VariableData({
+            if (allElementsOfRowNull) {
+                solutionType = SystemSolutionType.SPI;
+
+                vectorizedX[row] = createMatrixElement({
+                    variables: [
+                        new VariableData({
                             variable: letters.splice(0, 1)[0]
-                        })]
-                    })
+                        })
+                    ]
                 });
+            }
         }
 
         // Definição das variáveis dependentes:
         // Começa no último elemento antes da variável independente:
-        for (let rowIndex = matrixA.dimensions().rows - 1; rowIndex >= 0; rowIndex--) {
+        for (let rowIndex = vectorizedX.length - 1; rowIndex >= 0; rowIndex--) {
 
             for (let columnIndex = matrixA.dimensions().columns - 1; columnIndex > rowIndex; columnIndex--)
-                matrixXData[rowIndex] = ExpressionSimplification.varOperation(
-                    matrixXData[rowIndex],
+                vectorizedX[rowIndex] = ExpressionSimplification.varOperation(
+                    vectorizedX[rowIndex],
                     Operator.Subtract,
                     ExpressionSimplification.varOperation(
                         matrixA.data[rowIndex][columnIndex],
                         Operator.Multiply,
-                        matrixXData[columnIndex]
+                        vectorizedX[columnIndex]
                     )
                 );
 
         }
 
-        return MatrixOperations.devectorizeVector(matrixXData);
+        return {
+            vectorizedX,
+            solutionType
+        };
     }
 
     static systemSolutionTypesVerification(
