@@ -11,6 +11,7 @@ interface FullEquationData {
     matrixD?: MatrixData;
     solutionWithIndependentVariables?: MatrixData;
     scalar?: ElementData | ExpressionData;
+    lettersUsed?: Array<string>;
 }
 
 export default FullEquationData;

@@ -30,8 +30,8 @@ const MatrixArea: React.FC = () => {
         operationHappening,
         editableOperatorNumber,
         changeEditableDimensions,
-        solutionType,
         fullEquation,
+        getSolutionTypeString,
         viewReduced,
         fullScreenDeterminant
     } = useCalculator();
@@ -252,7 +252,7 @@ const MatrixArea: React.FC = () => {
                         })
                 }
                 bottomMiddleText={
-                    calcState === CalcState.ready ? solutionType : ''
+                    calcState === CalcState.ready ? getSolutionTypeString(!isPortrait) : ''
                 }
                 onPressBottomRightText={
                     !isPortrait

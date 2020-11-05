@@ -18,10 +18,10 @@ interface ChangeNumberWrittenParams {
     forceNotOperatorNumber?: boolean;
 }
 
-interface EnterEditingModeParams { 
-    newCalcState: CalcState; 
-    newEditableMatrix?: MatrixData; 
-    newSelectedElement?: SelectedMatrixElement; 
+interface EnterEditingModeParams {
+    newCalcState: CalcState;
+    newEditableMatrix?: MatrixData;
+    newSelectedElement?: SelectedMatrixElement;
     newScalar?: ExpressionData;
 }
 
@@ -41,7 +41,6 @@ interface CalculatorContextData {
     // Estados de operações:
     operationHappening: boolean;
     editableOperatorNumber: ExpressionData | null;
-    solutionType: SystemSolutionType | null;
     fullEquation: FullEquationData | null;
     viewReduced: boolean;
     // Estados de botões
@@ -65,6 +64,7 @@ interface CalculatorContextData {
     undoHistory(): void;
     redoHistory(): void;
     clearHistory(): void;
+    getSolutionTypeString(withVariables: boolean): string;
     changeNumberWritten(params: ChangeNumberWrittenParams): void;
     changeEditableDimensions(params: MatrixDimensions): void;
     changeSelectedMatrixElement(selectedElement: SelectedMatrixElement): void;
@@ -125,7 +125,6 @@ export const CalculatorProvider: React.FC = ({ children }) => {
     // Estados de operações:
     const [operationHappening, setOperationHappening] = useState(false);
     const [editableOperatorNumber, setEditableOperatorNumber] = useState<ExpressionData | null>(null);
-    const [solutionType, setSolutionType] = useState<SystemSolutionType | null>(null);
     const [fullEquation, setFullEquation] = useState<FullEquationData | null>(null);
     const [viewReduced, setViewReduced] = useState(false);
 
@@ -152,6 +151,19 @@ export const CalculatorProvider: React.FC = ({ children }) => {
                 });
 
         }, [matrixHistory, _setReadyMatrix, setMatrixHistory]
+    );
+
+    const getSolutionTypeString = useCallback(
+        (withVariables: boolean) => (
+            fullEquation?.solutionType
+                ? fullEquation?.solutionType + (
+                    fullEquation?.lettersUsed && withVariables
+                        ? ` (${fullEquation.lettersUsed.join(', ')} \u2208 R)`
+                        : ''
+                )
+                : ''
+        ),
+        [fullEquation]
     );
 
     const isNumberKeyboardActive = useMemo(
@@ -306,7 +318,7 @@ export const CalculatorProvider: React.FC = ({ children }) => {
             if (!selectedMatrixElement) return !doNotStringify ? '' : null;
 
             const { row, column } = selectedMatrixElement || {} as SelectedMatrixElement;
-            
+
             const matrixNumber = calcState === CalcState.LambdaxA
                 ? editableScalar
                 : editableMatrix?.data[row] && editableMatrix.data[row][column];
@@ -487,8 +499,6 @@ export const CalculatorProvider: React.FC = ({ children }) => {
             setFullEquation(null);
             newEditableMatrix && setEditableMatrix(newEditableMatrix)
 
-            setSolutionType(null);
-
             newScalar && setEditableScalar(newScalar);
 
             newSelectedElement !== undefined && changeSettingsOfSelectedMatrixElement(newSelectedElement);
@@ -497,7 +507,6 @@ export const CalculatorProvider: React.FC = ({ children }) => {
             setCalcState,
             setFullEquation,
             setEditableMatrix,
-            setSolutionType,
             setEditableScalar,
             changeSettingsOfSelectedMatrixElement
         ]
@@ -592,7 +601,8 @@ export const CalculatorProvider: React.FC = ({ children }) => {
                     partiallyEliminatedOriginal,
                     solution,
                     systemSolutionsType,
-                    solutionWithIndependentVariables
+                    solutionWithIndependentVariables,
+                    lettersUsed
                 } = result;
 
                 setViewReduced(false);
@@ -603,9 +613,9 @@ export const CalculatorProvider: React.FC = ({ children }) => {
                     matrixB: editableMatrix,
                     matrixC: solution,
                     matrixD: partiallyEliminatedOriginal,
-                    solutionWithIndependentVariables
+                    solutionWithIndependentVariables,
+                    lettersUsed
                 });
-                setSolutionType(systemSolutionsType);
 
                 setReadyMatrix(
                     systemSolutionsType == SystemSolutionType.SPD
@@ -614,7 +624,7 @@ export const CalculatorProvider: React.FC = ({ children }) => {
                 );
             }
 
-        }, [isAFirst, calcState, readyMatrix, editableMatrix, setViewReduced, setFullEquation, setSolutionType, setReadyMatrix]
+        }, [isAFirst, calcState, readyMatrix, editableMatrix, setViewReduced, setFullEquation, setReadyMatrix]
     );
 
     const singleInputFullEquationSetup = useCallback(
@@ -976,13 +986,13 @@ export const CalculatorProvider: React.FC = ({ children }) => {
                 if (calcState === CalcState.ready) {
                     setReadyMatrix(inverted);
                 }
-    
+
                 else {
                     setEditableMatrix(inverted);
                     changeSettingsOfSelectedMatrixElement(null);
                     exitEditingMode();
                 }
-    
+
                 singleInputFullEquationSetup(CalcState.invert, inverted);
             }
 
@@ -1089,7 +1099,6 @@ export const CalculatorProvider: React.FC = ({ children }) => {
                 // Estados de operações:
                 operationHappening,
                 editableOperatorNumber,
-                solutionType,
                 fullEquation,
                 viewReduced,
                 // Estados de botões
@@ -1113,6 +1122,7 @@ export const CalculatorProvider: React.FC = ({ children }) => {
                 undoHistory,
                 redoHistory,
                 clearHistory,
+                getSolutionTypeString,
                 changeNumberWritten,
                 changeEditableDimensions,
                 changeSelectedMatrixElement,

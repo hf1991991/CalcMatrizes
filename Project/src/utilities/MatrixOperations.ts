@@ -36,6 +36,7 @@ interface FindSolutionMatrixEquationData {
     solution: MatrixData;
     systemSolutionsType: SystemSolutionType;
     solutionWithIndependentVariables: MatrixData | undefined;
+    lettersUsed: Array<string>;
 }
 
 interface GetGaussianEliminationData {
@@ -685,6 +686,7 @@ class MatrixOperations {
             let partiallyEliminatedOriginal = matrixACopy;
             let solution = matrixX;
             let solutionWithIndependentVariables: MatrixData | undefined = undefined;
+            let lettersUsed: Array<string> = [];
 
             if (systemSolutionsType === SystemSolutionType.SPDOrSPI) {
 
@@ -703,6 +705,7 @@ class MatrixOperations {
                 const generalVectorData = MatrixOperations.findGeneralVectorForSPDOrSPIEquation(vectorEquation);
 
                 systemSolutionsType = generalVectorData.solutionType;
+                lettersUsed = generalVectorData.lettersUsed;
 
                 const devectorizedMatrixX = MatrixOperations.devectorizeVector(
                     generalVectorData.vectorizedX, 
@@ -734,7 +737,8 @@ class MatrixOperations {
                 partiallyEliminatedOriginal,
                 solution,
                 systemSolutionsType,
-                solutionWithIndependentVariables
+                solutionWithIndependentVariables,
+                lettersUsed
             };
         }
 
@@ -819,6 +823,8 @@ class MatrixOperations {
 
         const letters = 'klmnopqrstuvwxyz'.split('');
 
+        let lettersUsed: Array<string> = [];
+
         let solutionType = SystemSolutionType.SPD;
 
         // Definição das variáveis independentes:
@@ -832,12 +838,12 @@ class MatrixOperations {
             if (allElementsOfRowNull) {
                 solutionType = SystemSolutionType.SPI;
 
+                const variable = letters.splice(0, 1)[0];
+
+                lettersUsed.push(variable);
+
                 vectorizedX[row] = createMatrixElement({
-                    variables: [
-                        new VariableData({
-                            variable: letters.splice(0, 1)[0]
-                        })
-                    ]
+                    variables: [ new VariableData({ variable }) ]
                 });
             }
         }
@@ -861,7 +867,8 @@ class MatrixOperations {
 
         return {
             vectorizedX,
-            solutionType
+            solutionType,
+            lettersUsed
         };
     }
 
