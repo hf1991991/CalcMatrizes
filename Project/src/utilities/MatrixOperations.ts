@@ -45,9 +45,10 @@ interface GetGaussianEliminationData {
     error: boolean;
 }
 
-interface DeterminantData {
+interface PartialGaussianEliminationData {
+    matrixA: MatrixData;
+    matrixB: MatrixData;
     determinant: ExpressionData;
-    error: boolean;
 }
 
 class MatrixOperations {
