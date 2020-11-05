@@ -821,7 +821,7 @@ class MatrixOperations {
             vectorizedX
         } = vectorEquation;
 
-        const letters = 'klmnopqrstuvwxyz'.split('');
+        const letters = 'mnopqrstuvwxyz'.split('');
 
         let lettersUsed: Array<string> = [];
 
