@@ -649,20 +649,20 @@ class MatrixOperations {
             );
 
             let multiplication: MatrixData;
-
-            console.log({verticalElimination});
     
             if (verticalElimination) {
-                multiplication = MatrixOperations.multiplyMatrix(resizedMatrixX, matrixACopy);
+                multiplication = MatrixOperations.multiplyMatrix(resizedMatrixX, matrixA);
+                console.log({verticalElimination});
                 MatrixOperations.printMatrix(resizedMatrixX);
-                MatrixOperations.printMatrix(matrixACopy);
+                MatrixOperations.printMatrix(matrixA);
                 MatrixOperations.printMatrix(multiplication);
                 MatrixOperations.printMatrix(matrixB);
             }
             else {
-                multiplication = MatrixOperations.multiplyMatrix(matrixACopy, resizedMatrixX);
+                multiplication = MatrixOperations.multiplyMatrix(matrixA, resizedMatrixX);
+                console.log({verticalElimination});
                 MatrixOperations.printMatrix(resizedMatrixX);
-                MatrixOperations.printMatrix(matrixACopy);
+                MatrixOperations.printMatrix(matrixA);
                 MatrixOperations.printMatrix(multiplication);
                 MatrixOperations.printMatrix(matrixB);
             }
@@ -693,7 +693,8 @@ class MatrixOperations {
                         partiallyEliminatedOriginal,
                         solution
                     );
-                    solution = resizedMatrixX;
+                
+                solution = resizedMatrixX;
 
                 // Erro que não altera em nada o funcionamento do código que devo implementar
                 // acima: a matrix reduzida por vezes não tem zeros acima dos pivôts
