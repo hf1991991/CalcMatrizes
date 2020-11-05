@@ -440,126 +440,137 @@ class MatrixOperations {
         ) {
             let pivot = _matrixA.data[pivotColumn][pivotColumn];
 
-            if (pivot.isZero) {
+            // Se estiver na eliminação acima da diagonal e 
+            // encontrar um pivot zero, simplesmente pular para o próximo
+            // (permite deixar da forma escalonada reduzida):
+            if (eliminateBelowMainDiagonal || !pivot.isZero) {
 
-                let testRow = pivotColumn + 1;
-                while (true) {
-                    // Se houver uma coluna sem pivot em uma matriz escalonada reduzida, o determinante dela é nulo:
-                    if (testRow === dimensionsA.columns) {
-                        noPivotOnColumn = true;
-                        break;
+                if (pivot.isZero) {
+
+                    let testRow = pivotColumn + 1;
+                    while (true) {
+                        // Se houver uma coluna sem pivot em uma matriz escalonada reduzida, o determinante dela é nulo:
+                        if (testRow === dimensionsA.columns) {
+                            noPivotOnColumn = true;
+                            break;
+                        }
+
+                        let possibleNewPivot = _matrixA.data[testRow][pivotColumn];
+
+                        if (!possibleNewPivot.isZero) break;
+
+                        testRow++;
                     }
 
-                    let possibleNewPivot = _matrixA.data[testRow][pivotColumn];
+                    if (!noPivotOnColumn) {
+                        let _matrixACopy = MatrixOperations.copyMatrixData(_matrixA);
+                        let _matrixBCopy = MatrixOperations.copyMatrixData(_matrixB);
 
-                    if (!possibleNewPivot.isZero) break;
+                        _matrixA.data[pivotColumn] = _matrixACopy.data[testRow];
+                        _matrixA.data[testRow] = _matrixACopy.data[pivotColumn];
 
-                    testRow++;
+                        _matrixB.data[pivotColumn] = _matrixBCopy.data[testRow];
+                        _matrixB.data[testRow] = _matrixBCopy.data[pivotColumn];
+
+                        pivot = _matrixA.data[pivotColumn][pivotColumn];
+
+                        determinant = ExpressionSimplification.varOperation(determinant, Operator.Multiply, createMatrixElement({ scalar: -1 }));
+                    }
                 }
 
                 if (!noPivotOnColumn) {
-                    let _matrixACopy = MatrixOperations.copyMatrixData(_matrixA);
-                    let _matrixBCopy = MatrixOperations.copyMatrixData(_matrixB);
 
-                    _matrixA.data[pivotColumn] = _matrixACopy.data[testRow];
-                    _matrixA.data[testRow] = _matrixACopy.data[pivotColumn];
+                    console.log({ pivot: pivot.stringify(), pivotColumn });
 
-                    _matrixB.data[pivotColumn] = _matrixBCopy.data[testRow];
-                    _matrixB.data[testRow] = _matrixBCopy.data[pivotColumn];
+                    if (!pivot.isOne) {
+                        for (let index = 0; index < dimensionsA.columns; index++)
+                            _matrixA.data[pivotColumn][index] =
+                                ExpressionSimplification.varOperation(_matrixA.data[pivotColumn][index], Operator.Divide, pivot);
 
-                    pivot = _matrixA.data[pivotColumn][pivotColumn];
+                        console.log('STARTING MATRIX B DIVISION BY PIVOT')
+                        for (let index = 0; index < dimensionsB.columns; index++)
+                            _matrixB.data[pivotColumn][index] =
+                                ExpressionSimplification.varOperation(_matrixB.data[pivotColumn][index], Operator.Divide, pivot);
+                        console.log('ENDED MATRIX B DIVISION BY PIVOT')
 
-                    determinant = ExpressionSimplification.varOperation(determinant, Operator.Multiply, createMatrixElement({ scalar: -1 }));
-                }
-            }
+                        determinant = ExpressionSimplification.varOperation(determinant, Operator.Multiply, pivot);
 
-            if (!noPivotOnColumn) {
+                        //if (showSteps)
+                        //    exibicao_passos_resolver_equacao_matricial(_matrixA, _matrixB, pivot, pivotColumn+1, pivotColumn+1, verticalElimination, None)
 
-                console.log({ pivot: pivot.stringify(), pivotColumn });
-
-                if (!pivot.isOne) {
-                    for (let index = 0; index < dimensionsA.columns; index++)
-                        _matrixA.data[pivotColumn][index] =
-                            ExpressionSimplification.varOperation(_matrixA.data[pivotColumn][index], Operator.Divide, pivot);
-
-                    console.log('STARTING MATRIX B DIVISION BY PIVOT')
-                    for (let index = 0; index < dimensionsB.columns; index++)
-                        _matrixB.data[pivotColumn][index] =
-                            ExpressionSimplification.varOperation(_matrixB.data[pivotColumn][index], Operator.Divide, pivot);
-                    console.log('ENDED MATRIX B DIVISION BY PIVOT')
-
-                    determinant = ExpressionSimplification.varOperation(determinant, Operator.Multiply, pivot);
-
-                    //if (showSteps)
-                    //    exibicao_passos_resolver_equacao_matricial(_matrixA, _matrixB, pivot, pivotColumn+1, pivotColumn+1, verticalElimination, None)
-
-                    pivot = _matrixA.data[pivotColumn][pivotColumn];
-                }
-
-                for (
-                    let index = (eliminateBelowMainDiagonal
-                        ? 0
-                        : pivotColumn - 1
-                    );
-                    index != (eliminateBelowMainDiagonal
-                        ? dimensionsA.rows - pivotColumn - 1
-                        : -1
-                    );
-                    index += (eliminateBelowMainDiagonal
-                        ? 1
-                        : -1
-                    )
-                ) {
-                    let verticalIndex = null;
-                    if (eliminateBelowMainDiagonal)
-                        verticalIndex = index + pivotColumn + 1;
-                    else
-                        verticalIndex = index;
-
-                    const element = _matrixA.data[verticalIndex][pivotColumn];
-                    const eliminationFactor = ExpressionSimplification.varOperation(
-                        ExpressionSimplification.varOperation(
-                            element,
-                            Operator.Multiply,
-                            createMatrixElement({ scalar: -1 })
-                        ),
-                        Operator.Divide,
-                        pivot,
-                    );
-                    MatrixOperations.printMatrix(_matrixA);
-
-                    console.log({ element: element.stringify(), pivot: pivot.stringify(), eliminationFactor: eliminationFactor.stringify() })
-
-                    for (let horizontalIndex = 0; horizontalIndex < dimensionsA.columns; horizontalIndex++) {
-                        _matrixA.data[verticalIndex][horizontalIndex] = ExpressionSimplification.varOperation(
-                            _matrixA.data[verticalIndex][horizontalIndex],
-                            Operator.Add,
-                            ExpressionSimplification.varOperation(
-                                eliminationFactor,
-                                Operator.Multiply,
-                                _matrixA.data[pivotColumn][horizontalIndex]
-                            ),
-                        );
+                        pivot = _matrixA.data[pivotColumn][pivotColumn];
                     }
 
-                    console.log('STARTING MATRIX B MERGE ROWS')
-                    for (let horizontalIndex = 0; horizontalIndex < dimensionsB.columns; horizontalIndex++)
-                        _matrixB.data[verticalIndex][horizontalIndex] = ExpressionSimplification.varOperation(
-                            _matrixB.data[verticalIndex][horizontalIndex],
-                            Operator.Add,
-                            ExpressionSimplification.varOperation(
-                                eliminationFactor,
-                                Operator.Multiply,
-                                _matrixB.data[pivotColumn][horizontalIndex]
-                            ),
+                    for (
+                        let index = (eliminateBelowMainDiagonal
+                            ? 0
+                            : pivotColumn - 1
                         );
-                    console.log('ENDED MATRIX B MERGE ROWS')
+                        index != (eliminateBelowMainDiagonal
+                            ? dimensionsA.rows - pivotColumn - 1
+                            : -1
+                        );
+                        index += (eliminateBelowMainDiagonal
+                            ? 1
+                            : -1
+                        )
+                    ) {
+                        let verticalIndex: number;
+                        if (eliminateBelowMainDiagonal)
+                            verticalIndex = index + pivotColumn + 1;
+                        else
+                            verticalIndex = index;
 
-                    //if (showSteps)
-                    //    exibicao_passos_resolver_equacao_matricial(_matrixA, _matrixB, eliminationFactor, pivotColumn+1, verticalIndex+1, verticalElimination, None)
+                        const element = _matrixA.data[verticalIndex][pivotColumn];
+                        const eliminationFactor = ExpressionSimplification.varOperation(
+                            ExpressionSimplification.varOperation(
+                                element,
+                                Operator.Multiply,
+                                createMatrixElement({ scalar: -1 })
+                            ),
+                            Operator.Divide,
+                            pivot,
+                        );
+                        MatrixOperations.printMatrix(_matrixA);
+
+                        console.log({ element: element.stringify(), pivot: pivot.stringify(), eliminationFactor: eliminationFactor.stringify() })
+
+                        for (let horizontalIndex = 0; horizontalIndex < dimensionsA.columns; horizontalIndex++) {
+                            _matrixA.data[verticalIndex][horizontalIndex] = ExpressionSimplification.varOperation(
+                                _matrixA.data[verticalIndex][horizontalIndex],
+                                Operator.Add,
+                                ExpressionSimplification.varOperation(
+                                    eliminationFactor,
+                                    Operator.Multiply,
+                                    _matrixA.data[pivotColumn][horizontalIndex]
+                                ),
+                            );
+                        }
+
+                        console.log('STARTING MATRIX B MERGE ROWS')
+                        for (let horizontalIndex = 0; horizontalIndex < dimensionsB.columns; horizontalIndex++)
+                            _matrixB.data[verticalIndex][horizontalIndex] = ExpressionSimplification.varOperation(
+                                _matrixB.data[verticalIndex][horizontalIndex],
+                                Operator.Add,
+                                ExpressionSimplification.varOperation(
+                                    eliminationFactor,
+                                    Operator.Multiply,
+                                    _matrixB.data[pivotColumn][horizontalIndex]
+                                ),
+                            );
+                        console.log('ENDED MATRIX B MERGE ROWS')
+
+                        //if (showSteps)
+                        //    exibicao_passos_resolver_equacao_matricial(_matrixA, _matrixB, eliminationFactor, pivotColumn+1, verticalIndex+1, verticalElimination, None)
+                    }
+                    MatrixOperations.printMatrix(_matrixA);
                 }
-                MatrixOperations.printMatrix(_matrixA);
+            
             }
+
+            else 
+                determinant = createMatrixElement({ scalar: 0 });
+
         }
 
         if (noPivotOnColumn) determinant = createMatrixElement({
@@ -650,9 +661,9 @@ class MatrixOperations {
                 _matrixB,
                 matrixX
             );
-    
+
             const multiplication = MatrixOperations.multiplyMatrix(_matrixA, resizedMatrixX);
-            console.log({verticalElimination});
+            console.log({ verticalElimination });
             MatrixOperations.printMatrix(resizedMatrixX);
             MatrixOperations.printMatrix(_matrixA);
             MatrixOperations.printMatrix(multiplication);
@@ -683,7 +694,7 @@ class MatrixOperations {
                         partiallyEliminatedOriginal,
                         solution
                     );
-                
+
                 solution = resizedMatrixX;
 
                 // Erro que não altera em nada o funcionamento do código que devo implementar
@@ -800,16 +811,16 @@ class MatrixOperations {
                         && !multiplication.data[row][column].hasVariables
                     )
                         return SystemSolutionType.SI;
-                    
+
                     isMaybeSPI = true;
                 }
             }
-            
+
         }
 
-        if (isMaybeSPI) 
+        if (isMaybeSPI)
             return SystemSolutionType.MaybeSPI;
-        
+
         return SystemSolutionType.SPDOrSPI;
     }
 
