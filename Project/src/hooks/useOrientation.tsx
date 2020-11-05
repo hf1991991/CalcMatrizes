@@ -8,12 +8,12 @@ interface ChangeOrientationType {
     multiply(a: number, b: number): Promise<number>;
     /**
      * Para rodar `setLandscape` em modo de desenvolvimento,
-     * é necessário definir `__DEV__` como false em index.tsx.
+     * talvez seja necessário definir `__DEV__` como false em index.tsx.
      */
     setLandscape(): Promise<void>;
     /**
      * Para rodar `setPortrait` em modo de desenvolvimento,
-     * é necessário definir `__DEV__` como false em index.tsx.
+     * talvez seja necessário definir `__DEV__` como false em index.tsx.
      */
     setPortrait(): Promise<void>;
 };
