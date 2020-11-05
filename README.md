@@ -2,6 +2,13 @@
 
 Autor: Henrique Falconer
 
+## INSTRUÇÕES PARA MANDAR PARA O TESTFLIGHT
+
+ - Passo 1: Dê `yarn release` no diretório Project
+ - Passo 2: Verifique se o projeto está como você queria
+ - Passo 3: Rode `cd ios; fastlane beta` novamente no diretório Project
+ - Passo 4: Digite o que precisar ser digitado, e espere até o processo finalizar
+
 ## Repositório com certificados
 
 [Clique aqui](https://github.com/hf1991991/CalcMatrizesCodeSigning)
