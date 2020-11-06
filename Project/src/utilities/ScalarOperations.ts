@@ -1,4 +1,4 @@
-import { Operator, count } from "./constants";
+import { count } from "./constants";
 
 class ScalarOperations {
 

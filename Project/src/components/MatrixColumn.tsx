@@ -1,9 +1,7 @@
 import React, { useCallback } from 'react';
 import { View, Text, TouchableOpacity, FlatList } from 'react-native';
 import ElementDataWithPosition from '../interfaces/ElementDataWithPosition';
-import MatrixColumnData from '../interfaces/MatrixColumnData';
 import SelectedMatrixElement from '../interfaces/SelectedMatrixElement';
-import { findFraction, smartToFixed, toFixedOnZeroes, toFixedWithThreeDots } from '../utilities/constants';
 import { ElementData } from '../utilities/ExpressionClasses';
 import MatrixData from '../utilities/MatrixData';
 

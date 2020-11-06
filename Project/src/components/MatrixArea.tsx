@@ -3,7 +3,6 @@ import { View, Text, ScrollView } from 'react-native';
 import Matrix from './Matrix';
 import { CalcState, findFraction, toFixedOnZeroes, SystemSolutionType } from '../utilities/constants';
 import ArrowButtonsArea from './ArrowButtonsArea';
-import MatrixOperations from '../utilities/MatrixOperations';
 import FullEquation from './FullEquation';
 import ScalarOperations from '../utilities/ScalarOperations';
 

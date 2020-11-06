@@ -1,5 +1,4 @@
 import { Alert } from 'react-native';
-import { ExpressionData } from './ExpressionClasses';
 
 type ErrorTreatment<T, K extends string> = Record<K, T> & Record<'error', boolean>;
 

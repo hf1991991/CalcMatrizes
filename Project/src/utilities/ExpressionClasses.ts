@@ -1,4 +1,4 @@
-import { smartToFixed, findFraction, Operator, parenthesisEnglobe, toFixedWithThreeDots } from "./constants";
+import { smartToFixed, findFraction, Operator, parenthesisEnglobe } from "./constants";
 import ScalarOperations from "./ScalarOperations";
 
 interface ExpressionDataParams {

@@ -1,4 +1,3 @@
-import ElementDataWithPosition from "../interfaces/ElementDataWithPosition";
 import { Operator } from "./constants";
 import { createMatrixElement, ElementData, ElementDataParams, ExpressionData, VariableData } from "./ExpressionClasses";
 

@@ -1,8 +1,8 @@
 import MatrixData from "./MatrixData";
-import { smartToFixed, SystemSolutionType, Operator } from "./constants";
+import { SystemSolutionType, Operator } from "./constants";
 import ScalarOperations from "./ScalarOperations";
 import * as ExpressionSimplification from "./ExpressionSimplification";
-import { createMatrixElement, ElementData, ExpressionData, VariableData } from "./ExpressionClasses";
+import { createMatrixElement, ExpressionData, VariableData } from "./ExpressionClasses";
 import ElementDataWithPosition from "../interfaces/ElementDataWithPosition";
 import MatrixColumnWithPosition from "../interfaces/MatrixColumnWithPosition";
 import SelectedMatrixElement from "../interfaces/SelectedMatrixElement";

@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Image, TouchableOpacity, ImageSourcePropType } from 'react-native';
+import { Image, TouchableOpacity } from 'react-native';
 import { ButtonType, CalcState, Operator } from '../utilities/constants';
 import ButtonData from '../interfaces/ButtonData';
 
