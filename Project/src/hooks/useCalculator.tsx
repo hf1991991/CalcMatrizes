@@ -334,6 +334,8 @@ export const CalculatorProvider: React.FC = ({ children }) => {
 
             const { history, currentPosition } = matrixHistory;
 
+            setFullEquation(null);
+
             setMatrixHistory(
                 {
                     history,
@@ -345,7 +347,7 @@ export const CalculatorProvider: React.FC = ({ children }) => {
                 MatrixOperations.copyMatrixData(history[currentPosition - 1])
             );
 
-        }, [matrixHistory, _setReadyMatrix, setMatrixHistory]
+        }, [matrixHistory, _setReadyMatrix, setFullEquation, setMatrixHistory]
     );
 
     const redoHistory = useCallback(
