@@ -200,8 +200,8 @@ const MatrixArea: React.FC = () => {
                     vertical
                     forwardHistory
                     hidden={
-                        calcState === CalcState.ready 
-                        || calcState === CalcState.LambdaxA 
+                        calcState === CalcState.ready
+                        || calcState === CalcState.LambdaxA
                         || !editableDimensions
                     }
                     disabled={
@@ -223,8 +223,8 @@ const MatrixArea: React.FC = () => {
             </View>
             <ArrowButtonsArea
                 hidden={
-                    calcState === CalcState.ready 
-                    || calcState === CalcState.LambdaxA 
+                    calcState === CalcState.ready
+                    || calcState === CalcState.LambdaxA
                     || !editableDimensions
                 }
                 disabled={
@@ -255,13 +255,25 @@ const MatrixArea: React.FC = () => {
                                 ? viewReduced ? 'Não Reduzida' : 'Reduzida'
                                 : null
                         : !operationHappening
-                            && calcState !== CalcState.LambdaxA
-                            && formatDeterminant(matrixOnScreenDeterminant)
+                        && calcState !== CalcState.LambdaxA
+                        && formatDeterminant(matrixOnScreenDeterminant)
                 }
                 bottomMiddleText={
-                    calcState === CalcState.ready ? getSolutionTypeString(!isPortrait) : ''
+                    fullEquation?.equationType === CalcState.gaussianElimination
+                    && calcState !== CalcState.editing
+                    && isPortrait
+                        ? viewReduced ? 'Não Reduzida' : 'Reduzida'
+                        : calcState === CalcState.ready 
+                            ? getSolutionTypeString(!isPortrait)
+                            : ''
                 }
-                onPressBottomMiddleText={() => isPortrait && setLandscape()}
+                onPressBottomMiddleText={
+                    () => isPortrait && (
+                        fullEquation?.equationType === CalcState.gaussianElimination
+                            ? onPressGaussianEliminationReduced()
+                            : setLandscape()
+                    )
+                }
                 onPressBottomRightText={
                     !isPortrait
                         ? fullEquation !== null
