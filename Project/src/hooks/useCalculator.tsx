@@ -250,7 +250,7 @@ export const CalculatorProvider: React.FC = ({ children }) => {
         [editableDimensions]
     );
 
-    const changeMatrixOnScreen = useMemo(
+    const setMatrixOnScreen = useMemo(
         () => (
             (newMatrix: MatrixData) => (
                 calcState === CalcState.ready
@@ -791,7 +791,7 @@ export const CalculatorProvider: React.FC = ({ children }) => {
 
             if (calcState !== CalcState.LambdaxA) {
 
-                changeMatrixOnScreen(
+                setMatrixOnScreen(
                     MatrixOperations.emptyMatrix(matrixOnScreen.dimensions())
                 );
 
@@ -806,7 +806,7 @@ export const CalculatorProvider: React.FC = ({ children }) => {
         [
             calcState,
             matrixOnScreen,
-            changeMatrixOnScreen,
+            setMatrixOnScreen,
             resetScalarOperations,
             exitEditingMode,
             changeSettingsOfSelectedMatrixElement
@@ -992,10 +992,10 @@ export const CalculatorProvider: React.FC = ({ children }) => {
                     matrixD: reducedRowEchelonForm
                 });
 
-                setReadyMatrix(rowEchelonForm);
+                setMatrixOnScreen(rowEchelonForm);
             }
 
-        }, [matrixOnScreen, setViewReduced, setFullEquation, setReadyMatrix]
+        }, [matrixOnScreen, setViewReduced, setFullEquation, setMatrixOnScreen]
     );
 
     const onPressGaussianEliminationReduced = useCallback(
