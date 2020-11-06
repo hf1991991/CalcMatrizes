@@ -119,9 +119,9 @@ export const CalculatorProvider: React.FC = ({ children }) => {
     const [calcState, setCalcState] = useState(CalcState.editing);
 
     // Estados de matrizes:
-    const [readyMatrix, _setReadyMatrix] = useState(new IntialMatrix());
-    const [editableMatrix, setEditableMatrix] = useState(new IntialMatrix());
-    const [matrixHistory, setMatrixHistory] = useState({
+    const [readyMatrix, _setReadyMatrix] = useState<MatrixData>(new IntialMatrix());
+    const [editableMatrix, setEditableMatrix] = useState<MatrixData>(new IntialMatrix());
+    const [matrixHistory, setMatrixHistory] = useState<MatrixHistory>({
         history: [new IntialMatrix()],
         currentPosition: 0
     });
