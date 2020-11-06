@@ -72,7 +72,7 @@ const MatrixArea: React.FC = () => {
                 ? editableScalar
                 : editableOperatorNumber;
             if (scalar === null) return null;
-            return scalar?.commaStringify({ dontFindFraction: true });
+            return scalar.commaStringify({ dontFindFraction: true });
         }, [editableOperatorNumber, editableScalar]
     );
 

@@ -371,7 +371,7 @@ export const CalculatorProvider: React.FC = ({ children }) => {
                     ? ''
                     : editableOperatorNumber;
 
-            if (!selectedMatrixElement) return !doNotStringify ? '' : null;
+            if (calcState !== CalcState.LambdaxA && !selectedMatrixElement) return !doNotStringify ? '' : null;
 
             const { row, column } = selectedMatrixElement || {} as SelectedMatrixElement;
 
