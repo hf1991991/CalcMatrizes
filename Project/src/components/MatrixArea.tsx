@@ -123,14 +123,18 @@ const MatrixArea: React.FC = () => {
                     flex: 1,
                 }}
             >
-                <ArrowButtonsArea
-                    vertical
-                    backHistory
-                    hidden
-                    editableDimensions={editableDimensions}
-                    changeEditableDimensions={changeEditableDimensions}
-                    crossWidth={BUTTON_AREAS_CROSS_WIDTH}
-                />
+                {
+                    (!fullEquation || isPortrait) && (
+                        <ArrowButtonsArea
+                            vertical
+                            backHistory
+                            hidden
+                            editableDimensions={editableDimensions}
+                            changeEditableDimensions={changeEditableDimensions}
+                            crossWidth={BUTTON_AREAS_CROSS_WIDTH}
+                        />
+                    )
+                }
                 {
                     calcState !== CalcState.LambdaxA
                         ? fullEquation !== null && !isPortrait
@@ -196,30 +200,34 @@ const MatrixArea: React.FC = () => {
                             </View>
                         )
                 }
-                <ArrowButtonsArea
-                    vertical
-                    forwardHistory
-                    hidden={
-                        calcState === CalcState.ready
-                        || calcState === CalcState.LambdaxA
-                        || !editableDimensions
-                    }
-                    disabled={
-                        [
-                            CalcState.addMatrix,
-                            CalcState.subtractMatrix,
-                            CalcState.BxA,
-                            CalcState.XxAeB,
-                            CalcState.XxBeA,
-                        ]
-                            .includes(calcState)
-                        || fullScreenDeterminant
-                    }
-                    bottomLeftText={bottomLeftText}
-                    editableDimensions={editableDimensions}
-                    changeEditableDimensions={changeEditableDimensions}
-                    crossWidth={BUTTON_AREAS_CROSS_WIDTH}
-                />
+                {
+                    (!fullEquation || isPortrait) && (
+                        <ArrowButtonsArea
+                            vertical
+                            forwardHistory
+                            hidden={
+                                calcState === CalcState.ready
+                                || calcState === CalcState.LambdaxA
+                                || !editableDimensions
+                            }
+                            disabled={
+                                [
+                                    CalcState.addMatrix,
+                                    CalcState.subtractMatrix,
+                                    CalcState.BxA,
+                                    CalcState.XxAeB,
+                                    CalcState.XxBeA,
+                                ]
+                                    .includes(calcState)
+                                || fullScreenDeterminant
+                            }
+                            bottomLeftText={bottomLeftText}
+                            editableDimensions={editableDimensions}
+                            changeEditableDimensions={changeEditableDimensions}
+                            crossWidth={BUTTON_AREAS_CROSS_WIDTH}
+                        />
+                    )
+                }
             </View>
             <ArrowButtonsArea
                 hidden={
@@ -260,10 +268,10 @@ const MatrixArea: React.FC = () => {
                 }
                 bottomMiddleText={
                     fullEquation?.equationType === CalcState.gaussianElimination
-                    && calcState !== CalcState.editing
-                    && isPortrait
+                        && calcState !== CalcState.editing
+                        && isPortrait
                         ? viewReduced ? 'Não Reduzida' : 'Reduzida'
-                        : calcState === CalcState.ready 
+                        : calcState === CalcState.ready
                             ? getSolutionTypeString(!isPortrait)
                             : ''
                 }
