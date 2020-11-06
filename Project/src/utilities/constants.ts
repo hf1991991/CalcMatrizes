@@ -159,7 +159,7 @@ export function findFraction(number: number) {
         }
     }
 
-    return toFixedWithThreeDots(number);
+    return number;
 }
 
 export function toFixedOnZeroes(number: string | number) {

@@ -9,6 +9,7 @@ import ScalarOperations from '../utilities/ScalarOperations';
 
 import { useCalculator } from '../hooks/useCalculator';
 import { useOrientation } from '../hooks/useOrientation';
+import { ExpressionData } from '../utilities/ExpressionClasses';
 
 const BUTTON_AREAS_CROSS_WIDTH = 70;
 
@@ -47,7 +48,7 @@ const MatrixArea: React.FC = () => {
     );
 
     const formatDeterminant = useCallback(
-        ({ determinant, overflow = true, det = true }) => {
+        (determinant: ExpressionData | null, overflow: boolean = true, det: boolean = true) => {
             if (determinant === null) return null
             let stringDeterminant = determinant?.commaStringify();
             if (stringDeterminant.length > 8 && overflow)
@@ -158,11 +159,11 @@ const MatrixArea: React.FC = () => {
                                             }}
                                         >
                                             {
-                                                formatDeterminant({
-                                                    determinant: matrixOnScreenDeterminant,
-                                                    overflow: false,
-                                                    det: false
-                                                })
+                                                formatDeterminant(
+                                                    matrixOnScreenDeterminant,
+                                                    false,
+                                                    false
+                                                )
                                             }
                                         </Text>
                                     </ScrollView>
@@ -247,9 +248,7 @@ const MatrixArea: React.FC = () => {
                                 ? viewReduced ? 'Não Reduzida' : 'Reduzida'
                                 : null
                         : !operationHappening
-                        && formatDeterminant({
-                            determinant: matrixOnScreenDeterminant
-                        })
+                        && formatDeterminant(matrixOnScreenDeterminant)
                 }
                 bottomMiddleText={
                     calcState === CalcState.ready ? getSolutionTypeString(!isPortrait) : ''

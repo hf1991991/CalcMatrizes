@@ -164,21 +164,16 @@ export class ElementData {
 
         if (!!this.unfilteredString) return this.unfilteredString;
 
-        const findPossibleFraction =
-            (number: number | string) => dontFindFraction || Number.isNaN(number)
-                ? toFixedWithThreeDots(number)
-                : findFraction(number as number);
-
         const formatScalar =
             () => (this.scalar === 1 && this.variables.length !== 0) || onlyVariables
                 ? ''
                 : this.scalar === -1 && this.variables.length !== 0
                     ? '-'
-                    : findPossibleFraction(this.scalar)
+                    : findFraction(this.scalar)
         const formatExponent =
             (exponent: number) => exponent === 1
                 ? ''
-                : ScalarOperations.superscript(findPossibleFraction(exponent))
+                : ScalarOperations.superscript(findFraction(exponent))
         const formatVariables =
             () => this.variables.map(
                 vari => `${vari.variable}${formatExponent(vari.exponent)}`
