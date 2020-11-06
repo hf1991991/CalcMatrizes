@@ -200,7 +200,11 @@ const MatrixArea: React.FC = () => {
                 <ArrowButtonsArea
                     vertical
                     forwardHistory
-                    hidden={calcState === CalcState.ready || !editableDimensions}
+                    hidden={
+                        calcState === CalcState.ready 
+                        || calcState === CalcState.LambdaxA 
+                        || !editableDimensions
+                    }
                     disabled={
                         [
                             CalcState.addMatrix,
@@ -219,7 +223,11 @@ const MatrixArea: React.FC = () => {
                 />
             </View>
             <ArrowButtonsArea
-                hidden={calcState === CalcState.ready || !editableDimensions}
+                hidden={
+                    calcState === CalcState.ready 
+                    || calcState === CalcState.LambdaxA 
+                    || !editableDimensions
+                }
                 disabled={
                     [
                         CalcState.addMatrix,

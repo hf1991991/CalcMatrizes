@@ -95,18 +95,22 @@ interface CalculatorContextData {
     onCheck(): void;
 }
 
-const _INITIAL_MATRIX = __DEV__
-    ? new MatrixData([
-        [1, 2, 3],
-        [4, 5, 6],
-        [7, 8, 9]
-    ])
-    : MatrixOperations.emptyMatrix({
-        rows: 3,
-        columns: 1
-    });
-
-const INITIAL_MATRIX = () => MatrixOperations.copyMatrixData(_INITIAL_MATRIX);
+class IntialMatrix extends MatrixData {
+    constructor() {
+        super(__DEV__
+            ? [
+                [1, 2, 3],
+                [4, 5, 6],
+                [7, 8, 9]
+            ]
+            : [
+                [0],
+                [0],
+                [0]
+            ]
+        );
+    }
+}
 
 const CalculatorContext = createContext<CalculatorContextData>({} as CalculatorContextData);
 
@@ -115,10 +119,10 @@ export const CalculatorProvider: React.FC = ({ children }) => {
     const [calcState, setCalcState] = useState(CalcState.editing);
 
     // Estados de matrizes:
-    const [readyMatrix, _setReadyMatrix] = useState(INITIAL_MATRIX());
-    const [editableMatrix, setEditableMatrix] = useState(INITIAL_MATRIX());
+    const [readyMatrix, _setReadyMatrix] = useState(new IntialMatrix());
+    const [editableMatrix, setEditableMatrix] = useState(new IntialMatrix());
     const [matrixHistory, setMatrixHistory] = useState({
-        history: [INITIAL_MATRIX()],
+        history: [new IntialMatrix()],
         currentPosition: 0
     });
     const [selectedMatrixElement, setSelectedMatrixElement] = useState<SelectedMatrixElement | null>({
@@ -147,10 +151,10 @@ export const CalculatorProvider: React.FC = ({ children }) => {
     const setInitialState = useCallback(
         () => {
             setCalcState(CalcState.ready);
-            _setReadyMatrix(INITIAL_MATRIX());
-            setEditableMatrix(INITIAL_MATRIX());
+            _setReadyMatrix(new IntialMatrix());
+            setEditableMatrix(new IntialMatrix());
             setMatrixHistory({
-                history: [INITIAL_MATRIX()],
+                history: [new IntialMatrix()],
                 currentPosition: 0
             });
             setSelectedMatrixElement(null);
