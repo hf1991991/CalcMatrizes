@@ -103,7 +103,8 @@ const FullEquation = ({
                 justifyContent: 'center'
             }}
             style={{
-                paddingVertical: 4
+                paddingBottom: 3,
+                paddingTop: 15
             }}
             horizontal
             showsHorizontalScrollIndicator={false}
