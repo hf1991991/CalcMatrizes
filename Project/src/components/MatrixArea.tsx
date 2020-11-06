@@ -248,7 +248,8 @@ const MatrixArea: React.FC = () => {
                                 ? viewReduced ? 'Não Reduzida' : 'Reduzida'
                                 : null
                         : !operationHappening
-                        && formatDeterminant(matrixOnScreenDeterminant)
+                            && calcState !== CalcState.LambdaxA
+                            && formatDeterminant(matrixOnScreenDeterminant)
                 }
                 bottomMiddleText={
                     calcState === CalcState.ready ? getSolutionTypeString(!isPortrait) : ''
