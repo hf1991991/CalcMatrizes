@@ -9,7 +9,8 @@
     "test": "jest",
     "lint": "eslint .",
     "release": "yarn build:ios && react-native run-ios --configuration Release",
-    "build:ios": "react-native bundle --entry-file='index.ts' --bundle-output='./ios/main.jsbundle' --dev=false --platform='ios'"
+    "build:ios": "react-native bundle --entry-file='index.ts' --bundle-output='./ios/main.jsbundle' --dev=false --platform='ios'",
+    "testflight": "yarn build:ios && cd ios && fastlane beta && cd .."
   },
   "dependencies": {
     "react": "16.13.1",

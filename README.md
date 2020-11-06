@@ -2,12 +2,10 @@
 
 Autor: Henrique Falconer
 
-## INSTRUÇÕES PARA MANDAR PARA O TESTFLIGHT
+## Instruções para mandar para o TestFlight
 
- - Passo 1: Dê `yarn release` no diretório Project
- - Passo 2: Verifique se o projeto está como você queria
- - Passo 3: Rode `cd ios; fastlane beta` novamente no diretório Project
- - Passo 4: Digite o que precisar ser digitado, e espere até o processo finalizar
+ - Passo 1: dê `yarn testflight` no diretório Project
+ - Passo 2: pronto
 
 ## Repositório com certificados
 
