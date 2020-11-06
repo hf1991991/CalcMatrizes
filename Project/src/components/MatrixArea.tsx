@@ -145,16 +145,16 @@ const MatrixArea: React.FC = () => {
                                 ? (
                                     <ScrollView
                                         contentContainerStyle={{
-                                            justifyContent: 'center',
-                                            alignItems: 'center',
-                                            flex: 1
+                                            flexGrow: 1,
+                                            justifyContent: 'center'
                                         }}
+                                        showsVerticalScrollIndicator={false}
                                     >
                                         <Text
                                             style={{
                                                 color: '#fff',
                                                 fontSize: 60,
-                                                textAlign: 'center',
+                                                textAlign: 'center'
                                             }}
                                         >
                                             {
