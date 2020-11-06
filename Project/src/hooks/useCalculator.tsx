@@ -77,6 +77,7 @@ interface CalculatorContextData {
     onPressInfoAreaBackground(): void;
     onPressNumberButton(element: number | string): void;
     onPressAC(): void;
+    onLongPressAC(): void;
     onPressCE(): void;
     onPressAddMatrix(): void;
     onPressSubtractMatrix(): void;
@@ -94,7 +95,7 @@ interface CalculatorContextData {
     onCheck(): void;
 }
 
-const INITIAL_MATRIX = __DEV__
+const _INITIAL_MATRIX = __DEV__
     ? new MatrixData([
         [1, 2, 3],
         [4, 5, 6],
@@ -105,6 +106,8 @@ const INITIAL_MATRIX = __DEV__
         columns: 1
     });
 
+const INITIAL_MATRIX = () => MatrixOperations.copyMatrixData(_INITIAL_MATRIX);
+
 const CalculatorContext = createContext<CalculatorContextData>({} as CalculatorContextData);
 
 export const CalculatorProvider: React.FC = ({ children }) => {
@@ -112,10 +115,10 @@ export const CalculatorProvider: React.FC = ({ children }) => {
     const [calcState, setCalcState] = useState(CalcState.editing);
 
     // Estados de matrizes:
-    const [readyMatrix, _setReadyMatrix] = useState(INITIAL_MATRIX);
-    const [editableMatrix, setEditableMatrix] = useState(INITIAL_MATRIX);
+    const [readyMatrix, _setReadyMatrix] = useState(INITIAL_MATRIX());
+    const [editableMatrix, setEditableMatrix] = useState(INITIAL_MATRIX());
     const [matrixHistory, setMatrixHistory] = useState({
-        history: [MatrixOperations.copyMatrixData(INITIAL_MATRIX)],
+        history: [INITIAL_MATRIX()],
         currentPosition: 0
     });
     const [selectedMatrixElement, setSelectedMatrixElement] = useState<SelectedMatrixElement | null>({
@@ -141,6 +144,50 @@ export const CalculatorProvider: React.FC = ({ children }) => {
     const [isVariableKeyboardActive, setIsVariableKeyboardActive] = useState(false);
     const [selectedOperator, setSelectedOperator] = useState<Operator | null>(null);
 
+    const setInitialState = useCallback(
+        () => {
+            setCalcState(CalcState.ready);
+            _setReadyMatrix(INITIAL_MATRIX());
+            setEditableMatrix(INITIAL_MATRIX());
+            setMatrixHistory({
+                history: [INITIAL_MATRIX()],
+                currentPosition: 0
+            });
+            setSelectedMatrixElement(null);
+            setShouldUserInputOverwriteElement(true);
+            setEditableScalar(null);
+            setFullScreenDeterminant(false);
+            setOperationHappening(false);
+            setEditableOperatorNumber(null);
+            setFullEquation(null);
+            setViewReduced(false);
+            setSecondSetOfKeysActive(false);
+            setIsRActive(false);
+            setColumnDirectionActive(true);
+            setIsVariableKeyboardActive(false);
+            setSelectedOperator(null);
+        },
+        [
+            setCalcState,
+            _setReadyMatrix,
+            setEditableMatrix,
+            setMatrixHistory,
+            setSelectedMatrixElement,
+            setShouldUserInputOverwriteElement,
+            setEditableScalar,
+            setFullScreenDeterminant,
+            setOperationHappening,
+            setEditableOperatorNumber,
+            setFullEquation,
+            setViewReduced,
+            setSecondSetOfKeysActive,
+            setIsRActive,
+            setColumnDirectionActive,
+            setIsVariableKeyboardActive,
+            setSelectedOperator
+        ]
+    );
+
     const setReadyMatrix = useCallback(
         (newMatrix: MatrixData) => {
 
@@ -165,10 +212,9 @@ export const CalculatorProvider: React.FC = ({ children }) => {
                 ? fullEquation?.solutionType + (
                     !fullEquation.lettersUsed || !withVariables
                         ? ''
-                        : ` (${
-                            fullEquation.lettersUsed.length > 3
-                                ? 'n' + ScalarOperations.subscript('i')
-                                : fullEquation.lettersUsed.join(', ')
+                        : ` (${fullEquation.lettersUsed.length > 3
+                            ? 'n' + ScalarOperations.subscript('i')
+                            : fullEquation.lettersUsed.join(', ')
                         } \u2208 R)`
                 )
                 : ''
@@ -763,6 +809,11 @@ export const CalculatorProvider: React.FC = ({ children }) => {
         ]
     );
 
+    const onLongPressAC = useCallback(
+        setInitialState,
+        [setInitialState]
+    );
+
     const onPressCE = useCallback(
         () => changeNumberWritten({
             newNumber: createMatrixElement({
@@ -1144,6 +1195,7 @@ export const CalculatorProvider: React.FC = ({ children }) => {
                 onPressInfoAreaBackground,
                 onPressNumberButton,
                 onPressAC,
+                onLongPressAC,
                 onPressCE,
                 onPressAddMatrix,
                 onPressSubtractMatrix,
