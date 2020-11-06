@@ -1,4 +1,5 @@
 import { Alert } from 'react-native';
+import { ExpressionData } from './ExpressionClasses';
 
 type ErrorTreatment<T, K extends string> = Record<K, T> & Record<'error', boolean>;
 
@@ -15,7 +16,9 @@ const addErrorTreatment = <T, K extends string>(funct: () => T, key: K): { [key 
         error = true;
         Alert.alert(
             'Erro de cálculo',
-            __DEV__ ? e : 'Calculadora tentou resolver uma expressão muito complicada.'
+            __DEV__ 
+                ? e.toString()
+                : 'Calculadora tentou resolver uma expressão muito complicada.'
         );
     }
 
