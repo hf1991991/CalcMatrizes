@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, ScrollView, FlatList } from 'react-native';
 import Matrix from './Matrix';
 import EquationData from '../utilities/EquationData';
 import { CalcState } from '../utilities/constants';
@@ -8,7 +8,7 @@ import FullEquationData from '../interfaces/FullEquationData';
 const OPERATORS_WIDTH = 50;
 const X_OPERATOR_WIDTH = 50;
 
-interface FullEquationProps { 
+interface FullEquationProps {
     fullEquation: FullEquationData;
     totalMaxAreaWidth: number;
     viewReduced: boolean;
@@ -69,7 +69,7 @@ const XOperator = ({ variableDimensions }: XOperatorProps) => {
     );
 }
 
-const FullEquation = ({ 
+const FullEquation = ({
     fullEquation,
     totalMaxAreaWidth,
     viewReduced,
@@ -78,7 +78,7 @@ const FullEquation = ({
 
     const equationData = useMemo<EquationData>(
         () => new EquationData({
-            fullEquation, 
+            fullEquation,
             viewReduced,
         }),
         [fullEquation, viewReduced]
@@ -87,7 +87,7 @@ const FullEquation = ({
     const singleMatrixMaxWidth = useMemo(
         () => (
             (
-                totalMaxAreaWidth 
+                totalMaxAreaWidth
                 - equationData.getQuantityOfOperators() * OPERATORS_WIDTH
                 - (equationData.hasXOperator() ? X_OPERATOR_WIDTH : 0)
             ) / equationData.getQuantityOfMatrices()
@@ -96,17 +96,23 @@ const FullEquation = ({
     );
 
     return (
-        <View
-            style={{
-                flexDirection: 'row',
+        <ScrollView
+            contentContainerStyle={{
+                flexGrow: 1,
                 alignItems: 'center',
+                justifyContent: 'center'
             }}
+            style={{
+                paddingVertical: 4
+            }}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            overScrollMode='never'
         >
             {
-                equationData.matrix1 
+                equationData.matrix1
                     ? (
-                        <Matrix 
-                            maxMatrixWidth={singleMatrixMaxWidth}
+                        <Matrix
                             matrixData={equationData.matrix1}
                             onLayout={(event) => {
                                 changeMatrix1Height(event.nativeEvent.layout.height);
@@ -116,7 +122,7 @@ const FullEquation = ({
                     : equationData.scalar !== undefined
                         ? <Scalar scalar={equationData.scalar} />
                         : equationData.variablePosition === 1
-                            && <XOperator variableDimensions={equationData.getVariableDimensions()} />
+                        && <XOperator variableDimensions={equationData.getVariableDimensions()} />
             }
             {
                 equationData.singleMatrixOperator && (
@@ -151,15 +157,14 @@ const FullEquation = ({
                 )
             }
             {
-                equationData.matrix2 
+                equationData.matrix2
                     ? (
-                        <Matrix 
-                            maxMatrixWidth={singleMatrixMaxWidth}
+                        <Matrix
                             matrixData={equationData.matrix2}
                         />
                     )
                     : equationData.variablePosition === 2
-                        &&  <XOperator variableDimensions={equationData.getVariableDimensions()} />
+                    && <XOperator variableDimensions={equationData.getVariableDimensions()} />
             }
             {
                 equationData.secondOperator && (
@@ -176,17 +181,16 @@ const FullEquation = ({
                 )
             }
             {
-                equationData.matrix3 
+                equationData.matrix3
                     ? (
-                        <Matrix 
-                            maxMatrixWidth={singleMatrixMaxWidth}
+                        <Matrix
                             matrixData={equationData.matrix3}
                         />
                     )
                     : equationData.variablePosition === 3
-                        &&  <XOperator variableDimensions={equationData.getVariableDimensions()} />
+                    && <XOperator variableDimensions={equationData.getVariableDimensions()} />
             }
-        </View>
+        </ScrollView>
     );
 }
 
