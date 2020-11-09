@@ -13,7 +13,7 @@ import { ExpressionData } from '../utilities/ExpressionClasses';
 const BUTTON_AREAS_CROSS_WIDTH = 70;
 
 const MatrixArea: React.FC = () => {
-    const { isPortrait, setLandscape } = useOrientation();
+    const { isPortrait, setLandscape, setPortrait } = useOrientation();
 
     const {
         calcState,
@@ -280,6 +280,8 @@ const MatrixArea: React.FC = () => {
                         fullEquation?.equationType === CalcState.gaussianElimination
                             ? onPressGaussianEliminationReduced()
                             : setLandscape()
+                    ) || (
+                        !isPortrait && setPortrait()
                     )
                 }
                 onPressBottomRightText={
