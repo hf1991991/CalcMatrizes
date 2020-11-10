@@ -79,29 +79,29 @@ export enum ButtonType {
 export function count(string: number | string, substring: RegExp | string, caseSensitive: boolean) {
     // Se caseSensitive for indefinido, ele é considerada falsa:
     return ((caseSensitive ? string.toString() : string.toString().toLowerCase()).match(new RegExp((caseSensitive || substring instanceof RegExp ? substring : substring.toLowerCase()), "g")) || []).length;
-}; 
+};
 
 export function decimalPlaces(number: number | string) {
     return (number.toString().split(".").pop() as string).length;
 }
 
 export function removeScientificNotation(x: number): string {
-    if (Math.abs(x) < 1.0) {
-      var e = parseInt(x.toString().split('e-')[1]);
-      if (e) {
-          x *= Math.pow(10,e-1);
-          x = '0.' + (new Array(e)).join('0') + x.toString().substring(2);
-      }
+    if (Math.abs(x) < 1e-6) {
+        var e = parseInt(x.toString().split('e-')[1]);
+        if (e) {
+            x *= Math.pow(10, e - 1);
+            x = '0.' + (new Array(e)).join('0') + x.toString().split(/\./)[1];
+        }
     } else {
-      var e = parseInt(x.toString().split('+')[1]);
-      if (e > 20) {
-          e -= 20;
-          x /= Math.pow(10,e);
-          x += (new Array(e+1)).join('0');
-      }
+        var e = parseInt(x.toString().split('+')[1]);
+        if (e > 20) {
+            e -= 20;
+            x /= Math.pow(10, e);
+            x += (new Array(e + 1)).join('0');
+        }
     }
     return x.toString();
-  }
+}
 
 const PRECISION = 6;
 
@@ -125,9 +125,12 @@ export function smartToFixed(element: number) {
         }
         return null;
     }
-    
+
+    if (Math.abs(element) < 1e-6)
+        return 0;
+
     const digits = removeScientificNotation(element).split(".").pop() as string;
-    
+
     // console.log({element: removeScientificNotation(element), lastDig: lastDigitIndex(digits)});
     if (lastDigitIndex(digits) !== null) {
         return Number.parseFloat(element.toFixed(lastDigitIndex(digits) as number));
@@ -140,7 +143,7 @@ export function findFraction(number: number) {
     const MAX_DENOMINATOR = 10000;
 
     let numerator = null;
-    
+
     for (let denominator = 1; denominator < MAX_DENOMINATOR; denominator++) {
         numerator = smartToFixed(number * denominator);
         /* 
@@ -183,7 +186,7 @@ export enum SystemSolutionType {
 export function toFixedWithThreeDots(number: string | number) {
     if (number.toString().endsWith('.')) return number.toString();
     number = toFixedOnZeroes(number);
-    if (decimalPlaces(number) > PRECISION 
+    if (decimalPlaces(number) > PRECISION
         && count(number.toString(), /\./, true) !== 0
     ) return Number.parseFloat(number.toString()).toFixed(PRECISION) + '...';
     return number;
