@@ -1,4 +1,4 @@
-import { smartToFixed, findFraction, Operator, parenthesisEnglobe } from "./constants";
+import { smartToFixed, findFraction, Operator, parenthesisEnglobe, indentText, repeatedChar } from "./constants";
 import ScalarOperations from "./ScalarOperations";
 
 interface ExpressionDataParams {
@@ -66,8 +66,8 @@ export class ExpressionData {
                 const base = this.elements[0].algebraicStringify({ dontFindFraction });
                 const exponent = this.elements[1].algebraicStringify({ dontFindFraction });
                 return `(${parenthesisEnglobe(base)
-                        ? base.substring(1, base.length - 1)
-                        : base
+                    ? base.substring(1, base.length - 1)
+                    : base
                     })${ScalarOperations.superscript(exponent)
                     }`;
             case Operator.Divide:
@@ -86,10 +86,23 @@ export class ExpressionData {
         }
     }
 
-    stringify(): string {
-        return this.oneElement instanceof ElementData
+    stringify(indent: number = 4): string {
+        return this.oneElement
             ? this.oneElement.stringify()
-            : `${this.operator}(${this.elements.map(elem => elem.stringify()).join(';')})`
+            : !!indent
+                ? '\n' + indentText(
+                    this.operator + '(',
+                    this.elements.map(elem => elem.stringify(indent + 4)).join(
+                        ';\n' + repeatedChar(' ', 41 + indent + 4)
+                    ),
+                    ')',
+                    41 + indent
+                ) + '\n' + repeatedChar(' ', 41)
+                : (
+                    this.operator + '('
+                    + this.elements.map(elem => elem.stringify()).join(';') 
+                    + ')'
+                );
     }
 
 }

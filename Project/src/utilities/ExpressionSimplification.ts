@@ -34,10 +34,10 @@ export function varOperation(
 
     const result = simplifyExpressionAlgorithm(expressionData);
 
-    console.log(JSON.stringify({
+    console.log({
         initial: expressionData.stringify(),
         RESULT: result.stringify()
-    }));
+    });
 
     return result;
 }
