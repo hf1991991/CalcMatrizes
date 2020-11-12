@@ -187,16 +187,18 @@ export class ElementData {
 
         if (!!this.unfilteredString) return this.unfilteredString;
 
+        const maybeFindScalar = () => dontFindFraction
+            ? this.scalar
+            : findFraction(this.scalar);
+
         const formatScalar =
-            () => dontFindFraction
-                ? this.scalar
-                : this.variables.length === 0
-                    ? findFraction(this.scalar)
+            () => this.variables.length === 0
+                    ? maybeFindScalar()
                     : this.scalar === -1 
                         ? '-'
                         : this.scalar === 1
                             ? ''
-                            : findFraction(this.scalar);
+                            : maybeFindScalar();
         
         return indentText(
             [formatScalar() + this.stringifyVariables()],
