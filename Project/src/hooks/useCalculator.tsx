@@ -504,18 +504,27 @@ export const CalculatorProvider: React.FC = ({ children }) => {
 
             else if (count(stringifiedNumberWritten, /\.|,/, true) === 0 || element !== '.') {
 
-                changeNumberWritten({
-                    newNumber: createMatrixElement({
-                        scalar: originalValue === null
-                            ? element
-                            : !!originalValue?.oneElement?.unfilteredString
-                                ? (originalValue?.oneElement?.unfilteredString as string) + element
-                                : originalValue?.oneElement?.variables.length === 0 || originalValue?.oneElement?.scalar !== 1
-                                    ? originalValue?.oneElement?.scalar.toString() + element
-                                    : element,
-                        variables: (originalValue !== null && originalValue?.oneElement?.variables) || []
+                if (element === '.')
+                    changeNumberWritten({
+                        newNumber: createMatrixElement({
+                            unfilteredString: originalValue?.oneElement?.scalar + '.',
+                            variables: (originalValue !== null && originalValue?.oneElement?.variables) || []
+                        })
                     })
-                });
+
+                else
+                    changeNumberWritten({
+                        newNumber: createMatrixElement({
+                            scalar: originalValue === null
+                                ? element
+                                : !!originalValue?.oneElement?.unfilteredString
+                                    ? (originalValue?.oneElement?.unfilteredString as string) + element
+                                    : originalValue?.oneElement?.variables.length === 0 || originalValue?.oneElement?.scalar !== 1
+                                        ? originalValue?.oneElement?.scalar.toString() + element
+                                        : element,
+                            variables: (originalValue !== null && originalValue?.oneElement?.variables) || []
+                        })
+                    });
             }
 
             setShouldUserInputOverwriteElement(false);
