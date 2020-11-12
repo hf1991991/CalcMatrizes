@@ -4,7 +4,8 @@ import {
     Operator, 
     parenthesisEnglobe, 
     indentExpression, 
-    indentText 
+    indentText, 
+    toFixedWithThreeDots
 } from "./constants";
 import ScalarOperations from "./ScalarOperations";
 
@@ -188,7 +189,7 @@ export class ElementData {
         if (!!this.unfilteredString) return this.unfilteredString;
 
         const maybeFindScalar = () => dontFindFraction
-            ? this.scalar
+            ? toFixedWithThreeDots(this.scalar)
             : findFraction(this.scalar);
 
         const formatScalar =
