@@ -34,18 +34,8 @@ export function varOperation(
 
     const result = simplifyExpressionAlgorithm(expressionData);
 
-    const sum = new ExpressionData({
-        operator: Operator.Add,
-        elements: [
-            createMatrixElement({ scalar: 8 }),
-            createMatrixElement({ scalar: 8 }),
-            createMatrixElement({ scalar: 8 }),
-            createMatrixElement({ scalar: 8 }),
-        ]
-    })
-
     console.log({
-        initial: sum.indentStringify(),
+        initial: expressionData.indentStringify(),
         RESULT: result.stringify()
     });
 
@@ -146,7 +136,7 @@ function getIndexOfNormalizedAddition(additionElements: Array<ExpressionData>, a
 }
 
 function variablesMatch(variables1: ElementData, variables2: ElementData) {
-    return variables1.stringify({ onlyVariables: true }) === variables2.stringify({ onlyVariables: true });
+    return variables1.stringifyVariables() === variables2.stringifyVariables();
     // if (variables1.length !== variables2.length) return false;
     // else if (variables1.length === 0) return true;
     // for (let i = 0; i < variables1.length; i++) {

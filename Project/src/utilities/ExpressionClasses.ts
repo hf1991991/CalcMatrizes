@@ -1,4 +1,11 @@
-import { smartToFixed, findFraction, Operator, parenthesisEnglobe, indentText, repeatedChar } from "./constants";
+import { 
+    smartToFixed, 
+    findFraction, 
+    Operator, 
+    parenthesisEnglobe, 
+    indentExpression, 
+    indentText 
+} from "./constants";
 import ScalarOperations from "./ScalarOperations";
 
 interface ExpressionDataParams {
@@ -82,27 +89,30 @@ export class ExpressionData {
             case Operator.None:
                 if (!(this.oneElement instanceof ElementData))
                     throw `${this}.oneElement is not ElementData`;
-                return this.oneElement.stringify({ dontFindFraction });
+                return this.oneElement.stringify();
         }
     }
 
-    stringify(indent: number = 4): string {
+    stringify(indent?: number, delta?: number): string {
         return this.oneElement
-            ? this.oneElement.stringify()
-            : !!indent
-                ? '\n' + indentText(
+            ? this.oneElement.stringify(delta || 0)
+            : indent !== undefined && delta !== undefined
+                ? indentExpression(
                     this.operator + '(',
-                    this.elements.map(elem => elem.stringify(indent + 4)).join(
-                        ';\n' + repeatedChar(' ', 41 + indent + 4)
-                    ),
+                    this.elements.map(elem => elem.stringify(indent + delta, delta)),
                     ')',
-                    41 + indent
-                ) + '\n' + repeatedChar(' ', 41)
+                    indent,
+                    delta
+                )
                 : (
                     this.operator + '('
                     + this.elements.map(elem => elem.stringify()).join(';') 
                     + ')'
                 );
+    }
+
+    indentStringify(): string {
+        return '\n' + this.stringify(0, 3).substring(3) + '\n';
     }
 
 }
@@ -169,20 +179,30 @@ export class ElementData {
         // console.log({varrrrr: this.variables});
     }
 
-    commaStringify({ dontFindFraction = false } = {}) {
-        return this.stringify({ dontFindFraction }).replace('.', ',');
+    commaStringify() {
+        return this.stringify().replace('.', ',');
     }
 
-    stringify({ onlyVariables = false, dontFindFraction = false } = {}) {
+    stringify(indent: number = 0) {
 
         if (!!this.unfilteredString) return this.unfilteredString;
 
         const formatScalar =
-            () => (this.scalar === 1 && this.variables.length !== 0) || onlyVariables
-                ? ''
-                : this.scalar === -1 && this.variables.length !== 0
+            () => this.variables.length === 0
+                ? findFraction(this.scalar)
+                : this.scalar === -1 
                     ? '-'
-                    : findFraction(this.scalar)
+                    : this.scalar === 1
+                        ? ''
+                        : findFraction(this.scalar);
+        
+        return indentText(
+            [formatScalar() + this.stringifyVariables()],
+            indent
+        );
+    }
+
+    stringifyVariables() {
         const formatExponent =
             (exponent: number) => exponent === 1
                 ? ''
@@ -191,7 +211,7 @@ export class ElementData {
             () => this.variables.map(
                 vari => `${vari.variable}${formatExponent(vari.exponent)}`
             )
-        return [formatScalar(), ...formatVariables()].join('')
+        return formatVariables().join('');
     }
 
 }

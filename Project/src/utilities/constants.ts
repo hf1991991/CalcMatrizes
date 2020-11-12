@@ -212,10 +212,15 @@ export function parenthesisEnglobe(string: string) {
     return true;
 }
 
-export const repeatedChar = (char: string, repeat: number) => new Array(repeat).join(char);
+export const repeatedChar = (char: string, repeat: number) => new Array(repeat + 1).join(char);
 
-export const indentText = (start: string, middle: string, end: string, indent: number) => (
-    repeatedChar(' ', indent) + start + '\n'
-    + repeatedChar(' ', indent + 4) + middle + '\n'
-    + repeatedChar(' ', indent) + end
+export const indentText = (lines: Array<string>, indent: number) => (
+    repeatedChar(' ', indent) + lines.join('\n' + repeatedChar(' ', indent))
+);
+
+export const indentExpression = (start: string, middle: Array<string>, end: string, indent: number, delta: number) => (
+    repeatedChar(' ', delta) + start + '\n' + indentText([
+        ...middle,
+        end
+    ], indent)
 );
