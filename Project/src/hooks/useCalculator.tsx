@@ -398,7 +398,7 @@ export const CalculatorProvider: React.FC = ({ children }) => {
 
             return doNotStringify
                 ? matrixNumber
-                : (matrixNumber as ExpressionData).commaStringify({ dontFindFraction: true });
+                : (matrixNumber as ExpressionData).commaStringify(true);
 
         }, [calcState, editableMatrix, shouldUserInputOverwriteElement, editableScalar, operationHappening, selectedMatrixElement, editableOperatorNumber]
     );

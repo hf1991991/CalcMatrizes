@@ -74,7 +74,7 @@ const MatrixColumn = ({
                 && editableOperatorNumber 
                     ? editableOperatorNumber
                     : number
-            )?.commaStringify({ dontFindFraction: isElementSelected({ row, column })});
+            )?.commaStringify(isElementSelected({ row, column }));
         }, [editableOperatorNumber, isElementSelected]
     );
 

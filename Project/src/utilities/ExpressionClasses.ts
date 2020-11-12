@@ -60,40 +60,40 @@ export class ExpressionData {
         });
     }
 
-    commaStringify({ dontFindFraction = false } = {}) {
-        const string = this.algebraicStringify({ dontFindFraction }).replace('.', ',');
+    commaStringify(dontFindFraction: boolean = false) {
+        const string = this.algebraicStringify(dontFindFraction).replace('.', ',');
         return parenthesisEnglobe(string)
             ? string.substring(1, string.length - 1)
             : string;
     }
 
-    algebraicStringify({ dontFindFraction = false } = {}): string {
+    algebraicStringify(dontFindFraction: boolean = false): string {
         switch (this.operator) {
             case Operator.Elevate:
-                const base = this.elements[0].algebraicStringify({ dontFindFraction });
-                const exponent = this.elements[1].algebraicStringify({ dontFindFraction });
+                const base = this.elements[0].algebraicStringify(dontFindFraction);
+                const exponent = this.elements[1].algebraicStringify(dontFindFraction);
                 return `(${parenthesisEnglobe(base)
                     ? base.substring(1, base.length - 1)
                     : base
                     })${ScalarOperations.superscript(exponent)
                     }`;
             case Operator.Divide:
-                return `${this.elements[0].algebraicStringify({ dontFindFraction })}/(${[...this.elements].splice(1, this.elements.length - 1).map(a => a.algebraicStringify({ dontFindFraction })).join(')/(')}`;
+                return `${this.elements[0].algebraicStringify(dontFindFraction)}/(${[...this.elements].splice(1, this.elements.length - 1).map(a => a.algebraicStringify(dontFindFraction)).join(')/(')}`;
             case Operator.Multiply:
-                return `${this.elements.map(a => a.algebraicStringify({ dontFindFraction })).join('×')}`;
+                return `${this.elements.map(a => a.algebraicStringify(dontFindFraction)).join('×')}`;
             case Operator.Add:
-                const terms = this.elements.map(a => a.algebraicStringify({ dontFindFraction })).map(a => a.startsWith('-') ? a : '+' + a).join('');
+                const terms = this.elements.map(a => a.algebraicStringify(dontFindFraction)).map(a => a.startsWith('-') ? a : '+' + a).join('');
                 return `(${terms.startsWith('+') ? terms.substring(1, terms.length) : terms})`;
             case Operator.Subtract:
-                return `(${this.elements[0].algebraicStringify({ dontFindFraction })}-${[...this.elements].splice(1, this.elements.length - 1).map(a => a.algebraicStringify({ dontFindFraction })).join('-')})`;
+                return `(${this.elements[0].algebraicStringify(dontFindFraction)}-${[...this.elements].splice(1, this.elements.length - 1).map(a => a.algebraicStringify(dontFindFraction)).join('-')})`;
             case Operator.None:
                 if (!(this.oneElement instanceof ElementData))
                     throw `${this}.oneElement is not ElementData`;
-                return this.oneElement.stringify();
+                return this.oneElement.stringify(0, dontFindFraction);
         }
     }
 
-    stringify(indent?: number, delta?: number): string {
+    stringify(indent: number = 0, delta: number = 0): string {
         return this.oneElement
             ? this.oneElement.stringify(delta || 0)
             : indent !== undefined && delta !== undefined
@@ -179,22 +179,24 @@ export class ElementData {
         // console.log({varrrrr: this.variables});
     }
 
-    commaStringify() {
-        return this.stringify().replace('.', ',');
+    commaStringify(dontFindFraction: boolean = false) {
+        return this.stringify(0, dontFindFraction).replace('.', ',');
     }
 
-    stringify(indent: number = 0) {
+    stringify(indent: number = 0, dontFindFraction: boolean = false) {
 
         if (!!this.unfilteredString) return this.unfilteredString;
 
         const formatScalar =
-            () => this.variables.length === 0
-                ? findFraction(this.scalar)
-                : this.scalar === -1 
-                    ? '-'
-                    : this.scalar === 1
-                        ? ''
-                        : findFraction(this.scalar);
+            () => dontFindFraction
+                ? this.scalar
+                : this.variables.length === 0
+                    ? findFraction(this.scalar)
+                    : this.scalar === -1 
+                        ? '-'
+                        : this.scalar === 1
+                            ? ''
+                            : findFraction(this.scalar);
         
         return indentText(
             [formatScalar() + this.stringifyVariables()],
