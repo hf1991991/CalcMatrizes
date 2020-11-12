@@ -34,8 +34,18 @@ export function varOperation(
 
     const result = simplifyExpressionAlgorithm(expressionData);
 
+    const sum = new ExpressionData({
+        operator: Operator.Add,
+        elements: [
+            createMatrixElement({ scalar: 8 }),
+            createMatrixElement({ scalar: 8 }),
+            createMatrixElement({ scalar: 8 }),
+            createMatrixElement({ scalar: 8 }),
+        ]
+    })
+
     console.log({
-        initial: expressionData.stringify(),
+        initial: sum.indentStringify(),
         RESULT: result.stringify()
     });
 
@@ -135,7 +145,7 @@ function getIndexOfNormalizedAddition(additionElements: Array<ExpressionData>, a
     return -1;
 }
 
-function variablesMatch(variables1: ExpressionData | ElementData, variables2: ExpressionData | ElementData) {
+function variablesMatch(variables1: ElementData, variables2: ElementData) {
     return variables1.stringify({ onlyVariables: true }) === variables2.stringify({ onlyVariables: true });
     // if (variables1.length !== variables2.length) return false;
     // else if (variables1.length === 0) return true;
@@ -153,7 +163,7 @@ function variablesMatch(variables1: ExpressionData | ElementData, variables2: Ex
     // return true;
 }
 
-function getIndexOfVariable(simplifiedElements: Array<ExpressionData | ElementData>, variablesSearch: ExpressionData | ElementData) {
+function getIndexOfVariable(simplifiedElements: Array<ElementData>, variablesSearch: ElementData) {
 
     // console.log(JSON.stringify({variablesSearch: variablesSearch, simplifiedElements: simplifiedElements}));
 
