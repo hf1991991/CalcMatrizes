@@ -19,5 +19,10 @@ target 'calcmatrizes' do
     inherit! :search_paths
     # Pods for testing
   end
+  
+  use_flipper!
+  post_install do |installer|
+    flipper_post_install(installer)
+  end
 
 end
