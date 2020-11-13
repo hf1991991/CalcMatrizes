@@ -134,7 +134,9 @@ export class ElementData {
     hasVariables: boolean;
 
     constructor({ variables = [], scalar = 1, unfilteredString }: ElementDataParams) {
-        this.scalar = smartToFixed(Number.parseFloat(scalar.toString()));
+        this.scalar = unfilteredString
+            ? Number(unfilteredString)
+            : smartToFixed(Number(scalar));
 
         this.variables = this.scalar === 0 ? [] : variables;
 
