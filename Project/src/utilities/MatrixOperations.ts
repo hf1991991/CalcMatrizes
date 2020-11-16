@@ -396,7 +396,7 @@ class MatrixOperations {
             () => (
                 MatrixOperations.bareissAlgorithm(
                     matrix,
-                    MatrixOperations.identity(matrix.dimensions().rows)
+                    MatrixOperations.identity(matrix.dimensions().rows),
                 ).determinant
             ),
             'determinant'
@@ -645,23 +645,56 @@ class MatrixOperations {
 
         console.log('INICIO BAREISS')
 
+        let noPivotOnColumn = false;
+
         for (let pivotIndex = 0; pivotIndex < joinedMatrix.dimensions().rows; pivotIndex++) {
 
-            MatrixOperations.printMatrix(joinedMatrix);
-            
-            let joinedMatrixCopy = MatrixOperations.copyMatrixData(joinedMatrix);
+            const pivot = joinedMatrix.data[pivotIndex][pivotIndex];
 
-            for (let row = 0; row < joinedMatrix.dimensions().rows; row++) {
-                for (let column = 0; column < joinedMatrix.dimensions().columns; column++) {
-                    if (row !== pivotIndex) {
-                        applyBareissFormula(joinedMatrix, joinedMatrixCopy, row, column, pivotIndex);
+            if (pivot.isZero) {
+
+                let testRow = pivotIndex + 1;
+
+                while (true) {
+                    // Se houver uma coluna sem pivot em uma matriz escalonada reduzida, o determinante dela é nulo:
+                    if (testRow === joinedMatrix.dimensions().rows) {
+                        noPivotOnColumn = true;
+                        break;
                     }
+
+                    const possibleNewPivot = joinedMatrix.data[testRow][pivotIndex];
+
+                    if (!possibleNewPivot.isZero) break;
+
+                    testRow++;
+                }
+
+                if (!noPivotOnColumn) {
+                    let joinedMatrixTempCopy = MatrixOperations.copyMatrixData(joinedMatrix);
+
+                    joinedMatrix.data[pivotIndex] = joinedMatrixTempCopy.data[testRow];
+                    joinedMatrix.data[testRow] = joinedMatrixTempCopy.data[pivotIndex];
                 }
             }
 
-            joinedMatrix = joinedMatrixCopy;
-
             MatrixOperations.printMatrix(joinedMatrix);
+
+            if (!noPivotOnColumn) {
+            
+                let joinedMatrixCopy = MatrixOperations.copyMatrixData(joinedMatrix);
+    
+                for (let row = 0; row < joinedMatrix.dimensions().rows; row++) {
+                    for (let column = 0; column < joinedMatrix.dimensions().columns; column++) {
+                        if (row !== pivotIndex)
+                            applyBareissFormula(joinedMatrix, joinedMatrixCopy, row, column, pivotIndex);
+                    }
+                }
+    
+                joinedMatrix = joinedMatrixCopy;
+    
+                MatrixOperations.printMatrix(joinedMatrix);
+
+            }
             
         }
 
@@ -679,25 +712,33 @@ class MatrixOperations {
         let determinant: ExpressionData | undefined;
         
         if (MatrixOperations.isMatrixSquare(newMatrixA)) {
-            determinant = newMatrixA.data
-                [newMatrixA.dimensions().rows - 1]
-                [newMatrixA.dimensions().columns - 1];
 
-            const invertedDeterminant = ExpressionSimplification.varOperation(
-                determinant,
-                Operator.Elevate,
-                createMatrixElement({ scalar: -1 })
-            );
-            
-            newMatrixA = MatrixOperations.multiplyMatrixByScalar({
-                matrixA: newMatrixA,
-                scalar: invertedDeterminant
-            });
-            
-            newMatrixB = MatrixOperations.multiplyMatrixByScalar({
-                matrixA: newMatrixB,
-                scalar: invertedDeterminant
-            });
+            if (noPivotOnColumn)
+                determinant = createMatrixElement({
+                    scalar: 0
+                });
+
+            else {
+                determinant = newMatrixA.data
+                    [newMatrixA.dimensions().rows - 1]
+                    [newMatrixA.dimensions().columns - 1];
+    
+                const invertedDeterminant = ExpressionSimplification.varOperation(
+                    determinant,
+                    Operator.Elevate,
+                    createMatrixElement({ scalar: -1 })
+                );
+                
+                newMatrixA = MatrixOperations.multiplyMatrixByScalar({
+                    matrixA: newMatrixA,
+                    scalar: invertedDeterminant
+                });
+                
+                newMatrixB = MatrixOperations.multiplyMatrixByScalar({
+                    matrixA: newMatrixB,
+                    scalar: invertedDeterminant
+                });
+            }
         }
 
         return {
