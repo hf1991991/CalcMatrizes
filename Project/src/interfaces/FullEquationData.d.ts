@@ -9,7 +9,7 @@ interface FullEquationData {
     matrixB?: MatrixData;
     matrixC?: MatrixData;
     matrixD?: MatrixData;
-    solutionWithIndependentVariables?: MatrixData;
+    matrixE?: MatrixData;
     scalar?: ElementData | ExpressionData;
     lettersUsed?: Array<string>;
 }

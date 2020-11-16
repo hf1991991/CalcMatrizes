@@ -32,10 +32,10 @@ interface PartialGaussianEliminationParams {
 }
 
 interface FindSolutionMatrixEquationData {
-    partiallyEliminatedOriginal: MatrixData;
-    solution: MatrixData;
+    eliminatedMatrixA: MatrixData;
+    eliminatedMatrixB: MatrixData;
+    solution: MatrixData | undefined;
     systemSolutionsType: SystemSolutionType;
-    solutionWithIndependentVariables: MatrixData | undefined;
     lettersUsed: Array<string> | undefined;
 }
 
@@ -797,41 +797,36 @@ class MatrixOperations {
                 _matrixB = MatrixOperations.transpose(matrixB);
             }
 
-            let matrixACopy = MatrixOperations.copyMatrixData(_matrixA);
-            let matrixX = MatrixOperations.copyMatrixData(_matrixB);
-
-            const bareissResult = MatrixOperations.bareissAlgorithm(
-                matrixACopy,
-                matrixX,
+            let {
+                matrixA: eliminatedMatrixA,
+                matrixB: eliminatedMatrixB
+            } = MatrixOperations.bareissAlgorithm(
+                _matrixA,
+                _matrixB,
                 true
             );
 
-            matrixACopy = bareissResult.matrixA;
-            matrixX = bareissResult.matrixB;
-
-            const resizedMatrixX = MatrixOperations.resizeMatrixAfterPartialElimination(
-                _matrixA,
-                _matrixB,
-                matrixX
+            const resizedEliminatedMatrixB = MatrixOperations.resizeMatrixAfterPartialElimination(
+                _matrixA.dimensions().columns,
+                _matrixB.dimensions().columns,
+                eliminatedMatrixB
             );
 
-            const multiplication = MatrixOperations.multiplyMatrix(_matrixA, resizedMatrixX);
-            console.log({ verticalElimination });
-            MatrixOperations.printMatrix(resizedMatrixX);
+            const multiplication = MatrixOperations.multiplyMatrix(_matrixA, resizedEliminatedMatrixB);
+
             MatrixOperations.printMatrix(_matrixA);
+            MatrixOperations.printMatrix(resizedEliminatedMatrixB);
             MatrixOperations.printMatrix(multiplication);
             MatrixOperations.printMatrix(_matrixB);
 
             let systemSolutionsType = MatrixOperations.systemSolutionTypesVerification(
                 _matrixB,
-                matrixACopy,
-                matrixX,
+                eliminatedMatrixA,
+                eliminatedMatrixB,
                 multiplication
             );
 
-            let partiallyEliminatedOriginal = matrixACopy;
-            let solution = matrixX;
-            let solutionWithIndependentVariables: MatrixData | undefined = undefined;
+            let solution: MatrixData | undefined = undefined;
             let lettersUsed: Array<string> | undefined = undefined;
 
             if (systemSolutionsType === SystemSolutionType.SPDOrSPI) {
@@ -839,9 +834,9 @@ class MatrixOperations {
                 // Método de transformar A(mxo) * X(oxn) = B(mxn) 
                 // em A((m*n)x(o*n)) * X((o*n)x1) = B((m*n)x1):
                 const vectorEquation = MatrixOperations.transformEquationToVectorForm(
-                    partiallyEliminatedOriginal,
-                    resizedMatrixX,
-                    solution
+                    eliminatedMatrixA,
+                    resizedEliminatedMatrixB,
+                    eliminatedMatrixB
                 );
 
                 MatrixOperations.printMatrix(vectorEquation.matrixA);
@@ -858,35 +853,25 @@ class MatrixOperations {
 
                 const devectorizedMatrixX = MatrixOperations.devectorizeVector(
                     generalVectorData.vectorizedX,
-                    resizedMatrixX.dimensions()
+                    resizedEliminatedMatrixB.dimensions()
                 );
 
-                if (systemSolutionsType === SystemSolutionType.SPI)
-                    solutionWithIndependentVariables = devectorizedMatrixX;
-                else
-                    solution = devectorizedMatrixX;
+                solution = devectorizedMatrixX;
 
             }
 
             if (verticalElimination) {
-                solution = MatrixOperations.transpose(solution);
-                partiallyEliminatedOriginal = MatrixOperations.transpose(partiallyEliminatedOriginal);
-                solutionWithIndependentVariables && (
-                    solutionWithIndependentVariables = MatrixOperations.transpose(solutionWithIndependentVariables)
+                solution && (
+                    solution = MatrixOperations.transpose(solution)
                 );
+                eliminatedMatrixA = MatrixOperations.transpose(eliminatedMatrixA);
             }
 
-            // console.log({
-            //     partiallyEliminatedOriginal,
-            //     solution,
-            //     systemSolutionsType,
-            // });
-
             return {
-                partiallyEliminatedOriginal,
+                eliminatedMatrixA,
+                eliminatedMatrixB,
                 solution,
                 systemSolutionsType,
-                solutionWithIndependentVariables,
                 lettersUsed
             };
         }
@@ -1025,24 +1010,24 @@ class MatrixOperations {
 
     static systemSolutionTypesVerification(
         matrixB: MatrixData,
-        matrixACopy: MatrixData,
-        matrixX: MatrixData,
+        eliminatedMatrixA: MatrixData,
+        eliminatedMatrixB: MatrixData,
         multiplication: MatrixData
     ) {
 
         /* Se, na expressão, houver uma igualdade de um número nulo com 
         um não nulo fora das dimensoes da matrix final, ela é um SI: */
         for (
-            let row = matrixACopy.dimensions().columns;
-            row < matrixX.dimensions().rows;
+            let row = eliminatedMatrixA.dimensions().columns;
+            row < eliminatedMatrixB.dimensions().rows;
             row++
         ) {
             for (
                 let column = 0;
-                column < matrixX.dimensions().columns;
+                column < eliminatedMatrixB.dimensions().columns;
                 column++
             ) {
-                if (!matrixX.data[row][column].isZero) return SystemSolutionType.SI;
+                if (!eliminatedMatrixB.data[row][column].isZero) return SystemSolutionType.SI;
             }
         }
 
@@ -1073,12 +1058,12 @@ class MatrixOperations {
         return SystemSolutionType.SPDOrSPI;
     }
 
-    static resizeMatrixAfterPartialElimination(matrixA: MatrixData, matrixB: MatrixData, matrixX: MatrixData) {
+    static resizeMatrixAfterPartialElimination(matrixAColumns: number, matrixBColumns: number, matrixX: MatrixData) {
         return MatrixOperations.resizeMatrix({
             originalMatrix: MatrixOperations.emptyMatrix(matrixX.dimensions()),
             editableMatrix: matrixX,
-            rows: matrixA.dimensions().columns,
-            columns: matrixB.dimensions().columns,
+            rows: matrixAColumns,
+            columns: matrixBColumns,
         });
     }
 }

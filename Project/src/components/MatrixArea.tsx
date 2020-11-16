@@ -257,7 +257,6 @@ const MatrixArea: React.FC = () => {
                             CalcState.XxAeB,
                             CalcState.XxBeA,
                         ].includes(fullEquation.equationType)
-                            && fullEquation.solutionType !== SystemSolutionType.SPD
                             ? viewReduced ? 'Original' : 'Reduzida'
                             : fullEquation.equationType === CalcState.gaussianElimination
                                 ? viewReduced ? 'Não Reduzida' : 'Reduzida'

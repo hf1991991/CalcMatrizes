@@ -26,13 +26,11 @@ class EquationData {
                 this.secondOperator = '=';
                 this.variablePosition = 2;
 
-                this.matrix2 = fullEquation.solutionType === SystemSolutionType.SPI
-                    ? fullEquation.solutionWithIndependentVariables
-                    : fullEquation.matrixC;
+                this.matrix2 = fullEquation.matrixC;
 
                 if (viewReduced) {
                     this.matrix1 = fullEquation.matrixD;
-                    this.matrix3 = fullEquation.matrixC;
+                    this.matrix3 = fullEquation.matrixE;
                 } else {
                     this.matrix1 = fullEquation.matrixA;
                     this.matrix3 = fullEquation.matrixB;
@@ -44,13 +42,11 @@ class EquationData {
                 this.secondOperator = '=';
                 this.variablePosition = 2;
 
-                this.matrix2 = fullEquation.solutionType === SystemSolutionType.SPI
-                    ? fullEquation.solutionWithIndependentVariables
-                    : fullEquation.matrixC;
+                this.matrix2 = fullEquation.matrixC;
 
                 if (viewReduced) {
                     this.matrix1 = fullEquation.matrixD;
-                    this.matrix3 = fullEquation.matrixC;
+                    this.matrix3 = fullEquation.matrixE;
                 } else {
                     this.matrix1 = fullEquation.matrixB;
                     this.matrix3 = fullEquation.matrixA;
@@ -62,13 +58,11 @@ class EquationData {
                 this.secondOperator = '=';
                 this.variablePosition = 1;
 
-                this.matrix1 = fullEquation.solutionType === SystemSolutionType.SPI
-                    ? fullEquation.solutionWithIndependentVariables
-                    : fullEquation.matrixC;
+                this.matrix1 = fullEquation.matrixC;
 
                 if (viewReduced) {
                     this.matrix2 = fullEquation.matrixD;
-                    this.matrix3 = fullEquation.matrixC;
+                    this.matrix3 = fullEquation.matrixE;
                 } else {
                     this.matrix2 = fullEquation.matrixA;
                     this.matrix3 = fullEquation.matrixB;
@@ -80,13 +74,11 @@ class EquationData {
                 this.secondOperator = '=';
                 this.variablePosition = 1;
 
-                this.matrix1 = fullEquation.solutionType === SystemSolutionType.SPI
-                    ? fullEquation.solutionWithIndependentVariables
-                    : fullEquation.matrixC;
+                this.matrix1 = fullEquation.matrixC;
 
                 if (viewReduced) {
                     this.matrix2 = fullEquation.matrixD;
-                    this.matrix3 = fullEquation.matrixC;
+                    this.matrix3 = fullEquation.matrixE;
                 } else {
                     this.matrix2 = fullEquation.matrixB;
                     this.matrix3 = fullEquation.matrixA;

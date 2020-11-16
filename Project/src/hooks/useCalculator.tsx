@@ -669,10 +669,10 @@ export const CalculatorProvider: React.FC = ({ children }) => {
 
             if (!error) {
                 const {
-                    partiallyEliminatedOriginal,
+                    eliminatedMatrixA,
+                    eliminatedMatrixB,
                     solution,
                     systemSolutionsType,
-                    solutionWithIndependentVariables,
                     lettersUsed
                 } = result;
 
@@ -683,14 +683,14 @@ export const CalculatorProvider: React.FC = ({ children }) => {
                     matrixA: readyMatrix,
                     matrixB: editableMatrix,
                     matrixC: solution,
-                    matrixD: partiallyEliminatedOriginal,
-                    solutionWithIndependentVariables,
+                    matrixD: eliminatedMatrixA,
+                    matrixE: eliminatedMatrixB,
                     lettersUsed
                 });
 
                 setReadyMatrix(
                     systemSolutionsType == SystemSolutionType.SPD
-                        ? solution
+                        ? solution as MatrixData
                         : readyMatrix
                 );
             }
