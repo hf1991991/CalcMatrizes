@@ -285,7 +285,7 @@ export const CalculatorProvider: React.FC = ({ children }) => {
 
             return null;
         },
-        [isMatrixFull, isMatrixSquare, matrixOnScreen]
+        [selectedMatrixElement, isMatrixFull, isMatrixSquare, matrixOnScreen]
     );
 
     const isInverseEnabled = useMemo(
