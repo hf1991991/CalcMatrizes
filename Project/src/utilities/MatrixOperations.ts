@@ -716,7 +716,7 @@ class MatrixOperations {
 
         }
 
-        let determinant: ExpressionData | undefined;
+        let determinant: ExpressionData | null = null;
 
         if (MatrixOperations.isMatrixSquare(matrixA)) {
             if (noPivotOnColumn)
