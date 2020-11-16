@@ -612,7 +612,21 @@ class MatrixOperations {
         return [matrixA, matrixB];
     }
 
-    static bareissAlgorithm(matrixA: MatrixData, matrixB: MatrixData) {
+    static transformMatrixToReducedRowEchelonForm(matrix: MatrixData) {
+        for (let row = 0; row < matrix.dimensions().rows; row++) {
+            const pivot = matrix.data[row][row];
+            if (!pivot.isZero) {
+                for (let column = row; column < matrix.dimensions().columns; column++)
+                    matrix.data[row][column] = ExpressionSimplification.varOperation(
+                        matrix.data[row][column],
+                        Operator.Divide,
+                        pivot
+                    );
+            }
+        }
+    }
+
+    static bareissAlgorithm(matrixA: MatrixData, matrixB: MatrixData, forceReducedRowEchelonForm: boolean = false) {
 
         let joinedMatrix = MatrixOperations.joinMatrixRows(matrixA, matrixB);
 
@@ -680,28 +694,31 @@ class MatrixOperations {
             MatrixOperations.printMatrix(joinedMatrix);
 
             if (!noPivotOnColumn) {
-            
+
                 let joinedMatrixCopy = MatrixOperations.copyMatrixData(joinedMatrix);
-    
+
                 for (let row = 0; row < joinedMatrix.dimensions().rows; row++) {
                     for (let column = 0; column < joinedMatrix.dimensions().columns; column++) {
                         if (row !== pivotIndex)
                             applyBareissFormula(joinedMatrix, joinedMatrixCopy, row, column, pivotIndex);
                     }
                 }
-    
+
                 joinedMatrix = joinedMatrixCopy;
-    
+
                 MatrixOperations.printMatrix(joinedMatrix);
 
             }
-            
+
         }
 
         console.log('FIM BAREISS');
 
+        if (!noPivotOnColumn || forceReducedRowEchelonForm)
+            MatrixOperations.transformMatrixToReducedRowEchelonForm(joinedMatrix);
+
         let [newMatrixA, newMatrixB] = MatrixOperations.separateMatrixRows(
-            joinedMatrix, 
+            joinedMatrix,
             matrixA.dimensions().columns
         );
 
@@ -710,7 +727,7 @@ class MatrixOperations {
         MatrixOperations.printMatrix(newMatrixB);
 
         let determinant: ExpressionData | undefined;
-        
+
         if (MatrixOperations.isMatrixSquare(newMatrixA)) {
 
             if (noPivotOnColumn)
@@ -718,27 +735,11 @@ class MatrixOperations {
                     scalar: 0
                 });
 
-            else {
+            else
                 determinant = newMatrixA.data
-                    [newMatrixA.dimensions().rows - 1]
-                    [newMatrixA.dimensions().columns - 1];
-    
-                const invertedDeterminant = ExpressionSimplification.varOperation(
-                    determinant,
-                    Operator.Elevate,
-                    createMatrixElement({ scalar: -1 })
-                );
-                
-                newMatrixA = MatrixOperations.multiplyMatrixByScalar({
-                    matrixA: newMatrixA,
-                    scalar: invertedDeterminant
-                });
-                
-                newMatrixB = MatrixOperations.multiplyMatrixByScalar({
-                    matrixA: newMatrixB,
-                    scalar: invertedDeterminant
-                });
-            }
+                [newMatrixA.dimensions().rows - 1]
+                [newMatrixA.dimensions().columns - 1];
+
         }
 
         return {
@@ -747,7 +748,6 @@ class MatrixOperations {
             determinant
         };
     }
-
 
     static getGaussianElimination(matrix: MatrixData) {
         function _getGaussianElimination(): GetGaussianEliminationData {
@@ -798,22 +798,14 @@ class MatrixOperations {
             let matrixACopy = MatrixOperations.copyMatrixData(_matrixA);
             let matrixX = MatrixOperations.copyMatrixData(_matrixB);
 
-            /* if showSteps:
-                exibicao_passos_resolver_equacao_matricial(matrixACopy, matrixX, None, None, None, verticalElimination, "Equação inicial:\n") */
+            const bareissResult = MatrixOperations.bareissAlgorithm(
+                matrixACopy,
+                matrixX,
+                true
+            );
 
-            const firstElimination = MatrixOperations.partialGaussianElimination({
-                matrixA: matrixACopy,
-                matrixB: matrixX,
-                eliminateBelowMainDiagonal: true
-            });
-
-            const secondElimination = MatrixOperations.partialGaussianElimination({
-                ...firstElimination,
-                eliminateBelowMainDiagonal: false
-            });
-
-            matrixACopy = secondElimination.matrixA;
-            matrixX = secondElimination.matrixB;
+            matrixACopy = bareissResult.matrixA;
+            matrixX = bareissResult.matrixB;
 
             const resizedMatrixX = MatrixOperations.resizeMatrixAfterPartialElimination(
                 _matrixA,
