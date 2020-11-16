@@ -18,96 +18,80 @@ class EquationData {
     scalar: string | undefined;
     singleMatrixOperator: string | undefined;
 
-    constructor({ fullEquation, viewReduced=false }: EquationDataParams) {
+    constructor({ fullEquation, viewReduced = false }: EquationDataParams) {
 
         switch (fullEquation.equationType) {
             case CalcState.AxXeB:
-                if (fullEquation.solutionType !== SystemSolutionType.SPD) {
-                    this.firstOperator = '×';
-                    this.variablePosition = 2;
-                    this.secondOperator = '=';
-                    this.matrix2 = fullEquation.solutionWithIndependentVariables;
-                    if (viewReduced) {
-                        this.matrix1 = fullEquation.matrixD;
-                        this.matrix3 = fullEquation.matrixC;
-                    } else {
-                        this.matrix1 = fullEquation.matrixA;
-                        this.matrix3 = fullEquation.matrixB;
-                    }
-                }
-                else {
+                this.firstOperator = '×';
+                this.secondOperator = '=';
+                this.variablePosition = 2;
+
+                this.matrix2 = fullEquation.solutionType === SystemSolutionType.SPI
+                    ? fullEquation.solutionWithIndependentVariables
+                    : fullEquation.matrixC;
+
+                if (viewReduced) {
+                    this.matrix1 = fullEquation.matrixD;
+                    this.matrix3 = fullEquation.matrixC;
+                } else {
                     this.matrix1 = fullEquation.matrixA;
-                    this.firstOperator = '×';
-                    this.matrix2 = fullEquation.matrixC;
-                    this.secondOperator = '=';
                     this.matrix3 = fullEquation.matrixB;
                 }
+
                 break;
             case CalcState.BxXeA:
-                if (fullEquation.solutionType !== SystemSolutionType.SPD) {
-                    this.firstOperator = '×';
-                    this.variablePosition = 2;
-                    this.secondOperator = '=';
-                    this.matrix2 = fullEquation.solutionWithIndependentVariables;
-                    if (viewReduced) {
-                        this.matrix1 = fullEquation.matrixD;
-                        this.matrix3 = fullEquation.matrixC;
-                    } else {
-                        this.matrix1 = fullEquation.matrixB;
-                        this.matrix3 = fullEquation.matrixA;
-                    }
-                }
-                else {
+                this.firstOperator = '×';
+                this.secondOperator = '=';
+                this.variablePosition = 2;
+
+                this.matrix2 = fullEquation.solutionType === SystemSolutionType.SPI
+                    ? fullEquation.solutionWithIndependentVariables
+                    : fullEquation.matrixC;
+
+                if (viewReduced) {
+                    this.matrix1 = fullEquation.matrixD;
+                    this.matrix3 = fullEquation.matrixC;
+                } else {
                     this.matrix1 = fullEquation.matrixB;
-                    this.firstOperator = '×';
-                    this.matrix2 = fullEquation.matrixC;
-                    this.secondOperator = '=';
                     this.matrix3 = fullEquation.matrixA;
                 }
+
                 break;
             case CalcState.XxAeB:
-                if (fullEquation.solutionType !== SystemSolutionType.SPD) {
-                    this.firstOperator = '×';
-                    this.variablePosition = 1;
-                    this.secondOperator = '=';
-                    this.matrix1 = fullEquation.solutionWithIndependentVariables;
-                    if (viewReduced) {
-                        this.matrix2 = fullEquation.matrixD;
-                        this.matrix3 = fullEquation.matrixC;
-                    } else {
-                        this.matrix2 = fullEquation.matrixA;
-                        this.matrix3 = fullEquation.matrixB;
-                    }
-                }
-                else {
-                    this.matrix1 = fullEquation.matrixC;
-                    this.firstOperator = '×';
+                this.firstOperator = '×';
+                this.secondOperator = '=';
+                this.variablePosition = 1;
+
+                this.matrix1 = fullEquation.solutionType === SystemSolutionType.SPI
+                    ? fullEquation.solutionWithIndependentVariables
+                    : fullEquation.matrixC;
+
+                if (viewReduced) {
+                    this.matrix2 = fullEquation.matrixD;
+                    this.matrix3 = fullEquation.matrixC;
+                } else {
                     this.matrix2 = fullEquation.matrixA;
-                    this.secondOperator = '=';
                     this.matrix3 = fullEquation.matrixB;
                 }
+
                 break;
             case CalcState.XxBeA:
-                if (fullEquation.solutionType !== SystemSolutionType.SPD) {
-                    this.firstOperator = '×';
-                    this.variablePosition = 1;
-                    this.secondOperator = '=';
-                    this.matrix1 = fullEquation.solutionWithIndependentVariables;
-                    if (viewReduced) {
-                        this.matrix2 = fullEquation.matrixD;
-                        this.matrix3 = fullEquation.matrixC;
-                    } else {
-                        this.matrix2 = fullEquation.matrixB;
-                        this.matrix3 = fullEquation.matrixA;
-                    }
-                }
-                else {
-                    this.matrix1 = fullEquation.matrixC;
-                    this.firstOperator = '×';
+                this.firstOperator = '×';
+                this.secondOperator = '=';
+                this.variablePosition = 1;
+
+                this.matrix1 = fullEquation.solutionType === SystemSolutionType.SPI
+                    ? fullEquation.solutionWithIndependentVariables
+                    : fullEquation.matrixC;
+
+                if (viewReduced) {
+                    this.matrix2 = fullEquation.matrixD;
+                    this.matrix3 = fullEquation.matrixC;
+                } else {
                     this.matrix2 = fullEquation.matrixB;
-                    this.secondOperator = '=';
                     this.matrix3 = fullEquation.matrixA;
                 }
+
                 break;
             case CalcState.gaussianElimination:
                 this.firstOperator = 'GE(';
@@ -170,15 +154,15 @@ class EquationData {
     }
 
     getQuantityOfMatrices() {
-        return (this.matrix1 !== undefined ? 1 : 0) 
-            + (this.matrix2 !== undefined ? 1 : 0) 
+        return (this.matrix1 !== undefined ? 1 : 0)
+            + (this.matrix2 !== undefined ? 1 : 0)
             + (this.matrix3 !== undefined ? 1 : 0);
     }
 
     getQuantityOfOperators() {
-        return (this.firstOperator !== undefined ? 1 : 0) 
-            + (this.secondOperator !== undefined ? 1 : 0) 
-            + (this.singleMatrixOperator !== undefined ? 1 : 0) 
+        return (this.firstOperator !== undefined ? 1 : 0)
+            + (this.secondOperator !== undefined ? 1 : 0)
+            + (this.singleMatrixOperator !== undefined ? 1 : 0)
             + (this.scalar !== undefined ? 1 : 0);
     }
 
