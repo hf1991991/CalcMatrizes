@@ -976,10 +976,6 @@ class MatrixOperations {
 
         let solutionType = SystemSolutionType.SPD;
 
-        console.log(vectorizedX.map(e => e.stringify()));
-
-        MatrixOperations.printMatrix(matrixA);
-
         const { rows, columns } = matrixA.dimensions();
 
         const minDimensions = Math.min(rows, columns);
