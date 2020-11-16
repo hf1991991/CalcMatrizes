@@ -35,7 +35,7 @@ export function varOperation(
     const result = simplifyExpressionAlgorithm(expressionData);
 
     console.log({
-        initial: expressionData.indentStringify(),
+        initial: expressionData.stringify(),
         RESULT: result.stringify()
     });
 

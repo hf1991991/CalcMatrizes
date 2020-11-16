@@ -94,7 +94,7 @@ export class ExpressionData {
         }
     }
 
-    stringify(indent: number = 0, delta: number = 0): string {
+    stringify(indent?: number, delta?: number): string {
         return this.oneElement
             ? this.oneElement.stringify(delta || 0)
             : indent !== undefined && delta !== undefined

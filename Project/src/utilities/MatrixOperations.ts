@@ -382,25 +382,10 @@ class MatrixOperations {
 
     static invert(matrix: MatrixData) {
         function _invert() {
-            console.log('STARTING BELOW MAIN DIAGONAL')
-            let firstElimination = MatrixOperations.partialGaussianElimination({
-                matrixA: matrix,
-                matrixB: MatrixOperations.identity(matrix.dimensions().rows),
-                eliminateBelowMainDiagonal: true,
-            });
-            console.log('ENDED BELOW MAIN DIAGONAL')
-
-            MatrixOperations.printMatrix(firstElimination.matrixA)
-            MatrixOperations.printMatrix(firstElimination.matrixB)
-
-            console.log('STARTING ABOVE MAIN DIAGONAL')
-            let secondElimination = MatrixOperations.partialGaussianElimination({
-                ...firstElimination,
-                eliminateBelowMainDiagonal: false,
-            });
-            console.log('ENDED ABOVE MAIN DIAGONAL')
-
-            return MatrixOperations.copyMatrixData(secondElimination.matrixB);
+            return MatrixOperations.bareissAlgorithm(
+                matrix,
+                MatrixOperations.identity(matrix.dimensions().rows)
+            ).matrixB;
         }
 
         return addErrorTreatment(_invert, 'inverted');
@@ -409,10 +394,10 @@ class MatrixOperations {
     static determinant(matrix: MatrixData) {
         return addErrorTreatment(
             () => (
-                MatrixOperations.partialGaussianElimination({
-                    matrixA: matrix,
-                    matrixB: MatrixOperations.identity(matrix.dimensions().rows)
-                }).determinant
+                MatrixOperations.bareissAlgorithm(
+                    matrix,
+                    MatrixOperations.identity(matrix.dimensions().rows)
+                ).determinant
             ),
             'determinant'
         );
@@ -596,6 +581,132 @@ class MatrixOperations {
         // return arredondamento_na_raca(determinant, 6);
     }
 
+    static joinMatrixRows(matrixA: MatrixData, matrixB: MatrixData) {
+        return new MatrixData(
+            matrixA.data.map((row, index) => [...row, ...matrixB.data[index]])
+        );
+    }
+
+    static separateMatrixRows(matrix: MatrixData, columnsA: number) {
+        const [matrixA, matrixB] = matrix.data.reduce(
+            (matrixDatasAccumulator, rowData, rowIndex) => {
+                let [matrixA, matrixB] = matrixDatasAccumulator;
+
+                matrixA.data[rowIndex] = rowData.slice(0, columnsA);
+                matrixB.data[rowIndex] = rowData.slice(columnsA, matrix.dimensions().columns);
+
+                return [matrixA, matrixB];
+            },
+            [
+                MatrixOperations.emptyMatrix({
+                    rows: matrix.dimensions().rows,
+                    columns: columnsA
+                }),
+                MatrixOperations.emptyMatrix({
+                    rows: matrix.dimensions().rows,
+                    columns: matrix.dimensions().columns - columnsA
+                })
+            ]
+        );
+
+        return [matrixA, matrixB];
+    }
+
+    static bareissAlgorithm(matrixA: MatrixData, matrixB: MatrixData) {
+
+        let joinedMatrix = MatrixOperations.joinMatrixRows(matrixA, matrixB);
+
+        // Aqui uma página legal para entender o funcionamento do algoritmo de Bareiss:
+        // https://matrixcalc.org/en/#determinant%28%7B%7B1,4,7%7D,%7B2,5,8%7D,%7B3,6,10%7D%7D%29
+        // Obs.: Para encontrar a explicação, escreva uma matriz, clique no botão de achar 
+        // o determinante e aperte "Details (Montante's method (Bareiss algorithm))"
+
+        const applyBareissFormula = (entryMatrix: MatrixData, exitMatrix: MatrixData, i: number, j: number, r: number) => {
+            exitMatrix.data[i][j] = ExpressionSimplification.varOperation(
+                ExpressionSimplification.varOperation(
+                    ExpressionSimplification.varOperation(
+                        entryMatrix.data[r][r],
+                        Operator.Multiply,
+                        entryMatrix.data[i][j]
+                    ),
+                    Operator.Subtract,
+                    ExpressionSimplification.varOperation(
+                        entryMatrix.data[r][j],
+                        Operator.Multiply,
+                        entryMatrix.data[i][r]
+                    )
+                ),
+                Operator.Divide,
+                r - 1 < 0
+                    ? createMatrixElement({ scalar: 1 })
+                    : entryMatrix.data[r - 1][r - 1]
+            );
+        };
+
+        console.log('INICIO BAREISS')
+
+        for (let pivotIndex = 0; pivotIndex < joinedMatrix.dimensions().rows; pivotIndex++) {
+
+            MatrixOperations.printMatrix(joinedMatrix);
+            
+            let joinedMatrixCopy = MatrixOperations.copyMatrixData(joinedMatrix);
+
+            for (let row = 0; row < joinedMatrix.dimensions().rows; row++) {
+                for (let column = 0; column < joinedMatrix.dimensions().columns; column++) {
+                    if (row !== pivotIndex) {
+                        applyBareissFormula(joinedMatrix, joinedMatrixCopy, row, column, pivotIndex);
+                    }
+                }
+            }
+
+            joinedMatrix = joinedMatrixCopy;
+
+            MatrixOperations.printMatrix(joinedMatrix);
+            
+        }
+
+        console.log('FIM BAREISS');
+
+        let [newMatrixA, newMatrixB] = MatrixOperations.separateMatrixRows(
+            joinedMatrix, 
+            matrixA.dimensions().columns
+        );
+
+        MatrixOperations.printMatrix(joinedMatrix);
+        MatrixOperations.printMatrix(newMatrixA);
+        MatrixOperations.printMatrix(newMatrixB);
+
+        let determinant: ExpressionData | undefined;
+        
+        if (MatrixOperations.isMatrixSquare(newMatrixA)) {
+            determinant = newMatrixA.data
+                [newMatrixA.dimensions().rows - 1]
+                [newMatrixA.dimensions().columns - 1];
+
+            const invertedDeterminant = ExpressionSimplification.varOperation(
+                determinant,
+                Operator.Elevate,
+                createMatrixElement({ scalar: -1 })
+            );
+            
+            newMatrixA = MatrixOperations.multiplyMatrixByScalar({
+                matrixA: newMatrixA,
+                scalar: invertedDeterminant
+            });
+            
+            newMatrixB = MatrixOperations.multiplyMatrixByScalar({
+                matrixA: newMatrixB,
+                scalar: invertedDeterminant
+            });
+        }
+
+        return {
+            matrixA: newMatrixA,
+            matrixB: newMatrixB,
+            determinant
+        };
+    }
+
 
     static getGaussianElimination(matrix: MatrixData) {
         function _getGaussianElimination(): GetGaussianEliminationData {
@@ -711,7 +822,7 @@ class MatrixOperations {
                 );
 
                 const devectorizedMatrixX = MatrixOperations.devectorizeVector(
-                    generalVectorData.vectorizedX, 
+                    generalVectorData.vectorizedX,
                     resizedMatrixX.dimensions()
                 );
 
@@ -792,7 +903,7 @@ class MatrixOperations {
     }
 
     static devectorizeVector(matrix: Array<ExpressionData>, matrixDimensions: MatrixDimensions) {
-        const newData =  matrix.reduce(
+        const newData = matrix.reduce(
             (dataAccumulator, element) => {
                 console.log(JSON.stringify({ dataAccumulator }));
                 let lastElement = dataAccumulator.pop();
@@ -846,7 +957,7 @@ class MatrixOperations {
                 lettersUsed.push(variable);
 
                 vectorizedX[row] = createMatrixElement({
-                    variables: [ new VariableData({ variable }) ]
+                    variables: [new VariableData({ variable })]
                 });
             }
         }
