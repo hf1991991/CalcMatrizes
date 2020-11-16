@@ -712,7 +712,19 @@ class MatrixOperations {
 
         }
 
-        console.log('FIM BAREISS');
+        let determinant: ExpressionData | undefined;
+
+        if (MatrixOperations.isMatrixSquare(matrixA)) {
+            if (noPivotOnColumn)
+                determinant = createMatrixElement({
+                    scalar: 0
+                });
+
+            else
+                determinant = joinedMatrix.data
+                    [matrixA.dimensions().rows - 1]
+                    [matrixA.dimensions().columns - 1];
+        }
 
         if (!noPivotOnColumn || forceReducedRowEchelonForm)
             MatrixOperations.transformMatrixToReducedRowEchelonForm(joinedMatrix);
@@ -722,25 +734,11 @@ class MatrixOperations {
             matrixA.dimensions().columns
         );
 
+        console.log('FIM BAREISS');
+
         MatrixOperations.printMatrix(joinedMatrix);
         MatrixOperations.printMatrix(newMatrixA);
         MatrixOperations.printMatrix(newMatrixB);
-
-        let determinant: ExpressionData | undefined;
-
-        if (MatrixOperations.isMatrixSquare(newMatrixA)) {
-
-            if (noPivotOnColumn)
-                determinant = createMatrixElement({
-                    scalar: 0
-                });
-
-            else
-                determinant = newMatrixA.data
-                [newMatrixA.dimensions().rows - 1]
-                [newMatrixA.dimensions().columns - 1];
-
-        }
 
         return {
             matrixA: newMatrixA,
