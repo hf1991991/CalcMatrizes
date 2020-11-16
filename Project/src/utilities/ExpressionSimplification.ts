@@ -849,11 +849,13 @@ export function doOperation(expression: ExpressionData): ExpressionData {
 
                 if (distributivesCopyData.index !== -1) {
 
+                    console.log({exponent, distributivesCopyData})
+
                     const multiplier = new ElementData({
                         scalar: (
-                            distributivesCopyData.searchNormalizationFactor
+                            distributivesCopyData.elementEliminationFactor as number
                             * Math.pow(
-                                distributivesCopyData.elementEliminationFactor as number,
+                                distributivesCopyData.searchNormalizationFactor,
                                 exponent
                             )
                         )
@@ -863,7 +865,7 @@ export function doOperation(expression: ExpressionData): ExpressionData {
                         distributives.splice(distributivesCopyData.index)[0]
                     ).normalizedAddition
 
-                    // console.log({normalizedDistributive: normalizedDistributive.stringify()})
+                    console.log({normalizedDistributive: normalizedDistributive.stringify()})
 
                     const normalizedMultipliedBase = doOperation(
                         new ExpressionData({
@@ -880,6 +882,8 @@ export function doOperation(expression: ExpressionData): ExpressionData {
                     );
 
                     let newElement = normalizedMultipliedBase;
+
+                    console.log({multiplier: multiplier.stringify()})
 
                     if (multiplier.scalar === 1) {
 
