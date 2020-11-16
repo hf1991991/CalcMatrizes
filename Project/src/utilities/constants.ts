@@ -1,3 +1,4 @@
+import { VariableData } from "./ExpressionClasses";
 import ScalarOperations from "./ScalarOperations";
 
 export enum CalcState {
@@ -139,31 +140,43 @@ export function smartToFixed(element: number) {
         return element;
 }
 
-export function findFraction(number: number) {
+export function findFraction(number: number): [numerator: number, denominator: number] {
     const MAX_DENOMINATOR = 10000;
 
-    let numerator = null;
-
     for (let denominator = 1; denominator < MAX_DENOMINATOR; denominator++) {
-        numerator = smartToFixed(number * denominator);
-        /* 
-        console.log({
-            number,
-            numerator: numerator.toString(),
-            endsWith: numerator.toString().endsWith('.0'),
-            denominator,
-            dots: count(numerator, /\./, true)
-        });
-        */
-        if (count(numerator, /\./, true) === 0 || numerator.toString().endsWith('.0')) {
-            if (denominator === 1) return number;
-            if (numerator.toString().endsWith('.0')) numerator = numerator.toString().split('.')[0];
-            return `${ScalarOperations.superscript(numerator)}\u2044${ScalarOperations.subscript(denominator)} `;
+        let numerator = smartToFixed(number * denominator);
+        if (count(numerator.toString(), /\./, true) === 0 || numerator.toString().endsWith('.0')) {
+            if (denominator === 1) return [number, 1];
+            if (numerator.toString().endsWith('.0')) numerator = Number(numerator.toString().split('.')[0]);
+            return [numerator, denominator];
         }
     }
 
-    return number;
+    return [number, 1];
 }
+
+export function unicodeDiagonalFraction(numerator: number, denominator: number) {
+    if (denominator === 1) return numerator.toString();
+    return `${ScalarOperations.superscript(numerator)}\u2044${ScalarOperations.subscript(denominator)} `;
+}
+
+export function latexFraction(numerator: number, denominator: number) {
+    if (denominator === 1) return numerator.toString();
+    return `\\frac{${numerator}}{${denominator}}`;
+}
+
+export function latexVariables(variables: VariableData[]) {
+    const formatExponent =
+        (exponent: number) => exponent === 1
+            ? ''
+            : '^{' + latexFraction(...findFraction(exponent)) + '}'
+    const formatVariables =
+        () => variables.map(
+            (vari: VariableData) => `${vari.variable}${formatExponent(vari.exponent)}`
+        )
+    return formatVariables().join('');
+}
+
 
 export function toFixedOnZeroes(number: string | number) {
     if (number === number.toString() && number.startsWith('0.')) return number.toString();

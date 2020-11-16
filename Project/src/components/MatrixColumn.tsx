@@ -1,19 +1,20 @@
 import React, { useCallback } from 'react';
 import { View, Text, TouchableOpacity, FlatList } from 'react-native';
+import MathView from 'react-native-math-view';
 import ElementDataWithPosition from '../interfaces/ElementDataWithPosition';
 import SelectedMatrixElement from '../interfaces/SelectedMatrixElement';
 import { ElementData } from '../utilities/ExpressionClasses';
 import MatrixData from '../utilities/MatrixData';
 
-const ELEMENT_HEIGHT = 40;
-const ELEMENT_VERTICAL_MARGIN = 11;
+const ELEMENT_HEIGHT = 60;
+const ELEMENT_VERTICAL_MARGIN = 5;
 
 interface FlatListDimensions {
     height: number;
     width: number;
 }
 
-interface MatrixColumnProps { 
+interface MatrixColumnProps {
     wholeMatrix: MatrixData;
     matrixColumn: Array<ElementDataWithPosition>;
     selectedMatrixElement: SelectedMatrixElement | null;
@@ -24,7 +25,7 @@ interface MatrixColumnProps {
     changeSelectedMatrixElement?(position: SelectedMatrixElement): void;
 }
 
-const MatrixColumn = ({ 
+const MatrixColumn = ({
     wholeMatrix,
     matrixColumn,
     selectedMatrixElement,
@@ -32,11 +33,11 @@ const MatrixColumn = ({
     flatListDimensions,
     changeFlatListDimensions,
     editableOperatorNumber,
-    changeSelectedMatrixElement=() => {}
+    changeSelectedMatrixElement = () => { }
 }: MatrixColumnProps) => {
     const isElementSelected = useCallback(
-        ({ row, column }) => selectedMatrixElement 
-            && selectedMatrixElement.row === row 
+        ({ row, column }) => selectedMatrixElement
+            && selectedMatrixElement.row === row
             && selectedMatrixElement.column === column,
         [selectedMatrixElement]
     );
@@ -71,17 +72,17 @@ const MatrixColumn = ({
             // })
             return (
                 isElementSelected({ row, column })
-                && editableOperatorNumber 
+                    && editableOperatorNumber
                     ? editableOperatorNumber
                     : number
-            )?.commaStringify(isElementSelected({ row, column }));
+            )?.latexStringify(isElementSelected({ row, column }));
         }, [editableOperatorNumber, isElementSelected]
     );
 
     return (
         <FlatList
             style={{
-                transform:[{rotateX:'180deg'}],
+                transform: [{ rotateX: '180deg' }],
             }}
             scrollEnabled={false}
             key={JSON.stringify(wholeMatrix.dimensions())}
@@ -99,7 +100,7 @@ const MatrixColumn = ({
                     <TouchableOpacity
                         style={{
                             alignSelf: 'stretch',
-                            transform:[{rotateY:'180deg'},{rotateX:'180deg'}],
+                            transform: [{ rotateY: '180deg' }, { rotateX: '180deg' }],
                         }}
                         onPress={
                             () => {
@@ -115,7 +116,7 @@ const MatrixColumn = ({
                                 ...(getElementStyle(row, column)),
                                 marginVertical: ELEMENT_VERTICAL_MARGIN,
                                 paddingVertical: 5,
-                                paddingHorizontal: 20,
+                                paddingHorizontal: 10,
                                 borderRadius: 10,
                                 alignItems: 'center',
                                 justifyContent: 'center',
@@ -124,15 +125,20 @@ const MatrixColumn = ({
                                 marginHorizontal: 5,
                             }}
                         >
-                            <Text
+                            <MathView
                                 style={{
-                                    color: '#fff',
-                                    fontSize: 26,
-                                    textAlign: 'center',
+                                    color: 'white',
+                                    flex: 1
                                 }}
-                            >
-                                {formatElement(item)}
-                            </Text>
+                                config={{ ex: 16 }}
+                                math={
+                                    formatElement({
+                                        number,
+                                        row,
+                                        column
+                                    })
+                                }
+                            />
                         </View>
                     </TouchableOpacity>
                 );

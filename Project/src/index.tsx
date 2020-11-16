@@ -5,7 +5,7 @@ import { OrientionProvider } from './hooks/useOrientation';
 import { CalculatorProvider } from './hooks/useCalculator';
 
 // Descomente para testar o modo de produção (gera um erro, mas funciona):
-// __DEV__ = false;
+__DEV__ = false;
 
 // Impedir que os console.logs rodem na produção   
 if (!__DEV__) console.log = () => {};

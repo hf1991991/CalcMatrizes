@@ -1,11 +1,14 @@
-import { 
-    smartToFixed, 
-    findFraction, 
-    Operator, 
-    parenthesisEnglobe, 
-    indentExpression, 
-    indentText, 
-    toFixedWithThreeDots
+import {
+    smartToFixed,
+    findFraction,
+    Operator,
+    parenthesisEnglobe,
+    indentExpression,
+    indentText,
+    toFixedWithThreeDots,
+    unicodeDiagonalFraction,
+    latexFraction,
+    latexVariables
 } from "./constants";
 import ScalarOperations from "./ScalarOperations";
 
@@ -107,13 +110,88 @@ export class ExpressionData {
                 )
                 : (
                     this.operator + '('
-                    + this.elements.map(elem => elem.stringify()).join(';') 
+                    + this.elements.map(elem => elem.stringify()).join(';')
                     + ')'
                 );
     }
 
     indentStringify(): string {
         return '\n' + this.stringify(0, 3).substring(3) + '\n';
+    }
+
+    latexStringify(dontFindFraction: boolean = false, operator?: Operator): string {
+        switch (operator || this.operator) {
+            case Operator.Elevate:
+                const base = this.elements[0].latexStringify(dontFindFraction);
+                const exponent = this.elements[1].latexStringify(dontFindFraction);
+                return `(${parenthesisEnglobe(base)
+                    ? base.substring(1, base.length - 1)
+                    : base
+                    })^{${exponent}}`;
+            case Operator.Divide:
+                return `\\frac{${this.elements[0].latexStringify(dontFindFraction)}}{${this.elements[1].latexStringify(dontFindFraction)}}`;
+            case Operator.Multiply:
+
+                const [
+                    multipliers,
+                    divisions
+                ] = this.elements.reduce(
+                    (expressionsAccumulator, expression) => {
+                        let [
+                            multipliers,
+                            divisions
+                        ] = expressionsAccumulator;
+                        if (
+                            expression.operator === Operator.Elevate
+                        ) {
+                            const [base, exponent] = expression.elements;
+
+                            if ((exponent.oneElement?.scalar || 0) === -1)
+                                divisions.push(base);
+                            else
+                                multipliers.push(expression)
+                        }
+                        else
+                            multipliers.push(expression);
+
+                        return expressionsAccumulator
+                    },
+                    [
+                        [] as ExpressionData[],
+                        [] as ExpressionData[],
+                    ]
+                );
+
+                const multipliersString = '{'
+                    + multipliers.map(
+                        expression => expression.latexStringify(dontFindFraction)
+                    ).join('}\\times{')
+                    + '}';
+
+                const divisionsString = '{'
+                    + divisions.map(
+                        expression => expression.latexStringify(dontFindFraction)
+                    ).join('}\\times{')
+                    + '}';
+
+                if (divisionsString.length > 0)
+                    return '\\frac{'
+                        + multipliersString
+                        + '}{'
+                        + divisionsString
+                        + '}';
+                
+                return multipliersString;
+            case Operator.Add:
+                const terms = this.elements.map(a => a.latexStringify(dontFindFraction)).map(a => a.startsWith('-') ? a : '+' + a).join('');
+                return `${terms.startsWith('+') ? terms.substring(1, terms.length) : terms}`;
+            case Operator.Subtract:
+                return `(${this.elements[0].latexStringify(dontFindFraction)}-${this.elements[1].latexStringify(dontFindFraction)})`;
+            case Operator.None:
+                if (!(this.oneElement instanceof ElementData))
+                    throw `${this}.oneElement is not ElementData`;
+                return this.oneElement.latexStringify(dontFindFraction);
+        }
     }
 
 }
@@ -186,23 +264,45 @@ export class ElementData {
         return this.stringify(0, dontFindFraction).replace('.', ',');
     }
 
+    latexStringify(dontFindFraction: boolean = false) {
+
+        if (!!this.unfilteredString) return this.unfilteredString;
+
+        const frac = latexFraction(...findFraction(this.scalar));
+
+        const maybeFindScalar = () => dontFindFraction
+            ? toFixedWithThreeDots(this.scalar)
+            : frac;
+
+        const formatScalar =
+            () => this.variables.length === 0
+                ? maybeFindScalar()
+                : this.scalar === -1
+                    ? '-'
+                    : this.scalar === 1
+                        ? ''
+                        : maybeFindScalar();
+
+        return formatScalar() + this.stringifyVariables();
+    }
+
     stringify(indent: number = 0, dontFindFraction: boolean = false) {
 
         if (!!this.unfilteredString) return this.unfilteredString;
 
         const maybeFindScalar = () => dontFindFraction
             ? toFixedWithThreeDots(this.scalar)
-            : findFraction(this.scalar);
+            : unicodeDiagonalFraction(...findFraction(this.scalar));
 
         const formatScalar =
             () => this.variables.length === 0
-                    ? maybeFindScalar()
-                    : this.scalar === -1 
-                        ? '-'
-                        : this.scalar === 1
-                            ? ''
-                            : maybeFindScalar();
-        
+                ? maybeFindScalar()
+                : this.scalar === -1
+                    ? '-'
+                    : this.scalar === 1
+                        ? ''
+                        : maybeFindScalar();
+
         return indentText(
             [formatScalar() + this.stringifyVariables()],
             indent
@@ -210,15 +310,7 @@ export class ElementData {
     }
 
     stringifyVariables() {
-        const formatExponent =
-            (exponent: number) => exponent === 1
-                ? ''
-                : ScalarOperations.superscript(findFraction(exponent))
-        const formatVariables =
-            () => this.variables.map(
-                vari => `${vari.variable}${formatExponent(vari.exponent)}`
-            )
-        return formatVariables().join('');
+        return latexVariables(this.variables);
     }
 
 }

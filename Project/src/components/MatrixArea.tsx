@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { View, Text, ScrollView } from 'react-native';
 import Matrix from './Matrix';
-import { CalcState, findFraction, toFixedOnZeroes, SystemSolutionType } from '../utilities/constants';
+import { CalcState, findFraction, toFixedOnZeroes, SystemSolutionType, unicodeDiagonalFraction } from '../utilities/constants';
 import ArrowButtonsArea from './ArrowButtonsArea';
 import FullEquation from './FullEquation';
 import ScalarOperations from '../utilities/ScalarOperations';
@@ -41,9 +41,9 @@ const MatrixArea: React.FC = () => {
     const formatNumberToFraction = useCallback(
         (number) => {
             return number !== null
-                ? findFraction(toFixedOnZeroes(number))
+                ? unicodeDiagonalFraction(...findFraction(toFixedOnZeroes(number)))
                 : null;
-        }, [findFraction, toFixedOnZeroes]
+        }, [unicodeDiagonalFraction, findFraction, toFixedOnZeroes]
     );
 
     const formatDeterminant = useCallback(
