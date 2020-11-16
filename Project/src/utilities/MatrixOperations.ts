@@ -661,6 +661,10 @@ class MatrixOperations {
 
         let noPivotOnColumn = false;
 
+        const { rows, columns } = joinedMatrix.dimensions();
+
+        const minDimensions = Math.min(rows, columns)
+
         for (let pivotIndex = 0; pivotIndex < joinedMatrix.dimensions().rows; pivotIndex++) {
 
             const pivot = joinedMatrix.data[pivotIndex][pivotIndex];
@@ -722,8 +726,8 @@ class MatrixOperations {
 
             else
                 determinant = joinedMatrix.data
-                    [matrixA.dimensions().rows - 1]
-                    [matrixA.dimensions().columns - 1];
+                [matrixA.dimensions().rows - 1]
+                [matrixA.dimensions().columns - 1];
         }
 
         if (!noPivotOnColumn || forceReducedRowEchelonForm)
@@ -972,22 +976,28 @@ class MatrixOperations {
 
         let solutionType = SystemSolutionType.SPD;
 
+        console.log(vectorizedX.map(e => e.stringify()));
+
+        MatrixOperations.printMatrix(matrixA);
+
+        const { rows, columns } = matrixA.dimensions();
+
+        const minDimensions = Math.min(rows, columns);
+
         // Definição das variáveis independentes:
-        for (let row = 0; row < vectorizedX.length; row++) {
-            let allElementsOfRowNull = true;
+        for (let pivotIndex = 0; pivotIndex < minDimensions; pivotIndex++) {
+            let noPivotOnColumn = true;
 
-            for (let column = 0; column < matrixA.dimensions().columns; column++) {
-                if (!matrixA.data[row][column].isZero) allElementsOfRowNull = false;
-            }
+            if (!matrixA.data[pivotIndex][pivotIndex].isZero) noPivotOnColumn = false;
 
-            if (allElementsOfRowNull) {
+            if (noPivotOnColumn) {
                 solutionType = SystemSolutionType.SPI;
 
                 const variable = getLetter();
 
                 lettersUsed.push(variable);
 
-                vectorizedX[row] = createMatrixElement({
+                vectorizedX[pivotIndex] = createMatrixElement({
                     variables: [new VariableData({ variable })]
                 });
             }
