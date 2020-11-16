@@ -11,16 +11,16 @@
 		13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
+		1F5172AA1C35A3353B209660 /* libPods-calcmatrizesTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 343A6589041B3E83ED6C8B05 /* libPods-calcmatrizesTests.a */; };
 		2D02E4BC1E0B4A80006451C7 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
 		2D02E4BD1E0B4A84006451C7 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		2D02E4BF1E0B4AB3006451C7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		2DCD954D1E0B4F2C00145EB5 /* calcmatrizesTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* calcmatrizesTests.m */; };
-		44F2EC1E88EEF3C4AFD25BF7 /* libPods-calcmatrizes.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 53550048C992CD22899FD12E /* libPods-calcmatrizes.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
-		D1B7BA5051B0D9372CF5DF13 /* libPods-calcmatrizes-tvOSTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 06042B1774AB15363D36D3ED /* libPods-calcmatrizes-tvOSTests.a */; };
+		B38A6794BC827EFB82E9A2C6 /* libPods-calcmatrizes.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2B81A686C7C57BF7C73E52D1 /* libPods-calcmatrizes.a */; };
+		C97967B54D5EF78A7C3258CA /* libPods-calcmatrizes-tvOSTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0035B37479639657D3A7F89B /* libPods-calcmatrizes-tvOSTests.a */; };
 		E5213A49254CC2310011ED3B /* assets in Resources */ = {isa = PBXBuildFile; fileRef = E5213A48254CC2310011ED3B /* assets */; };
 		E5A4C7EB2549E87F00714E81 /* main.jsbundle in Resources */ = {isa = PBXBuildFile; fileRef = 008F07F21AC5B25A0029DE68 /* main.jsbundle */; };
-		EA7948CC57D90EBC96EBB029 /* libPods-calcmatrizesTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 62E5D76E9473F23FB4B86FE0 /* libPods-calcmatrizesTests.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -41,22 +41,22 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0035B37479639657D3A7F89B /* libPods-calcmatrizes-tvOSTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-calcmatrizes-tvOSTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		008F07F21AC5B25A0029DE68 /* main.jsbundle */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = main.jsbundle; sourceTree = "<group>"; };
 		00E356EE1AD99517003FC87E /* calcmatrizesTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = calcmatrizesTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* calcmatrizesTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = calcmatrizesTests.m; sourceTree = "<group>"; };
-		06042B1774AB15363D36D3ED /* libPods-calcmatrizes-tvOSTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-calcmatrizes-tvOSTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07F961A680F5B00A75B9A /* CalcMatrizes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CalcMatrizes.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = calcmatrizes/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = calcmatrizes/AppDelegate.m; sourceTree = "<group>"; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = calcmatrizes/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = calcmatrizes/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = calcmatrizes/main.m; sourceTree = "<group>"; };
+		2B81A686C7C57BF7C73E52D1 /* libPods-calcmatrizes.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-calcmatrizes.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2D02E47B1E0B4A5D006451C7 /* calcmatrizes-tvOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "calcmatrizes-tvOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2D02E4901E0B4A5D006451C7 /* calcmatrizes-tvOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "calcmatrizes-tvOSTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		335AC53A1070B8A7ABE40054 /* Pods-calcmatrizes-calcmatrizesTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-calcmatrizes-calcmatrizesTests.release.xcconfig"; path = "Target Support Files/Pods-calcmatrizes-calcmatrizesTests/Pods-calcmatrizes-calcmatrizesTests.release.xcconfig"; sourceTree = "<group>"; };
-		53550048C992CD22899FD12E /* libPods-calcmatrizes.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-calcmatrizes.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		62E5D76E9473F23FB4B86FE0 /* libPods-calcmatrizesTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-calcmatrizesTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		343A6589041B3E83ED6C8B05 /* libPods-calcmatrizesTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-calcmatrizesTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6F273A4553D695ABE9C9332D /* Pods-calcmatrizesTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-calcmatrizesTests.release.xcconfig"; path = "Target Support Files/Pods-calcmatrizesTests/Pods-calcmatrizesTests.release.xcconfig"; sourceTree = "<group>"; };
 		7608A03E688A140BEB124F69 /* Pods-calcmatrizes-tvOSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-calcmatrizes-tvOSTests.release.xcconfig"; path = "Target Support Files/Pods-calcmatrizes-tvOSTests/Pods-calcmatrizes-tvOSTests.release.xcconfig"; sourceTree = "<group>"; };
 		7EF07BDD09D61573330DF547 /* Pods-calcmatrizes.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-calcmatrizes.release.xcconfig"; path = "Target Support Files/Pods-calcmatrizes/Pods-calcmatrizes.release.xcconfig"; sourceTree = "<group>"; };
@@ -75,7 +75,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EA7948CC57D90EBC96EBB029 /* libPods-calcmatrizesTests.a in Frameworks */,
+				1F5172AA1C35A3353B209660 /* libPods-calcmatrizesTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -83,7 +83,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				44F2EC1E88EEF3C4AFD25BF7 /* libPods-calcmatrizes.a in Frameworks */,
+				B38A6794BC827EFB82E9A2C6 /* libPods-calcmatrizes.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -98,7 +98,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D1B7BA5051B0D9372CF5DF13 /* libPods-calcmatrizes-tvOSTests.a in Frameworks */,
+				C97967B54D5EF78A7C3258CA /* libPods-calcmatrizes-tvOSTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -141,9 +141,9 @@
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				ED2971642150620600B7C4FE /* JavaScriptCore.framework */,
-				53550048C992CD22899FD12E /* libPods-calcmatrizes.a */,
-				06042B1774AB15363D36D3ED /* libPods-calcmatrizes-tvOSTests.a */,
-				62E5D76E9473F23FB4B86FE0 /* libPods-calcmatrizesTests.a */,
+				2B81A686C7C57BF7C73E52D1 /* libPods-calcmatrizes.a */,
+				0035B37479639657D3A7F89B /* libPods-calcmatrizes-tvOSTests.a */,
+				343A6589041B3E83ED6C8B05 /* libPods-calcmatrizesTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -229,7 +229,7 @@
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				5252123DB3187D476346220C /* [CP] Copy Pods Resources */,
+				EAEE85166F9F3AB1D53F48D4 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -414,24 +414,6 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		5252123DB3187D476346220C /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-calcmatrizes/Pods-calcmatrizes-resources.sh",
-				"${PODS_CONFIGURATION_BUILD_DIR}/React-Core/AccessibilityResources.bundle",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/AccessibilityResources.bundle",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-calcmatrizes/Pods-calcmatrizes-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 		A7BEF4431FF5097CA97C48DE /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -474,6 +456,26 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		EAEE85166F9F3AB1D53F48D4 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-calcmatrizes/Pods-calcmatrizes-resources.sh",
+				"${PODS_CONFIGURATION_BUILD_DIR}/React-Core/AccessibilityResources.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/iosMath/mathFonts.bundle",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/AccessibilityResources.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/mathFonts.bundle",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-calcmatrizes/Pods-calcmatrizes-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		FD10A7F022414F080027D42C /* Start Packager */ = {
