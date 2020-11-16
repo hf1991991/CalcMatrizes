@@ -229,7 +229,7 @@ function distributiveMultiplication(distributives: Array<ExpressionData>): Expre
     }
 
     return distributives[0];
-    
+
 }
 
 function simpleMultiplication(multipliers: Array<ElementData>): ElementData {
@@ -397,7 +397,7 @@ function symplifyDenominators(addition: Array<ExpressionData>): ExpressionData {
 
         if (!denominatorExponent.oneElement)
             throw 'denominatorExponent should be oneElement';
-        
+
         const exponent = denominatorExponent.oneElement.scalar;
 
         // console.log({
@@ -408,7 +408,7 @@ function symplifyDenominators(addition: Array<ExpressionData>): ExpressionData {
 
         if (denominatorBase.elements.length !== 2)
             throw 'erro de preguiça do programador: programa só funciona com denominador de duas variáveis';
-        
+
         const [baseExpression1, baseExpression2] = denominatorBase.elements;
 
         if (!baseExpression1.oneElement || !baseExpression2.oneElement)
@@ -564,8 +564,67 @@ function symplifyDenominators(addition: Array<ExpressionData>): ExpressionData {
 
     }
 
+
+    enum CombinationMarkerTypes {
+        Selected,
+        Discarted,
+        Null
+    }
+
+    interface CombinationMarker {
+        type: CombinationMarkerTypes;
+    }
+
+    function additionsCombination(addition: ExpressionData[]) {
+        console.log({len: addition.length})
+        const initialMarkers = addition.map(_ => (
+            { type: CombinationMarkerTypes.Null } as CombinationMarker
+        ));
+
+        const markersCombinations = recursiveAdditionsCombination([ initialMarkers ]);
+
+        console.log('INICIO COMBINATIONS')
+        markersCombinations.map(markers => console.log(markers));
+        console.log('FIM COMBINATIONS')
+    }
+
+    function recursiveAdditionsCombination(markersCombinations: CombinationMarker[][]): CombinationMarker[][] {
+
+        let newMarkersCombinations: CombinationMarker[][] = [];
+
+        let noNullMarkers = false;
+
+        for (const markers of markersCombinations) {
+            let markersCopy = [...markers].map(marker => ({...marker}));
+
+            const nullMarker = markersCopy.find(marker => marker.type === CombinationMarkerTypes.Null);
+
+            if (nullMarker) {
+                noNullMarkers = true;
+
+                nullMarker.type = CombinationMarkerTypes.Selected;
+                const selectedVariations = recursiveAdditionsCombination([ markersCopy ]);
+
+                nullMarker.type = CombinationMarkerTypes.Discarted;
+                const discartedVariations = recursiveAdditionsCombination([ markersCopy ]);
+
+                newMarkersCombinations = { 
+                    ...newMarkersCombinations, 
+                    ...selectedVariations,
+                    ...discartedVariations
+                };
+            }
+        }
+
+        return noNullMarkers 
+            ? markersCombinations
+            : newMarkersCombinations;
+    }
+
     let newElements: Array<ExpressionData> = [];
     let addedIndexes: Array<number> = [];
+
+    additionsCombination(addition);
 
     // console.log('STARTING SYMPLIFYDENOMINATORS')
     // console.log(JSON.stringify({
@@ -628,13 +687,13 @@ function symplifyDenominators(addition: Array<ExpressionData>): ExpressionData {
         [
             [] as Array<ElementData>,
             [] as Array<ExpressionData>
-        ] 
+        ]
     )
 
     newOneElements = addNumbersWithSameVariables(newOneElements);
 
     const expressionNewOneElements = newOneElements.map(
-        elem => new ExpressionData({ 
+        elem => new ExpressionData({
             oneElement: new ElementData(elem)
         })
     ).filter(e => !e.isZero);
@@ -647,12 +706,12 @@ function symplifyDenominators(addition: Array<ExpressionData>): ExpressionData {
     const result = new ExpressionData({
         operator: Operator.Add,
         elements: [
-            ...expressionNewOneElements, 
+            ...expressionNewOneElements,
             ...expressionDatas
         ],
         isSimplified: true
     });
-    console.log({result: result.stringify()});
+    console.log({ result: result.stringify() });
     return result;
 
 }
@@ -849,7 +908,7 @@ export function doOperation(expression: ExpressionData): ExpressionData {
 
                 if (distributivesCopyData.index !== -1) {
 
-                    console.log({exponent, distributivesCopyData})
+                    console.log({ exponent, distributivesCopyData })
 
                     const multiplier = new ElementData({
                         scalar: (
@@ -865,7 +924,7 @@ export function doOperation(expression: ExpressionData): ExpressionData {
                         distributives.splice(distributivesCopyData.index)[0]
                     ).normalizedAddition
 
-                    console.log({normalizedDistributive: normalizedDistributive.stringify()})
+                    console.log({ normalizedDistributive: normalizedDistributive.stringify() })
 
                     const normalizedMultipliedBase = doOperation(
                         new ExpressionData({
@@ -883,7 +942,7 @@ export function doOperation(expression: ExpressionData): ExpressionData {
 
                     let newElement = normalizedMultipliedBase;
 
-                    console.log({multiplier: multiplier.stringify()})
+                    console.log({ multiplier: multiplier.stringify() })
 
                     if (multiplier.scalar === 1) {
 
@@ -1130,30 +1189,30 @@ export function doOperation(expression: ExpressionData): ExpressionData {
                     oneElementsMultiplicationResult,
                     simplifiedDistributives.oneElement
                 ]);
-    
+
                 if (simplifiedElevations.length === 0) {
                     // console.log(7)
                     return new ExpressionData({
                         oneElement: oneElementsMultiplicationResult
                     });
                 }
-    
+
                 if (oneElementsMultiplicationResult.stringify() === '1') {
-    
+
                     if (simplifiedElevations.length === 1) {
                         // console.log(8)
                         return simplifiedElevations[0];
                     }
-    
+
                     // console.log(9)
                     return new ExpressionData({
                         operator: Operator.Multiply,
                         elements: simplifiedElevations,
                         isSimplified: true
                     })
-    
+
                 }
-    
+
                 // console.log(10)
                 return new ExpressionData({
                     operator: Operator.Multiply,
@@ -1300,7 +1359,7 @@ function simplifyExpressionAlgorithm(expression: ExpressionData) {
         for (let element of expression.elements) {
             element = simplifyExpressionAlgorithm(element);
         }
-        
+
         // Após isso, realiza a operação:
         expression = doOperation(expression);
 
