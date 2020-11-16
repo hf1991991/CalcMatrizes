@@ -981,12 +981,12 @@ class MatrixOperations {
         const minDimensions = Math.min(rows, columns);
 
         // Definição das variáveis independentes:
-        for (let pivotIndex = 0; pivotIndex < minDimensions; pivotIndex++) {
-            let noPivotOnColumn = true;
+        for (let pivotIndex = 0; pivotIndex < vectorizedX.length; pivotIndex++) {
+            
+            const foundIndependentVariable = pivotIndex >= minDimensions
+                || matrixA.data[pivotIndex][pivotIndex].isZero;
 
-            if (!matrixA.data[pivotIndex][pivotIndex].isZero) noPivotOnColumn = false;
-
-            if (noPivotOnColumn) {
+            if (foundIndependentVariable) {
                 solutionType = SystemSolutionType.SPI;
 
                 const variable = getLetter();
