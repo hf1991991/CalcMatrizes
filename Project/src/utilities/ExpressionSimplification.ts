@@ -287,90 +287,303 @@ function addNumbersWithSameVariables(adders: Array<ElementData>) {
 
 }
 
-function symplifyDenominators(addition: Array<ExpressionData>): ExpressionData {
+function separateNumeratorsAndDenominators(elem: ExpressionData) {
 
-    function separateNumeratorsAndDenominators(elem: ExpressionData) {
+    let numerator: ExpressionData | null = null;
+    let denominators: Array<ExpressionData> = [];
 
-        let numerator: ExpressionData | null = null;
-        let denominators: Array<ExpressionData> = [];
-
-        if (elem.operator !== Operator.Multiply)
-            return {
-                numerator: elem,
-                denominators: [] as Array<ExpressionData>
-            };
-
-        for (let e of elem.elements) {
-            // console.log(JSON.stringify({e}))
-            if (e.operator === Operator.Elevate) {
-                const exponentElement = e.elements[1];
-
-                if (!exponentElement.oneElement)
-                    throw 'exponentElement should be oneElement'
-
-                if (exponentElement.oneElement.scalar < 0)
-                    denominators.push(e);
-            }
-            else {
-                if (numerator !== null)
-                    throw 'elem should be a multiplication of an expression and an elevation expression: ' + elem.stringify();
-
-                numerator = e;
-            }
-        }
-
+    if (elem.operator !== Operator.Multiply)
         return {
-            numerator: numerator as ExpressionData,
-            denominators
+            numerator: elem,
+            denominators: [] as Array<ExpressionData>
         };
 
+    for (let e of elem.elements) {
+        // console.log(JSON.stringify({e}))
+        if (e.operator === Operator.Elevate) {
+            const exponentElement = e.elements[1];
+
+            if (!exponentElement.oneElement)
+                throw 'exponentElement should be oneElement'
+
+            if (exponentElement.oneElement.scalar < 0)
+                denominators.push(e);
+        }
+        else {
+            if (numerator !== null)
+                throw 'elem should be a multiplication of an expression and an elevation expression: ' + elem.stringify();
+
+            numerator = e;
+        }
     }
 
-    function denominatorsMatch(denominatorsList: ExpressionData[][]) {
+    return {
+        numerator: numerator as ExpressionData,
+        denominators
+    };
 
-        const [first, ...rest] = denominatorsList;
+}
 
-        console.log({
-            restLen: rest.length,
-            len: denominatorsList.length
-        })
+function denominatorsMatch(denominatorsList: ExpressionData[][]) {
 
-        console.log({
-            first,
-            rest
-        });
+    const [first, ...rest] = denominatorsList;
 
-        // denominator1 e denominator2 são Elevations:
-        for (const denominator1 of first) {
+    console.log({
+        restLen: rest.length,
+        len: denominatorsList.length
+    })
 
-            const [base1, exponent1] = denominator1.elements;
+    console.log({
+        first,
+        rest
+    });
 
-            for (const second of rest) {
+    // denominator1 e denominator2 são Elevations:
+    for (const denominator1 of first) {
 
-                let match = false;
+        const [base1, exponent1] = denominator1.elements;
 
-                for (const denominator2 of second) {
+        for (const second of rest) {
 
-                    const [base2, exponent2] = denominator2.elements;
+            let match = false;
 
-                    if (!exponent1.oneElement || !exponent2.oneElement)
-                        throw 'exponent1 and exponent2 should be oneElements';
+            for (const denominator2 of second) {
 
-                    if (
-                        additionMatches(base1, base2)
-                        && exponent1.oneElement.scalar === exponent2.oneElement.scalar
-                    ) match = true;
+                const [base2, exponent2] = denominator2.elements;
+
+                if (!exponent1.oneElement || !exponent2.oneElement)
+                    throw 'exponent1 and exponent2 should be oneElements';
+
+                if (
+                    additionMatches(base1, base2)
+                    && exponent1.oneElement.scalar === exponent2.oneElement.scalar
+                ) match = true;
+            }
+
+            if (!match) return false;
+
+        }
+
+    }
+
+    return true;
+
+}
+
+enum CombinationMarkerTypes {
+    Selected = 'Selected',
+    Discarted = 'Discarted',
+    Null = 'Null'
+}
+
+interface CombinationMarker {
+    type: CombinationMarkerTypes;
+}
+
+function getAdditionsCombination(number: number) {
+
+    function copyMarkers(markers: CombinationMarker[]) {
+        return [...markers].map(marker => ({ ...marker }));
+    }
+
+    function recursiveAdditionsCombination(markersCombinations: CombinationMarker[][]) {
+
+        let newMarkersCombinations: CombinationMarker[][] = [];
+
+        let noNullMarkers = true;
+
+        for (const markers of markersCombinations) {
+            let markersCopy = copyMarkers(markers);
+
+            const nullMarker = markersCopy.find(marker => marker.type === CombinationMarkerTypes.Null);
+
+            if (nullMarker) {
+                noNullMarkers = false;
+
+                nullMarker.type = CombinationMarkerTypes.Selected;
+                const selectedVariations = recursiveAdditionsCombination([copyMarkers(markersCopy)]);
+
+                nullMarker.type = CombinationMarkerTypes.Discarted;
+                const discartedVariations = recursiveAdditionsCombination([copyMarkers(markersCopy)]);
+
+                newMarkersCombinations = [
+                    ...newMarkersCombinations,
+                    ...selectedVariations,
+                    ...discartedVariations
+                ];
+            }
+        }
+
+        return noNullMarkers
+            ? markersCombinations
+            : newMarkersCombinations;
+    }
+
+    const initialMarkers = Array(number).join().split(',').map(_ => (
+        { type: CombinationMarkerTypes.Null } as CombinationMarker
+    ));
+
+    const markersCombinations = recursiveAdditionsCombination([initialMarkers]);
+
+    const allSelectedMarkersCombinations = markersCombinations.filter(
+        m => m.filter(c => c.type === CombinationMarkerTypes.Selected).length > 1
+    )
+
+    return allSelectedMarkersCombinations;
+}
+
+function addFractionsWithSameDenominator(fractions: ExpressionData[]) {
+
+    let newElements: Array<ExpressionData> = [];
+    let addedIndexes: Array<number> = [];
+
+    const additionsCombination = getAdditionsCombination(fractions.length);
+
+    for (const marker of additionsCombination) {
+
+        const additionList = fractions.filter(
+            (_, index) => marker[index].type === CombinationMarkerTypes.Selected
+        );
+
+        const currentIndexes = marker.reduce(
+            (indexesAccumulator, c, index) => {
+                c.type === CombinationMarkerTypes.Selected && indexesAccumulator.push(index);
+                return indexesAccumulator;
+            },
+            [] as number[]
+        );
+
+        const someIndexAlreadyAdded = currentIndexes.some(
+            i => addedIndexes.some(index => index === i)
+        );
+
+        if (!someIndexAlreadyAdded) {
+
+            console.log({
+                fractions: fractions.map(a => a.stringify()),
+                additionList: additionList.map(a => a.stringify()),
+                marker
+            })
+
+            const fractionsList = additionList.map(
+                expression => separateNumeratorsAndDenominators(expression)
+            );
+
+            const denominators = fractionsList.map(e => e.denominators);
+
+            const someDenominatorLengthZero = denominators.some(d => d.length === 0);
+
+            if (
+                denominatorsMatch(denominators)
+                && !someDenominatorLengthZero
+            ) {
+
+                const [commonDenominator] = denominators;
+
+                const numeratorList = fractionsList.map(f => f.numerator);
+
+                console.log({
+                    commonDenominator: commonDenominator.map(e => e.stringify()),
+                    numeratorList: numeratorList.map(n => n.stringify())
+                })
+
+                if (commonDenominator.length > 1)
+                    throw 'preguiça do desenvolvedor: commonDenominator muito longo: ' + commonDenominator;
+
+                const numeratorAddition = doOperation(
+                    new ExpressionData({
+                        operator: Operator.Add,
+                        elements: numeratorList
+                    })
+                );
+
+                currentIndexes.forEach(
+                    index => addedIndexes.push(index)
+                );
+
+                if (!numeratorAddition.isZero) {
+
+                    const rejoinedFraction = new ExpressionData({
+                        operator: Operator.Multiply,
+                        elements: [
+                            numeratorAddition,
+                            ...commonDenominator
+                        ]
+                    });
+
+                    newElements.push(rejoinedFraction);
+                    
                 }
-
-                if (!match) return false;
 
             }
 
         }
 
-        return true;
-
     }
+
+    for (let index = 0; index < fractions.length; index++) {
+        if (!addedIndexes.includes(index))
+            newElements.push(fractions[index]);
+    }
+
+    let [
+        newOneElements,
+        expressionDatas
+    ] = newElements.reduce(
+        (separationAccumulator, expression) => {
+            let [
+                newOneElements,
+                expressionDatas
+            ] = separationAccumulator;
+
+            if (!expression.oneElement)
+                expressionDatas.push(expression);
+            else
+                newOneElements.push(expression.oneElement);
+
+            return separationAccumulator;
+        },
+        [
+            [] as Array<ElementData>,
+            [] as Array<ExpressionData>
+        ]
+    )
+
+    newOneElements = addNumbersWithSameVariables(newOneElements);
+
+    const expressionNewOneElements = newOneElements.map(
+        elem => new ExpressionData({
+            oneElement: new ElementData(elem)
+        })
+    ).filter(e => !e.isZero);
+
+    // console.log('ENDED SYMPLIFYDENOMINATORS')
+    // console.log(JSON.stringify({
+    //     newElements: newElements.map(a => a.stringify())
+    // }));
+
+    if (expressionNewOneElements.length === 0 && expressionDatas.length === 0)
+        return createMatrixElement({ scalar: 0 });
+
+    if (expressionNewOneElements.length === 0 && expressionDatas.length === 1)
+        return expressionDatas[0];
+
+    if (expressionNewOneElements.length === 1 && expressionDatas.length === 0)
+        return expressionNewOneElements[0];
+
+    const result = new ExpressionData({
+        operator: Operator.Add,
+        elements: [
+            ...expressionNewOneElements,
+            ...expressionDatas
+        ],
+        isSimplified: true
+    });
+    console.log({ resultFractions: result.stringify() });
+    return result;
+}
+
+function symplifyDenominators(addition: Array<ExpressionData>): ExpressionData {
 
     function inverseDistributive(numeratorList: ExpressionData[], denominator: ExpressionData): ExpressionData | null {
 
@@ -676,68 +889,6 @@ function symplifyDenominators(addition: Array<ExpressionData>): ExpressionData {
 
     }
 
-    enum CombinationMarkerTypes {
-        Selected = 'Selected',
-        Discarted = 'Discarted',
-        Null = 'Null'
-    }
-
-    interface CombinationMarker {
-        type: CombinationMarkerTypes;
-    }
-
-    function getAdditionsCombination(number: number) {
-
-        function copyMarkers(markers: CombinationMarker[]) {
-            return [...markers].map(marker => ({ ...marker }));
-        }
-
-        function recursiveAdditionsCombination(markersCombinations: CombinationMarker[][]) {
-
-            let newMarkersCombinations: CombinationMarker[][] = [];
-
-            let noNullMarkers = true;
-
-            for (const markers of markersCombinations) {
-                let markersCopy = copyMarkers(markers);
-
-                const nullMarker = markersCopy.find(marker => marker.type === CombinationMarkerTypes.Null);
-
-                if (nullMarker) {
-                    noNullMarkers = false;
-
-                    nullMarker.type = CombinationMarkerTypes.Selected;
-                    const selectedVariations = recursiveAdditionsCombination([copyMarkers(markersCopy)]);
-
-                    nullMarker.type = CombinationMarkerTypes.Discarted;
-                    const discartedVariations = recursiveAdditionsCombination([copyMarkers(markersCopy)]);
-
-                    newMarkersCombinations = [
-                        ...newMarkersCombinations,
-                        ...selectedVariations,
-                        ...discartedVariations
-                    ];
-                }
-            }
-
-            return noNullMarkers
-                ? markersCombinations
-                : newMarkersCombinations;
-        }
-
-        const initialMarkers = Array(number).join().split(',').map(_ => (
-            { type: CombinationMarkerTypes.Null } as CombinationMarker
-        ));
-
-        const markersCombinations = recursiveAdditionsCombination([initialMarkers]);
-
-        const allSelectedMarkersCombinations = markersCombinations.filter(
-            m => m.filter(c => c.type === CombinationMarkerTypes.Selected).length > 1
-        )
-
-        return allSelectedMarkersCombinations;
-    }
-
     let newElements: Array<ExpressionData> = [];
     let addedIndexes: Array<number> = [];
 
@@ -836,7 +987,7 @@ function symplifyDenominators(addition: Array<ExpressionData>): ExpressionData {
                 expressionDatas.push(expression);
             else
                 newOneElements.push(expression.oneElement);
-            
+
             return separationAccumulator;
         },
         [
@@ -1169,7 +1320,7 @@ export function doOperation(expression: ExpressionData): ExpressionData {
                     ] = simplifiedElevations.splice(elevationsCopyData.index)[0].elements;
 
                     const otherExponent = (exponentExpression.oneElement as ElementData).scalar;
-                    
+
                     if (multiplier.scalar !== 1)
                         throw 'Erro de preguiça de programador: sameBase deveria ser multiplicado por multiplier'
 
@@ -1485,9 +1636,23 @@ export function doOperation(expression: ExpressionData): ExpressionData {
                 ...expressionAdders,
                 ...notAdders
             ];
-            
-            if (someDenominator)
-                return symplifyDenominators(finalAdditionExpressions);
+
+            if (someDenominator) {
+                let simplifiedAdditions = symplifyDenominators(finalAdditionExpressions);
+
+                if (simplifiedAdditions.operator === Operator.Add) {
+
+                    const fractions = simplifiedAdditions.elements.filter(
+                        e => separateNumeratorsAndDenominators(e).denominators.length > 0
+                    );
+
+                    simplifiedAdditions = addFractionsWithSameDenominator(fractions);
+
+                }
+
+                return simplifiedAdditions;
+
+            }
 
             else
                 return new ExpressionData({
