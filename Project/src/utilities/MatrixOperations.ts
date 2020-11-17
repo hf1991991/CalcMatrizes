@@ -397,6 +397,8 @@ class MatrixOperations {
                 MatrixOperations.bareissAlgorithm(
                     matrix,
                     MatrixOperations.identity(matrix.dimensions().rows),
+                    false,
+                    true
                 ).determinant
             ),
             'determinant'
@@ -626,7 +628,7 @@ class MatrixOperations {
         }
     }
 
-    static bareissAlgorithm(matrixA: MatrixData, matrixB: MatrixData, forceReducedRowEchelonForm: boolean = false) {
+    static bareissAlgorithm(matrixA: MatrixData, matrixB: MatrixData, forceReducedRowEchelonForm: boolean = false, exitOnDeterminantFound: boolean = false) {
 
         let joinedMatrix = MatrixOperations.joinMatrixRows(matrixA, matrixB);
 
@@ -660,6 +662,7 @@ class MatrixOperations {
         console.log('INICIO BAREISS')
 
         let noPivotOnColumn = false;
+        let determinant: ExpressionData | null = null;
 
         const { rows, columns } = joinedMatrix.dimensions();
 
@@ -716,20 +719,33 @@ class MatrixOperations {
 
             }
 
-        }
+            if (pivotIndex === joinedMatrix.dimensions().rows - 1) {
+        
+                if (MatrixOperations.isMatrixSquare(matrixA)) {
+                    if (noPivotOnColumn)
+                        determinant = createMatrixElement({
+                            scalar: 0
+                        });
+        
+                    else
+                        determinant = joinedMatrix.data
+                            [matrixA.dimensions().rows - 1]
+                            [matrixA.dimensions().columns - 1];
+                }
 
-        let determinant: ExpressionData | null = null;
+                console.log('BAREISS DETERMINANT')
 
-        if (MatrixOperations.isMatrixSquare(matrixA)) {
-            if (noPivotOnColumn)
-                determinant = createMatrixElement({
-                    scalar: 0
-                });
+                console.log({ determinant: determinant?.stringify() });
 
-            else
-                determinant = joinedMatrix.data
-                [matrixA.dimensions().rows - 1]
-                [matrixA.dimensions().columns - 1];
+                if (exitOnDeterminantFound) 
+                    return {
+                        matrixA,
+                        matrixB,
+                        determinant
+                    };
+            
+            }
+
         }
 
         if (!noPivotOnColumn || forceReducedRowEchelonForm)
