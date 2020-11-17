@@ -824,18 +824,30 @@ function symplifyDenominators(addition: Array<ExpressionData>): ExpressionData {
             // poder ser simplificada da maneira N/D = (a + b)D/D = a + b.
             // Em contraste, as linhas anteriores verificavam apenas o caso N/D = aD/D = a.
             else if (newNumerator.elements.length > denominatorBase.elements.length) {
-                const secondCommon = varOperation(
-                    varOperation(
-                        createMatrixElement(commonElement),
-                        Operator.Multiply,
-                        varOperation(
-                            newNumerator,
-                            Operator.Subtract,
+                const secondCommon = doOperation(
+                    new ExpressionData({
+                        operator: Operator.Divide,
+                        elements: [
+                            doOperation(
+                                new ExpressionData({
+                                    operator: Operator.Multiply,
+                                    elements: [
+                                        createMatrixElement(commonElement),
+                                        doOperation(
+                                            new ExpressionData({
+                                                operator: Operator.Subtract,
+                                                elements: [
+                                                    newNumerator,
+                                                    denominatorBase
+                                                ]
+                                            })
+                                        )
+                                    ]
+                                })
+                            ),
                             denominatorBase
-                        )
-                    ),
-                    Operator.Divide,
-                    denominatorBase
+                        ]
+                    })
                 );
 
                 if (secondCommon.oneElement) {
