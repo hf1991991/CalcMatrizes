@@ -1040,6 +1040,42 @@ function symplifyDenominators(addition: Array<ExpressionData>): ExpressionData {
 
 }
 
+export function onlyJoinFractions(expression: ExpressionData) {
+
+    const fractions = expression.elements.filter(
+        e => separateNumeratorsAndDenominators(e).denominators.length > 0
+    );
+
+    const nonFractions = expression.elements.filter(
+        e => separateNumeratorsAndDenominators(e).denominators.length > 0
+    );
+
+    const simplifiedFractions = addFractionsWithSameDenominator(fractions);
+
+    if (simplifiedFractions.operator === Operator.Add)
+        return new ExpressionData({
+            operator: Operator.Add,
+            elements: [
+                ...simplifiedFractions.elements,
+                ...nonFractions
+            ]
+        });
+    
+    else {
+        if (nonFractions.length === 0)
+            return simplifiedFractions;
+        
+        else
+            return new ExpressionData({
+                operator: Operator.Add,
+                elements: [
+                    simplifiedFractions,
+                    ...nonFractions
+                ]
+            });
+    }
+}
+
 export function doOperation(expression: ExpressionData): ExpressionData {
 
     let element = null;
@@ -1666,44 +1702,20 @@ export function doOperation(expression: ExpressionData): ExpressionData {
             ];
 
             if (someDenominator) {
-                let simplifiedAdditions = symplifyDenominators(finalAdditionExpressions);
 
-                if (simplifiedAdditions.operator === Operator.Add) {
+                const initialJoinedFractions = onlyJoinFractions(
+                    new ExpressionData({
+                        operator: Operator.Add,
+                        elements: finalAdditionExpressions
+                    })
+                );
 
-                    const fractions = simplifiedAdditions.elements.filter(
-                        e => separateNumeratorsAndDenominators(e).denominators.length > 0
-                    );
+                const simplifiedAdditions = symplifyDenominators(
+                    initialJoinedFractions.elements
+                );
 
-                    const nonFractions = simplifiedAdditions.elements.filter(
-                        e => separateNumeratorsAndDenominators(e).denominators.length > 0
-                    );
-
-                    const simplifiedFractions = addFractionsWithSameDenominator(fractions);
-
-                    if (simplifiedFractions.operator === Operator.Add)
-                        return new ExpressionData({
-                            operator: Operator.Add,
-                            elements: [
-                                ...simplifiedFractions.elements,
-                                ...nonFractions
-                            ]
-                        });
-                    
-                    else {
-                        if (nonFractions.length === 0)
-                            return simplifiedFractions;
-                        
-                        else
-                            return new ExpressionData({
-                                operator: Operator.Add,
-                                elements: [
-                                    simplifiedFractions,
-                                    ...nonFractions
-                                ]
-                            });
-                    }
-
-                }
+                if (simplifiedAdditions.operator === Operator.Add)
+                    return onlyJoinFractions(simplifiedAdditions);
 
                 return simplifiedAdditions;
 
