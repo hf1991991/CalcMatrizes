@@ -1674,7 +1674,34 @@ export function doOperation(expression: ExpressionData): ExpressionData {
                         e => separateNumeratorsAndDenominators(e).denominators.length > 0
                     );
 
-                    simplifiedAdditions = addFractionsWithSameDenominator(fractions);
+                    const nonFractions = simplifiedAdditions.elements.filter(
+                        e => separateNumeratorsAndDenominators(e).denominators.length > 0
+                    );
+
+                    const simplifiedFractions = addFractionsWithSameDenominator(fractions);
+
+                    if (simplifiedFractions.operator === Operator.Add)
+                        return new ExpressionData({
+                            operator: Operator.Add,
+                            elements: [
+                                ...simplifiedFractions.elements,
+                                ...nonFractions
+                            ]
+                        });
+                    
+                    else {
+                        if (nonFractions.length === 0)
+                            return simplifiedFractions;
+                        
+                        else
+                            return new ExpressionData({
+                                operator: Operator.Add,
+                                elements: [
+                                    simplifiedFractions,
+                                    ...nonFractions
+                                ]
+                            });
+                    }
 
                 }
 
