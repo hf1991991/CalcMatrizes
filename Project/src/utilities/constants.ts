@@ -160,6 +160,11 @@ export function unicodeDiagonalFraction(numerator: number, denominator: number) 
     return `${ScalarOperations.superscript(numerator)}\u2044${ScalarOperations.subscript(denominator)} `;
 }
 
+export function normalStringFraction(numerator: number, denominator: number) {
+    if (denominator === 1) return numerator.toString();
+    return numerator + '/' + denominator;
+}
+
 export function latexFraction(numerator: number, denominator: number) {
     if (denominator === 1) return numerator.toString();
     return `\\frac{${numerator}}{${denominator}}`;

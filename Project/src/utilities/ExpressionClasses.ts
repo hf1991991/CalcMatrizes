@@ -8,7 +8,8 @@ import {
     toFixedWithThreeDots,
     unicodeDiagonalFraction,
     latexFraction,
-    latexVariables
+    latexVariables,
+    normalStringFraction
 } from "./constants";
 import ScalarOperations from "./ScalarOperations";
 
@@ -226,7 +227,7 @@ export class ElementData {
 
         this.isOne = stringified === '1';
 
-        this.hasVariables = !!stringified.match(/[a-i]/);
+        this.hasVariables = this.variables.length > 0;
 
         this.fixVariables()
     }
@@ -292,7 +293,7 @@ export class ElementData {
 
         const maybeFindScalar = () => dontFindFraction
             ? toFixedWithThreeDots(this.scalar)
-            : unicodeDiagonalFraction(...findFraction(this.scalar));
+            : normalStringFraction(...findFraction(this.scalar));
 
         const formatScalar =
             () => this.variables.length === 0

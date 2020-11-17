@@ -710,6 +710,8 @@ class MatrixOperations {
 
                 joinedMatrix = joinedMatrixCopy;
 
+                console.log('NOVO PASSO BAREISS')
+
                 MatrixOperations.printMatrix(joinedMatrix);
 
             }
