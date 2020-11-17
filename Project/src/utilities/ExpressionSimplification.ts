@@ -1042,6 +1042,8 @@ export function doOperation(expression: ExpressionData): ExpressionData {
 
             let simplifiedElevations: Array<ExpressionData> = [];
 
+            console.log({ elevations: elevations.map(e => e.stringify()) })
+
             for (let elevationExpression of elevations) {
 
                 if (elevationExpression.elements.length !== 2)
@@ -1149,6 +1151,8 @@ export function doOperation(expression: ExpressionData): ExpressionData {
 
                 if (elevationsCopyData.index !== -1) {
 
+                    console.log({ exponent, elevationsCopyData })
+
                     const multiplier = new ElementData({
                         scalar: (
                             elevationsCopyData.searchNormalizationFactor
@@ -1159,16 +1163,24 @@ export function doOperation(expression: ExpressionData): ExpressionData {
                         )
                     });
 
+                    const [
+                        sameBase,
+                        exponentExpression
+                    ] = simplifiedElevations.splice(elevationsCopyData.index)[0].elements;
+
+                    const otherExponent = (exponentExpression.oneElement as ElementData).scalar;
+                    
+                    if (multiplier.scalar !== 1)
+                        throw 'Erro de preguiça de programador: sameBase deveria ser multiplicado por multiplier'
+
                     const normalizedMultipliedBase = doOperation(
                         new ExpressionData({
                             operator: Operator.Elevate,
                             elements: [
-                                normalizeAddition(
-                                    elevations.splice(elevationsCopyData.index)[0].elements[0]
-                                ).normalizedAddition,
+                                sameBase,
                                 new ExpressionData({
                                     oneElement: new ElementData({
-                                        scalar: exponent + 1
+                                        scalar: exponent + otherExponent
                                     }),
                                 })
                             ]
@@ -1222,6 +1234,8 @@ export function doOperation(expression: ExpressionData): ExpressionData {
                     simplifiedElevations.push(elevationExpression);
 
             }
+
+            console.log({ simplifiedElevations: simplifiedElevations.map(e => e.stringify()) })
 
             if (distributives.length === 0) {
 
