@@ -1194,6 +1194,8 @@ export function doOperation(expression: ExpressionData): ExpressionData {
             let simplifiedElevations: Array<ExpressionData> = [];
 
             console.log({ elevations: elevations.map(e => e.stringify()) })
+            console.log({ distributives: distributives.map(e => e.stringify()) })
+            console.log({ oneElementsMultiplicationResult: oneElementsMultiplicationResult.stringify() })
 
             for (let elevationExpression of elevations) {
 
@@ -1436,7 +1438,7 @@ export function doOperation(expression: ExpressionData): ExpressionData {
                 let finalResult: Array<ExpressionData> = []
                 for (let distr of simplifiedDistributives.elements) {
 
-                    // console.log('ENTERING MULT MULTIPLICATION SUB-LOOP')
+                    console.log('ENTERING MULT MULTIPLICATION SUB-LOOP')
                     // console.log({
                     //     multipliersResult: multipliersResult.stringify(),
                     //     distr: distr.stringify()
@@ -1455,10 +1457,10 @@ export function doOperation(expression: ExpressionData): ExpressionData {
                             })
                         );
 
-                    // console.log('ENDED MULT MULTIPLICATION SUB-LOOP')
-                    // console.log({
-                    //     mult: mult.stringify()
-                    // });
+                    console.log('ENDED MULT MULTIPLICATION SUB-LOOP')
+                    console.log({
+                        mult: mult.stringify()
+                    });
 
                     if (simplifiedElevations.length === 0)
                         finalResult.push(mult);
@@ -1487,16 +1489,30 @@ export function doOperation(expression: ExpressionData): ExpressionData {
                         }
 
                         else {
-                            finalResult.push(
-                                new ExpressionData({
-                                    operator: Operator.Multiply,
-                                    elements: [
-                                        mult,
-                                        ...simplifiedElevations
-                                    ],
-                                    isSimplified: true
-                                })
-                            );
+                            if (mult.operator === Operator.Multiply) {
+                                const everythingMultiplied = doOperation(
+                                    new ExpressionData({
+                                        operator: Operator.Multiply,
+                                        elements: [
+                                            ...mult.elements,
+                                            ...simplifiedElevations
+                                        ]
+                                    })
+                                );
+
+                                finalResult.push(everythingMultiplied);
+                            } else {
+                                finalResult.push(
+                                    new ExpressionData({
+                                        operator: Operator.Multiply,
+                                        elements: [
+                                            mult,
+                                            ...simplifiedElevations
+                                        ],
+                                        isSimplified: true
+                                    })
+                                );
+                            }
                         }
 
                     }
