@@ -719,7 +719,7 @@ class MatrixOperations {
 
             }
 
-            if (pivotIndex === joinedMatrix.dimensions().rows - 1) {
+            if (pivotIndex === joinedMatrix.dimensions().rows - 2) {
         
                 if (MatrixOperations.isMatrixSquare(matrixA)) {
                     if (noPivotOnColumn)
