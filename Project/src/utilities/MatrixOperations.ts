@@ -615,7 +615,12 @@ class MatrixOperations {
     }
 
     static transformMatrixToReducedRowEchelonForm(matrix: MatrixData) {
-        for (let row = 0; row < matrix.dimensions().rows; row++) {
+
+        const { rows, columns } = matrix.dimensions();
+
+        const minDimensions = Math.min(rows, columns);
+
+        for (let row = 0; row < minDimensions; row++) {
             const pivot = matrix.data[row][row];
             if (!pivot.isZero) {
                 for (let column = row; column < matrix.dimensions().columns; column++)
@@ -668,7 +673,7 @@ class MatrixOperations {
 
         const minDimensions = Math.min(rows, columns)
 
-        for (let pivotIndex = 0; pivotIndex < joinedMatrix.dimensions().rows; pivotIndex++) {
+        for (let pivotIndex = 0; pivotIndex < minDimensions; pivotIndex++) {
 
             const pivot = joinedMatrix.data[pivotIndex][pivotIndex];
 
