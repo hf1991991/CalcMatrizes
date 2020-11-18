@@ -317,6 +317,9 @@ function separateNumeratorsAndDenominators(elem: ExpressionData) {
         }
     }
 
+    if (!numerator)
+        numerator = createMatrixElement({ scalar: 1 })
+
     return {
         numerator: numerator as ExpressionData,
         denominators
@@ -1618,7 +1621,13 @@ export function doOperation(expression: ExpressionData): ExpressionData {
                         })
                     );
 
-                    return symplifyDenominators(initialJoinedFractions.elements);
+                    console.log({initialJoinedFractions: initialJoinedFractions.stringify()});
+
+                    const newFractionsToSimplify = initialJoinedFractions.operator === Operator.Add
+                        ? initialJoinedFractions.elements
+                        : [initialJoinedFractions];
+
+                    return symplifyDenominators(newFractionsToSimplify);
                 }
 
                 return new ExpressionData({
@@ -1756,9 +1765,11 @@ export function doOperation(expression: ExpressionData): ExpressionData {
                     })
                 );
 
-                const simplifiedAdditions = symplifyDenominators(
-                    initialJoinedFractions.elements
-                );
+                const newFractionsToSimplify = initialJoinedFractions.operator === Operator.Add
+                    ? initialJoinedFractions.elements
+                    : [initialJoinedFractions];
+
+                const simplifiedAdditions = symplifyDenominators(newFractionsToSimplify);
 
                 if (simplifiedAdditions.operator === Operator.Add)
                     return onlyJoinFractions(simplifiedAdditions);
