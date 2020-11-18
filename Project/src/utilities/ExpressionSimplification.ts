@@ -1397,9 +1397,9 @@ export function doOperation(expression: ExpressionData): ExpressionData {
 
                     const multiplier = new ElementData({
                         scalar: (
-                            elevationsCopyData.searchNormalizationFactor
+                            elevationsCopyData.elementEliminationFactor as number
                             * Math.pow(
-                                elevationsCopyData.elementEliminationFactor as number,
+                                elevationsCopyData.searchNormalizationFactor,
                                 exponent
                             )
                         )
