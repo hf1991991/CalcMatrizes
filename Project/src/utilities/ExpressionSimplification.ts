@@ -328,16 +328,6 @@ function denominatorsMatch(denominatorsList: ExpressionData[][]) {
 
     const [first, ...rest] = denominatorsList;
 
-    console.log({
-        restLen: rest.length,
-        len: denominatorsList.length
-    })
-
-    console.log({
-        first,
-        rest
-    });
-
     // denominator1 e denominator2 são Elevations:
     for (const denominator1 of first) {
 
@@ -581,13 +571,15 @@ function addFractionsWithSameDenominator(fractions: ExpressionData[]) {
 }
 
 function rejoinFractionComponents(numerator: ExpressionData, denominators: ExpressionData[]) {
-    return new ExpressionData({
-        operator: Operator.Multiply,
-        elements: [
-            numerator,
-            ...denominators
-        ]
-    });
+    return denominators.length === 0
+        ? numerator
+        : new ExpressionData({
+            operator: Operator.Multiply,
+            elements: [
+                numerator,
+                ...denominators
+            ]
+        });
 }
 
 function separateFractionsNumerators(addition: ExpressionData[]) {
@@ -609,7 +601,7 @@ function separateFractionsNumerators(addition: ExpressionData[]) {
             const newNumerators = numerator.oneElement
                 ? [createMatrixElement(numerator.oneElement)]
                 : numerator.elements;
-            
+
             const newFractions = newNumerators.map(
                 n => rejoinFractionComponents(n, denominators)
             );
@@ -942,7 +934,7 @@ function symplifyDenominators(addition: Array<ExpressionData>): ExpressionData {
 
     let newElements: Array<ExpressionData> = [];
     let addedIndexes: Array<number> = [];
-    
+
     console.log({
         addition: addition.map(a => a.stringify()),
     })
