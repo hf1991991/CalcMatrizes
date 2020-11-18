@@ -1,4 +1,4 @@
-import { Operator } from "./constants";
+import { findFraction, Operator } from "./constants";
 import { createMatrixElement, ElementData, ElementDataParams, ExpressionData, VariableData } from "./ExpressionClasses";
 
 export function simplifyExpression(expression: ExpressionData) {
@@ -1175,6 +1175,31 @@ export function doOperation(expression: ExpressionData): ExpressionData {
 
             }
 
+            // if baseExpression is Fraction:
+            if (baseExpression.operator === Operator.Multiply) {
+
+                const finalElevationResult = baseExpression.elements.map(
+                    elem => doOperation(
+                        new ExpressionData({
+                            operator: Operator.Elevate,
+                            elements: [
+                                elem,
+                                exponentExpression
+                            ]
+                        })
+                    )
+                );
+
+                return finalElevationResult.length === 1
+                    ? finalElevationResult[0]
+                    : new ExpressionData({
+                        operator: Operator.Multiply,
+                        elements: finalElevationResult,
+                        isSimplified: true
+                    });
+
+            }
+
             if (exponent === 0)
                 return new ExpressionData({
                     oneElement: new ElementData({
@@ -1374,17 +1399,54 @@ export function doOperation(expression: ExpressionData): ExpressionData {
                             ]);
 
                         else {
-                            newElement = new ExpressionData({
-                                operator: Operator.Multiply,
-                                elements: [
-                                    new ExpressionData({
-                                        oneElement: multiplier
-                                    }),
-                                    normalizedMultipliedBase
-                                ]
-                            });
+                            if (exponent + 1 === -1) {
+                                const [multNum, multDen] = findFraction(multiplier.scalar);
 
-                            simplifiedElevations.push(newElement);
+                                const [newBase] = normalizedMultipliedBase.elements;
+
+                                const baseWithDenominator = doOperation(
+                                    new ExpressionData({
+                                        operator: Operator.Multiply,
+                                        elements: [
+                                            newBase,
+                                            createMatrixElement({ scalar: multDen })
+                                        ]
+                                    })
+                                );
+
+                                const newDenominator = new ExpressionData({
+                                    operator: Operator.Elevate,
+                                    elements: [
+                                        baseWithDenominator,
+                                        createMatrixElement({ scalar: exponent + 1 })
+                                    ],
+                                    isSimplified: true
+                                });
+
+                                newElement = multNum === 1
+                                    ? newDenominator
+                                    : new ExpressionData({
+                                        operator: Operator.Multiply,
+                                        elements: [
+                                            createMatrixElement({ scalar: multNum }),
+                                            newDenominator
+                                        ]
+                                    });
+
+                                simplifiedElevations.push(newElement);
+                            }
+
+                            else {
+                                newElement = new ExpressionData({
+                                    operator: Operator.Multiply,
+                                    elements: [
+                                        createMatrixElement(multiplier),
+                                        normalizedMultipliedBase
+                                    ]
+                                });
+
+                                simplifiedElevations.push(newElement);
+                            }
                         }
 
                     }
@@ -1621,7 +1683,7 @@ export function doOperation(expression: ExpressionData): ExpressionData {
                         })
                     );
 
-                    console.log({initialJoinedFractions: initialJoinedFractions.stringify()});
+                    console.log({ initialJoinedFractions: initialJoinedFractions.stringify() });
 
                     const newFractionsToSimplify = initialJoinedFractions.operator === Operator.Add
                         ? initialJoinedFractions.elements
