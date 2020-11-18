@@ -503,16 +503,13 @@ function addFractionsWithSameDenominator(fractions: ExpressionData[]) {
 
                 if (!numeratorAddition.isZero) {
 
-                    const rejoinedFraction = new ExpressionData({
-                        operator: Operator.Multiply,
-                        elements: [
-                            numeratorAddition,
-                            ...commonDenominator
-                        ]
-                    });
+                    const rejoinedFraction = rejoinFractionComponents(
+                        numeratorAddition,
+                        commonDenominator
+                    );
 
                     newElements.push(rejoinedFraction);
-                    
+
                 }
 
             }
@@ -581,6 +578,48 @@ function addFractionsWithSameDenominator(fractions: ExpressionData[]) {
     });
     console.log({ resultFractions: result.stringify() });
     return result;
+}
+
+function rejoinFractionComponents(numerator: ExpressionData, denominators: ExpressionData[]) {
+    return new ExpressionData({
+        operator: Operator.Multiply,
+        elements: [
+            numerator,
+            ...denominators
+        ]
+    });
+}
+
+function separateFractionsNumerators(addition: ExpressionData[]) {
+
+    // Transform addition expressions into oneElements:
+    const oneElementsFractions = addition.reduce(
+        (oneElementsAccumulator, expression) => {
+
+            const { numerator, denominators } = separateNumeratorsAndDenominators(expression);
+
+            if (
+                !(
+                    numerator.operator === Operator.Add
+                    && !numerator.elements.some(e => !e.oneElement)
+                ) && !numerator.oneElement
+            )
+                return [...oneElementsAccumulator, expression];
+
+            const newNumerators = numerator.oneElement
+                ? [createMatrixElement(numerator.oneElement)]
+                : numerator.elements;
+            
+            const newFractions = newNumerators.map(
+                n => rejoinFractionComponents(n, denominators)
+            );
+
+            return [...oneElementsAccumulator, ...newFractions];
+        },
+        [] as ExpressionData[]
+    );
+
+    return oneElementsFractions;
 }
 
 function symplifyDenominators(addition: Array<ExpressionData>): ExpressionData {
@@ -903,8 +942,15 @@ function symplifyDenominators(addition: Array<ExpressionData>): ExpressionData {
 
     let newElements: Array<ExpressionData> = [];
     let addedIndexes: Array<number> = [];
+    
+    console.log({
+        addition: addition.map(a => a.stringify()),
+    })
 
-    const additionsCombination = getAdditionsCombination(addition.length);
+    // Transform addition expressions into oneElements:
+    const additionOneElements = separateFractionsNumerators(addition);
+
+    const additionsCombination = getAdditionsCombination(additionOneElements.length);
 
     // console.log('STARTING SYMPLIFYDENOMINATORS')
     // console.log(JSON.stringify({
@@ -913,7 +959,7 @@ function symplifyDenominators(addition: Array<ExpressionData>): ExpressionData {
 
     for (const marker of additionsCombination) {
 
-        const additionList = addition.filter(
+        const additionList = additionOneElements.filter(
             (_, index) => marker[index].type === CombinationMarkerTypes.Selected
         );
 
@@ -932,7 +978,7 @@ function symplifyDenominators(addition: Array<ExpressionData>): ExpressionData {
         if (!someIndexAlreadyAdded) {
 
             console.log({
-                addition: addition.map(a => a.stringify()),
+                addition: additionOneElements.map(a => a.stringify()),
                 additionList: additionList.map(a => a.stringify()),
                 marker
             })
@@ -980,9 +1026,9 @@ function symplifyDenominators(addition: Array<ExpressionData>): ExpressionData {
 
     }
 
-    for (let index = 0; index < addition.length; index++) {
+    for (let index = 0; index < additionOneElements.length; index++) {
         if (!addedIndexes.includes(index))
-            newElements.push(addition[index]);
+            newElements.push(additionOneElements[index]);
     }
 
     let [
@@ -1047,7 +1093,7 @@ export function onlyJoinFractions(expression: ExpressionData) {
     );
 
     const nonFractions = expression.elements.filter(
-        e => separateNumeratorsAndDenominators(e).denominators.length > 0
+        e => separateNumeratorsAndDenominators(e).denominators.length === 0
     );
 
     const simplifiedFractions = addFractionsWithSameDenominator(fractions);
@@ -1060,11 +1106,11 @@ export function onlyJoinFractions(expression: ExpressionData) {
                 ...nonFractions
             ]
         });
-    
+
     else {
         if (nonFractions.length === 0)
             return simplifiedFractions;
-        
+
         else
             return new ExpressionData({
                 operator: Operator.Add,
@@ -1572,8 +1618,16 @@ export function doOperation(expression: ExpressionData): ExpressionData {
                     finalResult: finalResult.map(e => e.stringify()),
                 })
 
-                if (simplifiedElevations.length > 0)
-                    return symplifyDenominators(finalResult);
+                if (simplifiedElevations.length > 0) {
+                    const initialJoinedFractions = onlyJoinFractions(
+                        new ExpressionData({
+                            operator: Operator.Add,
+                            elements: finalResult
+                        })
+                    );
+
+                    return symplifyDenominators(initialJoinedFractions.elements);
+                }
 
                 return new ExpressionData({
                     operator: Operator.Add,
