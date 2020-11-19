@@ -1223,6 +1223,26 @@ export function doOperation(expression: ExpressionData): ExpressionData {
 
             const [numerator, denominator] = expression.elements;
 
+            if (numerator.oneElement && denominator.oneElement) {
+                
+                const [numeratorElem, denominatorElem] = [numerator.oneElement, denominator.oneElement];
+
+                const result = createMatrixElement({
+                    scalar: numeratorElem.scalar / denominatorElem.scalar,
+                    variables: [
+                        ...numeratorElem.variables,
+                        ...denominatorElem.variables.map(
+                            ({ variable, exponent }) => new VariableData({
+                                variable,
+                                exponent: -exponent
+                            })
+                        )
+                    ]
+                });
+
+                return result;
+            }
+
             let invertedDenominator;
 
             if (!!denominator.oneElement) {
