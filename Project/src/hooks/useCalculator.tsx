@@ -9,6 +9,8 @@ import MatrixDimensions from '../interfaces/MatrixDimensions';
 import FullEquationData from '../interfaces/FullEquationData';
 import ScalarOperations from '../utilities/ScalarOperations';
 
+import * as math from 'mathjs';
+
 interface MatrixHistory {
     history: Array<MatrixData>;
     currentPosition: number;
@@ -432,17 +434,19 @@ export const CalculatorProvider: React.FC = ({ children }) => {
             }: ChangeNumberWrittenParams
         ) => {
 
+            const newNode = math.parse(newNumber)
+
             if (operationHappening && !forceNotOperatorNumber)
-                setEditableOperatorNumber(newNumber);
+                setEditableOperatorNumber(newNode);
 
             else if (calcState === CalcState.LambdaxA)
-                setEditableScalar(newNumber);
+                setEditableScalar(newNode);
 
             else
                 setEditableMatrix(MatrixOperations.changeElement({
                     matrix: editableMatrix || readyMatrix,
                     ...(selectedMatrixElement as SelectedMatrixElement),
-                    numberWritten: newNumber
+                    numberWritten: newNode
                 }));
 
         },

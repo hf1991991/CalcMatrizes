@@ -74,7 +74,7 @@ const MatrixColumn = ({
                     && editableOperatorNumber
                     ? editableOperatorNumber
                     : number
-            );
+            ).toString();
         }, [editableOperatorNumber, isElementSelected]
     );
 

@@ -4,24 +4,26 @@ import SelectedMatrixElement from "../interfaces/SelectedMatrixElement";
 import * as math from 'mathjs';
 
 class MatrixData {
-    raw: math.Matrix;
-    data: number[][];
+    data: math.MathNode[][];
 
-    constructor(data: Array<Array<number>> | math.Matrix) {
-        this.raw = math.matrix(data);
-        this.data = this.raw.toArray() as number[][];
+    constructor(data: (math.MathNode | number)[][]) {
+        this.data = data.map(
+            row => row.map(
+                e => e instanceof Object ? e : math.parse(e.toString())
+            )
+        );
     }
 
     dimensions(): MatrixDimensions {
         return {
-            rows: this.raw.size()[0],
-            columns: this.raw.size()[1]
+            rows: this.data.length,
+            columns: this.data[0].length
         };
     }
 
     hasPosition({ row, column }: SelectedMatrixElement) {
         return row < this.dimensions().rows && column < this.dimensions().columns;
-    } 
+    }
 }
 
 export default MatrixData;

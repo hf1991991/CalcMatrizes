@@ -11,10 +11,11 @@ import MatrixDimensions from "../interfaces/MatrixDimensions";
 import addErrorTreatment from "./addErrorTreatment";
 
 import * as math from 'mathjs';
+import { OperatorNode, ContantNode } from 'mathjs';
 
 interface ChangeElementParams extends SelectedMatrixElement {
     matrix: MatrixData;
-    numberWritten: ExpressionData;
+    numberWritten: string | number;
 }
 
 interface JoinEditableAndOriginalMatricesParams extends MatrixDimensions {
@@ -645,23 +646,41 @@ class MatrixOperations {
         // o determinante e aperte "Details (Montante's method (Bareiss algorithm))"
 
         const applyBareissFormula = (entryMatrix: MatrixData, exitMatrix: MatrixData, i: number, j: number, r: number) => {
-            exitMatrix.data[i][j] = (
-                math.chain(
-                    math.chain(
-                        math.chain(entryMatrix.data[r][r])
-                            .multiply(entryMatrix.data[i][j])
-                            .done()
-                    ).subtract(
-                        math.chain(entryMatrix.data[r][j])
-                            .multiply(entryMatrix.data[i][r])
-                            .done()
-                    ).done()
-                ).divide(
-                    r - 1 < 0
-                        ? 1
-                        : entryMatrix.data[r - 1][r - 1]
-                ).done()
-            )
+            const subtraction = new OperatorNode(
+                '-',
+                'subtract',
+                [
+                    new OperatorNode(
+                        '*',
+                        'multiply',
+                        [
+                            entryMatrix.data[r][r],
+                            entryMatrix.data[i][j],
+                        ]
+                    ),
+                    new OperatorNode(
+                        '*',
+                        'multiply',
+                        [
+                            entryMatrix.data[r][j],
+                            entryMatrix.data[i][r],
+                        ]
+                    )
+                ]
+            );
+
+            const result = r - 1 < 0
+                ? subtraction
+                : new OperatorNode(
+                    '/',
+                    'divide',
+                    [
+                        subtraction,
+                        entryMatrix.data[r - 1][r - 1]
+                    ]
+                );
+
+            exitMatrix.data[i][j] = math.simplify(result);
         };
 
         console.log('INICIO BAREISS')
