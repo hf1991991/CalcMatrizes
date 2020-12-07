@@ -10,6 +10,8 @@ import MatrixColumnData from "../interfaces/MatrixColumnData";
 import MatrixDimensions from "../interfaces/MatrixDimensions";
 import addErrorTreatment from "./addErrorTreatment";
 
+import * as math from 'mathjs';
+
 interface ChangeElementParams extends SelectedMatrixElement {
     matrix: MatrixData;
     numberWritten: ExpressionData;
@@ -73,7 +75,7 @@ class MatrixOperations {
             let positionMatrixColumn: Array<ElementDataWithPosition> = [];
             for (let row = matrix.dimensions().rows - 1; row >= 0; row--) {
                 positionMatrixColumn.push({
-                    number: matrix.data[row][column],
+                    number: matrix.data.get([row, column]) as string | number,
                     row,
                     column,
                 });
@@ -172,22 +174,20 @@ class MatrixOperations {
     static isMatrixFull(matrix: MatrixData) {
         if (!matrix) return false;
 
-        for (let row = 0; row < matrix.dimensions().rows; row++) {
-            for (let column = 0; column < matrix.dimensions().columns; column++) {
-                if (Number.isNaN(matrix.data[row][column])) return false;
-            }
-        }
+        matrix.data.forEach(value => {
+            if (Number.isNaN(value)) return false;
+        })
+
         return true;
     }
 
     static isMatrixEmpty(matrix: MatrixData) {
         if (!matrix) return false;
 
-        for (let row = 0; row < matrix.dimensions().rows; row++) {
-            for (let column = 0; column < matrix.dimensions().columns; column++) {
-                if (matrix.data[row][column]?.commaStringify() !== '0') return false;
-            }
-        }
+        matrix.data.forEach(value => {
+            if (value !== 0) return false;
+        })
+        
         return true;
     }
 

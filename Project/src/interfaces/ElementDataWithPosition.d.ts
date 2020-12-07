@@ -1,7 +1,7 @@
 import { ElementData, ExpressionData } from "../utilities/ExpressionClasses";
 
 interface ElementDataWithPosition {
-    number: ElementData | ExpressionData;
+    number: string | number;
     row: number;
     column: number;
 }
