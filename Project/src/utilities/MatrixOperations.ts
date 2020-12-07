@@ -11,7 +11,7 @@ import MatrixDimensions from "../interfaces/MatrixDimensions";
 import addErrorTreatment from "./addErrorTreatment";
 
 import * as math from 'mathjs';
-import { OperatorNode, ContantNode } from 'mathjs';
+import { OperatorNode } from 'mathjs';
 
 interface ChangeElementParams extends SelectedMatrixElement {
     matrix: MatrixData;
@@ -165,7 +165,7 @@ class MatrixOperations {
         for (let row = 0; row < matrix1.dimensions().rows; row++) {
             for (let column = 0; column < matrix1.dimensions().columns; column++) {
                 if (
-                    matrix1.data[row][column]?.commaStringify() !== matrix2.data[row][column]?.commaStringify()
+                    matrix1.data[row][column].toString() !== matrix2.data[row][column].toString()
                 ) return false;
             }
         }
@@ -188,7 +188,7 @@ class MatrixOperations {
 
         for (let row = 0; row < matrix.dimensions().rows; row++) {
             for (let column = 0; column < matrix.dimensions().columns; column++) {
-                if (matrix.data[row][column]?.commaStringify() !== '0') return false;
+                if (matrix.data[row][column].toString() !== '0') return false;
             }
         }
         return true;
@@ -477,7 +477,7 @@ class MatrixOperations {
 
                 if (!noPivotOnColumn) {
 
-                    console.log({ pivot: pivot.stringify(), pivotColumn });
+                    console.log({ pivot: pivot.toString(), pivotColumn });
 
                     if (!pivot.isOne) {
                         for (let index = 0; index < dimensionsA.columns; index++)
@@ -530,7 +530,7 @@ class MatrixOperations {
                         );
                         MatrixOperations.printMatrix(_matrixA);
 
-                        console.log({ element: element.stringify(), pivot: pivot.stringify(), eliminationFactor: eliminationFactor.stringify() })
+                        console.log({ element: element.toString(), pivot: pivot.toString(), eliminationFactor: eliminationFactor.toString() })
 
                         for (let horizontalIndex = 0; horizontalIndex < dimensionsA.columns; horizontalIndex++) {
                             _matrixA.data[verticalIndex][horizontalIndex] = ExpressionSimplification.varOperation(
@@ -576,7 +576,7 @@ class MatrixOperations {
 
         console.log({ determinant })
 
-        console.log({ determinantString: determinant.stringify() });
+        console.log({ determinantString: determinant.toString() });
 
         return {
             matrixA: MatrixOperations.copyMatrixData(_matrixA),
@@ -1085,8 +1085,8 @@ class MatrixOperations {
 
             for (let column = 0; column < matrixB.dimensions().columns; column++) {
                 if (
-                    matrixB.data[row][column].commaStringify()
-                    !== multiplication.data[row][column].commaStringify()
+                    matrixB.data[row][column].toString()
+                    !== multiplication.data[row][column].toString()
                 ) {
                     if (
                         !matrixB.data[row][column].hasVariables
