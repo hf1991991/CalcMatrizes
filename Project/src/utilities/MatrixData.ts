@@ -4,16 +4,18 @@ import SelectedMatrixElement from "../interfaces/SelectedMatrixElement";
 import * as math from 'mathjs';
 
 class MatrixData {
-    data: math.Matrix;
+    raw: math.Matrix;
+    data: number[][];
 
     constructor(data: Array<Array<number>> | math.Matrix) {
-        this.data = math.matrix(data);
+        this.raw = math.matrix(data);
+        this.data = this.raw.toArray() as number[][];
     }
 
     dimensions(): MatrixDimensions {
         return {
-            rows: this.data.size()[0],
-            columns: this.data.size()[1]
+            rows: this.raw.size()[0],
+            columns: this.raw.size()[1]
         };
     }
 
