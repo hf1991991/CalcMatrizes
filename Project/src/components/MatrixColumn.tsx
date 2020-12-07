@@ -46,11 +46,11 @@ const MatrixColumn = ({
             return {
                 backgroundColor: isElementSelected({ row, column })
                     ? '#404040'
-                    : (wholeMatrix.data.get([row, column]) === null)
+                    : (wholeMatrix.data[row][column] === null)
                         ? '#1c1c1c'
                         : 'transparent',
                 ...(
-                    (wholeMatrix.data.get([row, column]) === null)
+                    (wholeMatrix.data[row][column] === null)
                     && {
                         //borderColor: '#fff',
                         //borderWidth: 1.5,

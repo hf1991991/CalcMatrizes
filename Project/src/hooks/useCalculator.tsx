@@ -290,7 +290,7 @@ export const CalculatorProvider: React.FC = ({ children }) => {
 
     const isInverseEnabled = useMemo(
         () => {
-            console.log({ a: matrixOnScreenDeterminant?.isZero, b: matrixOnScreenDeterminant?.commaStringify() })
+            console.log({ a: matrixOnScreenDeterminant?.isZero, b: matrixOnScreenDeterminant })
             return MatrixOperations.isMatrixFull(matrixOnScreen)
                 && MatrixOperations.isMatrixSquare(matrixOnScreen)
                 && !matrixOnScreenDeterminant?.isZero

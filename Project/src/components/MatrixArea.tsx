@@ -49,7 +49,7 @@ const MatrixArea: React.FC = () => {
     const formatDeterminant = useCallback(
         (determinant: ExpressionData | null, overflow: boolean = true, det: boolean = true) => {
             if (determinant === null) return null
-            let stringDeterminant = determinant?.commaStringify();
+            let stringDeterminant = determinant.toString();
             if (stringDeterminant.length > 8 && overflow)
                 stringDeterminant = stringDeterminant.substring(0, 8 - 3) + '...';
             if (stringDeterminant && !ScalarOperations.isNumber(stringDeterminant))
