@@ -680,7 +680,13 @@ class MatrixOperations {
                     ]
                 );
 
-            exitMatrix.data[i][j] = math.simplify(result);
+            const rules = [
+                ...math.simplify.rules,
+                'n1*(n2-n3) -> n1*n2-n1*n3',
+                'n1*(n2+n3) -> n1*n2+n1*n3'
+            ]
+
+            exitMatrix.data[i][j] = math.simplify(result, rules);
         };
 
         console.log('INICIO BAREISS')
