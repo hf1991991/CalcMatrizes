@@ -10,6 +10,8 @@ import MatrixColumnData from "../interfaces/MatrixColumnData";
 import MatrixDimensions from "../interfaces/MatrixDimensions";
 import addErrorTreatment from "./addErrorTreatment";
 
+import * as math from 'mathjs';
+
 interface ChangeElementParams extends SelectedMatrixElement {
     matrix: MatrixData;
     numberWritten: ExpressionData;
@@ -199,7 +201,7 @@ class MatrixOperations {
         for (let row of matrix.data) {
             let rowString = '';
             for (let elem of row) {
-                rowString += ` ${elem.stringify()} `;
+                rowString += ` ${elem} `;
             }
             console.log(rowString);
         }
@@ -643,25 +645,23 @@ class MatrixOperations {
         // o determinante e aperte "Details (Montante's method (Bareiss algorithm))"
 
         const applyBareissFormula = (entryMatrix: MatrixData, exitMatrix: MatrixData, i: number, j: number, r: number) => {
-            exitMatrix.data[i][j] = ExpressionSimplification.varOperation(
-                ExpressionSimplification.varOperation(
-                    ExpressionSimplification.varOperation(
-                        entryMatrix.data[r][r],
-                        Operator.Multiply,
-                        entryMatrix.data[i][j]
-                    ),
-                    Operator.Subtract,
-                    ExpressionSimplification.varOperation(
-                        entryMatrix.data[r][j],
-                        Operator.Multiply,
-                        entryMatrix.data[i][r]
-                    )
-                ),
-                Operator.Divide,
-                r - 1 < 0
-                    ? createMatrixElement({ scalar: 1 })
-                    : entryMatrix.data[r - 1][r - 1]
-            );
+            exitMatrix.data[i][j] = (
+                math.chain(
+                    math.chain(
+                        math.chain(entryMatrix.data[r][r])
+                            .multiply(entryMatrix.data[i][j])
+                            .done()
+                    ).subtract(
+                        math.chain(entryMatrix.data[r][j])
+                            .multiply(entryMatrix.data[i][r])
+                            .done()
+                    ).done()
+                ).divide(
+                    r - 1 < 0
+                        ? 1
+                        : entryMatrix.data[r - 1][r - 1]
+                ).done()
+            )
         };
 
         console.log('INICIO BAREISS')
@@ -677,7 +677,7 @@ class MatrixOperations {
 
             const pivot = joinedMatrix.data[pivotIndex][pivotIndex];
 
-            if (pivot.isZero) {
+            if (pivot === 0) {
 
                 let testRow = pivotIndex + 1;
 
@@ -690,7 +690,7 @@ class MatrixOperations {
 
                     const possibleNewPivot = joinedMatrix.data[testRow][pivotIndex];
 
-                    if (!possibleNewPivot.isZero) break;
+                    if (possibleNewPivot !== 0) break;
 
                     testRow++;
                 }
@@ -725,30 +725,30 @@ class MatrixOperations {
             }
 
             if (pivotIndex === joinedMatrix.dimensions().rows - 2) {
-        
+
                 if (MatrixOperations.isMatrixSquare(matrixA)) {
                     if (noPivotOnColumn)
                         determinant = createMatrixElement({
                             scalar: 0
                         });
-        
+
                     else
                         determinant = joinedMatrix.data
-                            [matrixA.dimensions().rows - 1]
-                            [matrixA.dimensions().columns - 1];
+                        [matrixA.dimensions().rows - 1]
+                        [matrixA.dimensions().columns - 1];
                 }
 
                 console.log('BAREISS DETERMINANT')
 
-                console.log({ determinant: determinant?.stringify() });
+                console.log({ determinant });
 
-                if (exitOnDeterminantFound) 
+                if (exitOnDeterminantFound)
                     return {
                         matrixA,
                         matrixB,
                         determinant
                     };
-            
+
             }
 
         }
@@ -990,7 +990,7 @@ class MatrixOperations {
 
         // Definição das variáveis independentes:
         for (let pivotIndex = 0; pivotIndex < vectorizedX.length; pivotIndex++) {
-            
+
             const foundIndependentVariable = pivotIndex >= minDimensions
                 || matrixA.data[pivotIndex][pivotIndex].isZero;
 
