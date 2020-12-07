@@ -1,20 +1,19 @@
-import MatrixColumnData from "../interfaces/MatrixColumnData";
 import MatrixDimensions from "../interfaces/MatrixDimensions";
 import SelectedMatrixElement from "../interfaces/SelectedMatrixElement";
-import { ExpressionData } from "./ExpressionClasses";
-import MatrixOperations from "./MatrixOperations";
+
+import * as math from 'mathjs';
 
 class MatrixData {
-    data: Array<MatrixColumnData>;
+    data: math.Matrix;
 
-    constructor(data: Array<Array<ExpressionData | number>>) {
-        this.data = MatrixOperations.applyFrescuresToMatrixData(data);
+    constructor(data: Array<Array<number>> | math.Matrix) {
+        this.data = math.matrix(data);
     }
 
     dimensions(): MatrixDimensions {
         return {
-            rows: this.data.length,
-            columns: this.data[0] && this.data[0].length,
+            rows: this.data.size()[0],
+            columns: this.data.size()[1]
         };
     }
 
