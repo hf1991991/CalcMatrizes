@@ -1,6 +1,5 @@
 import React, { useCallback } from 'react';
 import { View, Text, TouchableOpacity, FlatList } from 'react-native';
-import MathView from 'react-native-math-view';
 import ElementDataWithPosition from '../interfaces/ElementDataWithPosition';
 import SelectedMatrixElement from '../interfaces/SelectedMatrixElement';
 import { ElementData } from '../utilities/ExpressionClasses';
