@@ -47,11 +47,11 @@ const MatrixColumn = ({
             return {
                 backgroundColor: isElementSelected({ row, column })
                     ? '#404040'
-                    : (wholeMatrix?.data[row][column] === null)
+                    : (wholeMatrix.data.get([row, column]) === null)
                         ? '#1c1c1c'
                         : 'transparent',
                 ...(
-                    (wholeMatrix?.data[row][column] === null)
+                    (wholeMatrix.data.get([row, column]) === null)
                     && {
                         //borderColor: '#fff',
                         //borderWidth: 1.5,
@@ -75,7 +75,7 @@ const MatrixColumn = ({
                     && editableOperatorNumber
                     ? editableOperatorNumber
                     : number
-            )?.latexStringify(isElementSelected({ row, column }));
+            );
         }, [editableOperatorNumber, isElementSelected]
     );
 
@@ -125,20 +125,19 @@ const MatrixColumn = ({
                                 marginHorizontal: 5,
                             }}
                         >
-                            <MathView
+                            <Text
                                 style={{
-                                    color: 'white',
-                                    flex: 1
+                                    color: '#fff',
+                                    fontSize: 26,
+                                    textAlign: 'center',
                                 }}
-                                config={{ ex: 16 }}
-                                math={
-                                    formatElement({
-                                        number,
-                                        row,
-                                        column
-                                    })
-                                }
-                            />
+                            >
+                                {formatElement({
+                                    number,
+                                    row,
+                                    column
+                                })}
+                            </Text>
                         </View>
                     </TouchableOpacity>
                 );
