@@ -1,7 +1,9 @@
 import { ElementData, ExpressionData } from "../utilities/ExpressionClasses";
 
+import * as math from 'mathjs';
+
 interface ElementDataWithPosition {
-    number: string | number;
+    number: math.MathNode;
     row: number;
     column: number;
 }

@@ -1,20 +1,20 @@
 import MatrixData from "./MatrixData";
-import { SystemSolutionType, Operator } from "./constants";
+import { SystemSolutionType } from "./constants";
 import ScalarOperations from "./ScalarOperations";
-import { createMatrixElement, ExpressionData, VariableData } from "./ExpressionClasses";
+import { createMatrixElement } from "./ExpressionClasses";
 import ElementDataWithPosition from "../interfaces/ElementDataWithPosition";
 import MatrixColumnWithPosition from "../interfaces/MatrixColumnWithPosition";
 import SelectedMatrixElement from "../interfaces/SelectedMatrixElement";
-import MatrixColumnData from "../interfaces/MatrixColumnData";
 import MatrixDimensions from "../interfaces/MatrixDimensions";
 import addErrorTreatment from "./addErrorTreatment";
+import hasVariables from "./hasVariables";
 
 import * as math from 'mathjs';
 import { OperatorNode } from 'mathjs';
 
 interface ChangeElementParams extends SelectedMatrixElement {
     matrix: MatrixData;
-    numberWritten: string | number;
+    numberWritten: math.MathNode;
 }
 
 interface JoinEditableAndOriginalMatricesParams extends MatrixDimensions {
@@ -24,7 +24,7 @@ interface JoinEditableAndOriginalMatricesParams extends MatrixDimensions {
 
 interface MultiplyMatrixByScalarParams {
     matrixA: MatrixData;
-    scalar: ExpressionData;
+    scalar: math.MathNode;
 }
 
 interface PartialGaussianEliminationParams {
@@ -49,13 +49,13 @@ interface GetGaussianEliminationData {
 interface PartialGaussianEliminationData {
     matrixA: MatrixData;
     matrixB: MatrixData;
-    determinant: ExpressionData;
+    determinant: math.MathNode;
 }
 
 interface TransformEquationToVectorFormData {
     matrixA: MatrixData;
-    vectorizedX: Array<ExpressionData>;
-    vectorizedB: Array<ExpressionData>;
+    vectorizedX: Array<math.MathNode>;
+    vectorizedB: Array<math.MathNode>;
 }
 
 class MatrixOperations {
@@ -222,34 +222,6 @@ class MatrixOperations {
     //     return fixed;
     // }
 
-    static applyFrescuresToMatrixData(matrixData: Array<Array<ExpressionData | number>>): Array<MatrixColumnData> {
-        if (!matrixData) return [];
-
-        let converted = [];
-
-        for (let row = 0; row < matrixData.length; row++) {
-            let convertedRow = [];
-            for (let column = 0; column < matrixData[0].length; column++) {
-                let element = matrixData[row][column];
-
-                if (!(element instanceof ExpressionData)) {
-                    // console.log('applyFrescuresToMatrixData: elemento não é um ElementData: ' + element);
-                    element = createMatrixElement({
-                        scalar: element
-                    });
-                }
-
-                // if (!element.unfilteredString)
-                //     element = Number.parseFloat(element.scalar)
-
-                convertedRow.push(element);
-            }
-            converted.push(convertedRow);
-        }
-
-        return converted;
-    }
-
     static emptyMatrix({ rows, columns }: MatrixDimensions) {
         let matrix = [];
 
@@ -330,9 +302,8 @@ class MatrixOperations {
         for (let row = 0; row < matrixA.dimensions().rows; row++) {
             let matrixRow = [];
             for (let column = 0; column < matrixB.dimensions().columns; column++) {
-                let newElement = createMatrixElement({
-                    scalar: 0,
-                });
+                let newElement = math.parse('0');
+                
                 for (let index = 0; index < matrixA.dimensions().columns; index++) {
 
                     newElement = new OperatorNode(
@@ -454,9 +425,9 @@ class MatrixOperations {
             // Se estiver na eliminação acima da diagonal e 
             // encontrar um pivot zero, simplesmente pular para o próximo
             // (permite deixar da forma escalonada reduzida):
-            if (eliminateBelowMainDiagonal || !pivot.isZero) {
+            if (eliminateBelowMainDiagonal || pivot.toString() !== '0') {
 
-                if (pivot.isZero) {
+                if (pivot.toString() === '0') {
 
                     let testRow = pivotColumn + 1;
                     while (true) {
@@ -468,7 +439,7 @@ class MatrixOperations {
 
                         let possibleNewPivot = _matrixA.data[testRow][pivotColumn];
 
-                        if (!possibleNewPivot.isZero) break;
+                        if (possibleNewPivot.toString() !== '0') break;
 
                         testRow++;
                     }
@@ -490,7 +461,7 @@ class MatrixOperations {
                             'multiply',
                             [
                                 determinant,
-                                math.parse(-1)
+                                math.parse('-1')
                             ]
                         );
                     }
@@ -500,7 +471,7 @@ class MatrixOperations {
 
                     console.log({ pivot: pivot.toString(), pivotColumn });
 
-                    if (!pivot.isOne) {
+                    if (pivot.toString() !== '1') {
                         for (let index = 0; index < dimensionsA.columns; index++)
                             _matrixA.data[pivotColumn][index] = new OperatorNode(
                                 '/',
@@ -684,7 +655,7 @@ class MatrixOperations {
 
         for (let row = 0; row < minDimensions; row++) {
             const pivot = matrix.data[row][row];
-            if (!pivot.isZero) {
+            if (pivot.toString() !== '0') {
                 for (let column = row; column < matrix.dimensions().columns; column++)
                     matrix.data[row][column] = new OperatorNode(
                         '/',
@@ -754,7 +725,7 @@ class MatrixOperations {
         console.log('INICIO BAREISS')
 
         let noPivotOnColumn = false;
-        let determinant: ExpressionData | null = null;
+        let determinant: math.MathNode | null = null;
 
         const { rows, columns } = joinedMatrix.dimensions();
 
@@ -764,7 +735,7 @@ class MatrixOperations {
 
             const pivot = joinedMatrix.data[pivotIndex][pivotIndex];
 
-            if (pivot === 0) {
+            if (pivot.toString() === '0') {
 
                 let testRow = pivotIndex + 1;
 
@@ -777,7 +748,7 @@ class MatrixOperations {
 
                     const possibleNewPivot = joinedMatrix.data[testRow][pivotIndex];
 
-                    if (possibleNewPivot !== 0) break;
+                    if (possibleNewPivot.toString() !== '0') break;
 
                     testRow++;
                 }
@@ -815,9 +786,7 @@ class MatrixOperations {
 
                 if (MatrixOperations.isMatrixSquare(matrixA)) {
                     if (noPivotOnColumn)
-                        determinant = createMatrixElement({
-                            scalar: 0
-                        });
+                        determinant = math.parse('0');
 
                     else
                         determinant = joinedMatrix.data
@@ -1032,7 +1001,7 @@ class MatrixOperations {
 
     }
 
-    static devectorizeVector(matrix: Array<ExpressionData>, matrixDimensions: MatrixDimensions) {
+    static devectorizeVector(matrix: Array<math.MathNode>, matrixDimensions: MatrixDimensions) {
         const newData = matrix.reduce(
             (dataAccumulator, element) => {
                 console.log(JSON.stringify({ dataAccumulator }));
@@ -1044,7 +1013,7 @@ class MatrixOperations {
                 else
                     return [...dataAccumulator, lastElement, [element]];
             },
-            [] as Array<MatrixColumnData>
+            [] as math.MathNode[][]
         );
 
         return new MatrixData(newData);
@@ -1053,7 +1022,7 @@ class MatrixOperations {
     static vectorizeMatrix(matrix: MatrixData) {
         const vector = matrix.data.reduce(
             (elementsAccumulator, elementRow) => [...elementsAccumulator, ...elementRow],
-            [] as MatrixColumnData
+            [] as math.MathNode[]
         );
         return vector;
     }
@@ -1079,7 +1048,7 @@ class MatrixOperations {
         for (let pivotIndex = 0; pivotIndex < vectorizedX.length; pivotIndex++) {
 
             const foundIndependentVariable = pivotIndex >= minDimensions
-                || matrixA.data[pivotIndex][pivotIndex].isZero;
+                || matrixA.data[pivotIndex][pivotIndex].toString() === '0';
 
             if (foundIndependentVariable) {
                 solutionType = SystemSolutionType.SPI;
@@ -1088,9 +1057,7 @@ class MatrixOperations {
 
                 lettersUsed.push(variable);
 
-                vectorizedX[pivotIndex] = createMatrixElement({
-                    variables: [new VariableData({ variable })]
-                });
+                vectorizedX[pivotIndex] = math.parse(variable);
             }
         }
 
@@ -1143,7 +1110,7 @@ class MatrixOperations {
                 column < eliminatedMatrixB.dimensions().columns;
                 column++
             ) {
-                if (!eliminatedMatrixB.data[row][column].isZero) return SystemSolutionType.SI;
+                if (eliminatedMatrixB.data[row][column].toString() !== '0') return SystemSolutionType.SI;
             }
         }
 
@@ -1157,8 +1124,8 @@ class MatrixOperations {
                     !== multiplication.data[row][column].toString()
                 ) {
                     if (
-                        !matrixB.data[row][column].hasVariables
-                        && !multiplication.data[row][column].hasVariables
+                        !hasVariables(matrixB.data[row][column])
+                        && !hasVariables(multiplication.data[row][column])
                     )
                         return SystemSolutionType.SI;
 
