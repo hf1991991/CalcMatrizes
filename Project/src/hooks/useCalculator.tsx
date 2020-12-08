@@ -1,8 +1,8 @@
 import React, { createContext, useCallback, useContext, useMemo, useState } from 'react';
-import { CalcState, count, SystemSolutionType, Operator } from '../utilities/constants';
+import { CalcState, SystemSolutionType, Operator } from '../utilities/constants';
 import MatrixOperations from '../utilities/MatrixOperations';
 import { varOperation } from '../utilities/ExpressionSimplification';
-import { createMatrixElement, VariableData } from '../utilities/ExpressionClasses';
+import { createMatrixElement } from '../utilities/ExpressionClasses';
 import MatrixData from '../utilities/MatrixData';
 import SelectedMatrixElement from '../interfaces/SelectedMatrixElement';
 import MatrixDimensions from '../interfaces/MatrixDimensions';
@@ -17,7 +17,7 @@ interface MatrixHistory {
 }
 
 interface ChangeNumberWrittenParams {
-    newNumber: number | string;
+    newNumber: math.MathNode;
     forceNotOperatorNumber?: boolean;
 }
 
@@ -25,7 +25,7 @@ interface EnterEditingModeParams {
     newCalcState: CalcState;
     newEditableMatrix?: MatrixData;
     newSelectedElement?: SelectedMatrixElement;
-    newScalar?: number | string;
+    newScalar?: math.MathNode;
 }
 
 interface CalculatorContextData {
@@ -39,11 +39,11 @@ interface CalculatorContextData {
     selectedMatrixElement: SelectedMatrixElement | null;
     shouldUserInputOverwriteElement: boolean;
     // Estados de escalares:
-    editableScalar: number | string | null;
+    editableScalar: math.MathNode | null;
     fullScreenDeterminant: boolean;
     // Estados de operações:
     operationHappening: boolean;
-    editableOperatorNumber: number | string | null;
+    editableOperatorNumber: math.MathNode | null;
     fullEquation: FullEquationData | null;
     viewReduced: boolean;
     // Estados de botões
@@ -59,7 +59,7 @@ interface CalculatorContextData {
     matrixOnScreen: MatrixData;
     isMatrixSquare: boolean;
     isMatrixFull: boolean;
-    matrixOnScreenDeterminant: number | string | null;
+    matrixOnScreenDeterminant: math.MathNode | null;
     isInverseEnabled: boolean;
     isCheckActive: boolean;
     shouldACAppear: boolean;
@@ -134,12 +134,12 @@ export const CalculatorProvider: React.FC = ({ children }) => {
     const [shouldUserInputOverwriteElement, setShouldUserInputOverwriteElement] = useState(true);
 
     // Estados de escalares:
-    const [editableScalar, setEditableScalar] = useState<number | string | null>(null);
+    const [editableScalar, setEditableScalar] = useState<math.MathNode | null>(null);
     const [fullScreenDeterminant, setFullScreenDeterminant] = useState(false);
 
     // Estados de operações:
     const [operationHappening, setOperationHappening] = useState(false);
-    const [editableOperatorNumber, setEditableOperatorNumber] = useState<string | number | null>(null);
+    const [editableOperatorNumber, setEditableOperatorNumber] = useState<math.MathNode | null>(null);
     const [fullEquation, setFullEquation] = useState<FullEquationData | null>(null);
     const [viewReduced, setViewReduced] = useState(false);
 
@@ -292,10 +292,10 @@ export const CalculatorProvider: React.FC = ({ children }) => {
 
     const isInverseEnabled = useMemo(
         () => {
-            console.log({ a: matrixOnScreenDeterminant?.isZero, b: matrixOnScreenDeterminant })
+            console.log({ a: matrixOnScreenDeterminant?.toString() === '0', b: matrixOnScreenDeterminant })
             return MatrixOperations.isMatrixFull(matrixOnScreen)
                 && MatrixOperations.isMatrixSquare(matrixOnScreen)
-                && !matrixOnScreenDeterminant?.isZero
+                && matrixOnScreenDeterminant?.toString() !== '0'
         },
         [matrixOnScreen, matrixOnScreenDeterminant]
     );
@@ -372,7 +372,7 @@ export const CalculatorProvider: React.FC = ({ children }) => {
     );
 
     const getNumberWritten = useCallback(
-        (forceNotOperatorNumber: boolean, doNotStringify: boolean): number | string | null => {
+        (forceNotOperatorNumber: boolean, doNotStringify: boolean): math.MathNode | string | null => {
 
             if (operationHappening && !forceNotOperatorNumber)
                 return editableOperatorNumber === null && !doNotStringify
@@ -391,7 +391,7 @@ export const CalculatorProvider: React.FC = ({ children }) => {
                 (
                     shouldUserInputOverwriteElement
                     || (
-                        matrixNumber?.oneElement?.scalar === 0
+                        matrixNumber?.toString() === '0'
                         && !matrixNumber?.oneElement?.unfilteredString
                     )
                 ) && !forceNotOperatorNumber
@@ -409,18 +409,18 @@ export const CalculatorProvider: React.FC = ({ children }) => {
     );
 
     const elementDataNumberWritten = useMemo(
-        () => getNumberWritten(false, true) as number | string,
+        () => getNumberWritten(false, true) as math.MathNode | null,
         [getNumberWritten]
     );
 
     const notOperatorNumberWritten = useMemo(
-        () => getNumberWritten(true, true) as number | string,
+        () => getNumberWritten(true, true) as math.MathNode,
         [getNumberWritten]
     );
 
     const shouldACAppear = useMemo(
         () => (
-            elementDataNumberWritten?.oneElement?.scalar === 0
+            elementDataNumberWritten?.toString() === '0'
             || calcState === CalcState.ready
         ),
         [elementDataNumberWritten, calcState]
@@ -434,7 +434,7 @@ export const CalculatorProvider: React.FC = ({ children }) => {
             }: ChangeNumberWrittenParams
         ) => {
 
-            const newNode = math.parse(newNumber)
+            const newNode = newNumber
 
             if (operationHappening && !forceNotOperatorNumber)
                 setEditableOperatorNumber(newNode);
@@ -483,7 +483,7 @@ export const CalculatorProvider: React.FC = ({ children }) => {
             const originalValue = elementDataNumberWritten;
 
             changeNumberWritten({
-                newNumber: (originalValue || '') + element
+                newNumber: math.parse((originalValue || '') + element)
             });
 
             setShouldUserInputOverwriteElement(false);
@@ -790,9 +790,7 @@ export const CalculatorProvider: React.FC = ({ children }) => {
 
     const onPressCE = useCallback(
         () => changeNumberWritten({
-            newNumber: createMatrixElement({
-                scalar: 0
-            })
+            newNumber: math.parse('0')
         }), [changeNumberWritten]
     );
 
@@ -857,9 +855,7 @@ export const CalculatorProvider: React.FC = ({ children }) => {
 
             enterEditingMode({
                 newCalcState: CalcState.LambdaxA,
-                newScalar: createMatrixElement({
-                    scalar: 0
-                }),
+                newScalar: math.parse('0'),
             });
 
         }, [calcState, readyMatrix, editableMatrix, setReadyMatrix, enterEditingMode]
@@ -1081,7 +1077,7 @@ export const CalculatorProvider: React.FC = ({ children }) => {
                     scalarFullEquationSetup({
                         newMatrix: MatrixOperations.multiplyMatrixByScalar({
                             matrixA: readyMatrix,
-                            scalar: editableScalar as number | string,
+                            scalar: editableScalar as math.MathNode,
                         }),
                         scalar: editableScalar,
                     });
