@@ -1,7 +1,6 @@
 import MatrixData from "./MatrixData";
 import { SystemSolutionType, Operator } from "./constants";
 import ScalarOperations from "./ScalarOperations";
-import * as ExpressionSimplification from "./ExpressionSimplification";
 import { createMatrixElement, ExpressionData, VariableData } from "./ExpressionClasses";
 import ElementDataWithPosition from "../interfaces/ElementDataWithPosition";
 import MatrixColumnWithPosition from "../interfaces/MatrixColumnWithPosition";
@@ -286,10 +285,13 @@ class MatrixOperations {
             let matrixRow = [];
             for (let column = 0; column < matrixA.dimensions().columns; column++) {
                 matrixRow.push(
-                    ExpressionSimplification.varOperation(
-                        matrixA.data[row][column],
-                        Operator.Add,
-                        matrixB.data[row][column]
+                    new OperatorNode(
+                        '+',
+                        'add',
+                        [
+                            matrixA.data[row][column],
+                            matrixB.data[row][column]
+                        ]
                     )
                 );
             }
@@ -306,10 +308,13 @@ class MatrixOperations {
             let matrixRow = [];
             for (let column = 0; column < matrixA.dimensions().columns; column++) {
                 matrixRow.push(
-                    ExpressionSimplification.varOperation(
-                        matrixA.data[row][column],
-                        Operator.Subtract,
-                        matrixB.data[row][column]
+                    new OperatorNode(
+                        '-',
+                        'subtract',
+                        [
+                            matrixA.data[row][column],
+                            matrixB.data[row][column]
+                        ]
                     )
                 );
             }
@@ -330,15 +335,21 @@ class MatrixOperations {
                 });
                 for (let index = 0; index < matrixA.dimensions().columns; index++) {
 
-                    newElement = ExpressionSimplification.varOperation(
-                        ExpressionSimplification.varOperation(
-                            matrixA.data[row][index],
-                            Operator.Multiply,
-                            matrixB.data[index][column]
-                        ),
-                        Operator.Add,
-                        newElement
-                    );
+                    newElement = new OperatorNode(
+                        '+',
+                        'add',
+                        [
+                            new OperatorNode(
+                                '*',
+                                'multiply',
+                                [
+                                    matrixA.data[row][column],
+                                    matrixB.data[row][column]
+                                ]
+                            ),
+                            newElement
+                        ]
+                    )
 
                 }
                 matrixRow.push(newElement);
@@ -356,11 +367,14 @@ class MatrixOperations {
             let matrixRow = [];
             for (let column = 0; column < matrixA.dimensions().columns; column++) {
                 matrixRow.push(
-                    ExpressionSimplification.varOperation(
-                        matrixA.data[row][column],
-                        Operator.Multiply,
-                        scalar
-                    )
+                    new OperatorNode(
+                        '*',
+                        'multiply',
+                        [
+                            matrixA.data[row][column],
+                            scalar
+                        ]
+                    ),
                 );
             }
             matrix.push(matrixRow);
@@ -471,7 +485,14 @@ class MatrixOperations {
 
                         pivot = _matrixA.data[pivotColumn][pivotColumn];
 
-                        determinant = ExpressionSimplification.varOperation(determinant, Operator.Multiply, createMatrixElement({ scalar: -1 }));
+                        determinant = new OperatorNode(
+                            '*',
+                            'multiply',
+                            [
+                                determinant,
+                                math.parse(-1)
+                            ]
+                        );
                     }
                 }
 
@@ -481,16 +502,35 @@ class MatrixOperations {
 
                     if (!pivot.isOne) {
                         for (let index = 0; index < dimensionsA.columns; index++)
-                            _matrixA.data[pivotColumn][index] =
-                                ExpressionSimplification.varOperation(_matrixA.data[pivotColumn][index], Operator.Divide, pivot);
+                            _matrixA.data[pivotColumn][index] = new OperatorNode(
+                                '/',
+                                'divide',
+                                [
+                                    _matrixA.data[pivotColumn][index],
+                                    pivot
+                                ]
+                            );
 
                         console.log('STARTING MATRIX B DIVISION BY PIVOT')
                         for (let index = 0; index < dimensionsB.columns; index++)
-                            _matrixB.data[pivotColumn][index] =
-                                ExpressionSimplification.varOperation(_matrixB.data[pivotColumn][index], Operator.Divide, pivot);
+                            _matrixB.data[pivotColumn][index] = new OperatorNode(
+                                '/',
+                                'divide',
+                                [
+                                    _matrixB.data[pivotColumn][index],
+                                    pivot
+                                ]
+                            );
                         console.log('ENDED MATRIX B DIVISION BY PIVOT')
 
-                        determinant = ExpressionSimplification.varOperation(determinant, Operator.Multiply, pivot);
+                        determinant = new OperatorNode(
+                            '*',
+                            'multiply',
+                            [
+                                determinant,
+                                pivot
+                            ]
+                        );
 
                         //if (showSteps)
                         //    exibicao_passos_resolver_equacao_matricial(_matrixA, _matrixB, pivot, pivotColumn+1, pivotColumn+1, verticalElimination, None)
@@ -519,41 +559,60 @@ class MatrixOperations {
                             verticalIndex = index;
 
                         const element = _matrixA.data[verticalIndex][pivotColumn];
-                        const eliminationFactor = ExpressionSimplification.varOperation(
-                            ExpressionSimplification.varOperation(
-                                element,
-                                Operator.Multiply,
-                                createMatrixElement({ scalar: -1 })
-                            ),
-                            Operator.Divide,
-                            pivot,
+                        const eliminationFactor = new OperatorNode(
+                            '/',
+                            'divide',
+                            [
+                                new OperatorNode(
+                                    '*',
+                                    'multiply',
+                                    [
+                                        element,
+                                        math.parse('-1')
+                                    ]
+                                ),
+                                pivot
+                            ]
                         );
+
                         MatrixOperations.printMatrix(_matrixA);
 
                         console.log({ element: element.toString(), pivot: pivot.toString(), eliminationFactor: eliminationFactor.toString() })
 
                         for (let horizontalIndex = 0; horizontalIndex < dimensionsA.columns; horizontalIndex++) {
-                            _matrixA.data[verticalIndex][horizontalIndex] = ExpressionSimplification.varOperation(
-                                _matrixA.data[verticalIndex][horizontalIndex],
-                                Operator.Add,
-                                ExpressionSimplification.varOperation(
-                                    eliminationFactor,
-                                    Operator.Multiply,
-                                    _matrixA.data[pivotColumn][horizontalIndex]
-                                ),
+                            _matrixA.data[verticalIndex][horizontalIndex] = new OperatorNode(
+                                '+',
+                                'add',
+                                [
+                                    new OperatorNode(
+                                        '*',
+                                        'multiply',
+                                        [
+                                            eliminationFactor,
+                                            _matrixA.data[pivotColumn][horizontalIndex]
+                                        ]
+                                    ),
+                                    _matrixA.data[verticalIndex][horizontalIndex]
+                                ]
                             );
                         }
 
                         console.log('STARTING MATRIX B MERGE ROWS')
                         for (let horizontalIndex = 0; horizontalIndex < dimensionsB.columns; horizontalIndex++)
-                            _matrixB.data[verticalIndex][horizontalIndex] = ExpressionSimplification.varOperation(
-                                _matrixB.data[verticalIndex][horizontalIndex],
-                                Operator.Add,
-                                ExpressionSimplification.varOperation(
-                                    eliminationFactor,
-                                    Operator.Multiply,
-                                    _matrixB.data[pivotColumn][horizontalIndex]
-                                ),
+                            _matrixB.data[verticalIndex][horizontalIndex] = new OperatorNode(
+                                '+',
+                                'add',
+                                [
+                                    new OperatorNode(
+                                        '*',
+                                        'multiply',
+                                        [
+                                            eliminationFactor,
+                                            _matrixB.data[pivotColumn][horizontalIndex]
+                                        ]
+                                    ),
+                                    _matrixB.data[verticalIndex][horizontalIndex]
+                                ]
                             );
                         console.log('ENDED MATRIX B MERGE ROWS')
 
@@ -627,10 +686,13 @@ class MatrixOperations {
             const pivot = matrix.data[row][row];
             if (!pivot.isZero) {
                 for (let column = row; column < matrix.dimensions().columns; column++)
-                    matrix.data[row][column] = ExpressionSimplification.varOperation(
-                        matrix.data[row][column],
-                        Operator.Divide,
-                        pivot
+                    matrix.data[row][column] = new OperatorNode(
+                        '/',
+                        'divide',
+                        [
+                            matrix.data[row][column],
+                            pivot
+                        ]
                     );
             }
         }
@@ -1037,14 +1099,20 @@ class MatrixOperations {
         for (let rowIndex = vectorizedX.length - 1; rowIndex >= 0; rowIndex--) {
 
             for (let columnIndex = matrixA.dimensions().columns - 1; columnIndex > rowIndex; columnIndex--)
-                vectorizedX[rowIndex] = ExpressionSimplification.varOperation(
-                    vectorizedX[rowIndex],
-                    Operator.Subtract,
-                    ExpressionSimplification.varOperation(
-                        matrixA.data[rowIndex][columnIndex],
-                        Operator.Multiply,
-                        vectorizedX[columnIndex]
-                    )
+                vectorizedX[rowIndex] = new OperatorNode(
+                    '-',
+                    'subtract',
+                    [
+                        vectorizedX[rowIndex],
+                        new OperatorNode(
+                            '*',
+                            'multiply',
+                            [
+                                matrixA.data[rowIndex][columnIndex],
+                                vectorizedX[columnIndex]
+                            ]
+                        )
+                    ]
                 );
 
         }
