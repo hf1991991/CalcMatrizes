@@ -1,5 +1,6 @@
 import React, { useCallback } from 'react';
 import { View, Text, TouchableOpacity, FlatList } from 'react-native';
+import MathView from 'react-native-math-view';
 import ElementDataWithPosition from '../interfaces/ElementDataWithPosition';
 import SelectedMatrixElement from '../interfaces/SelectedMatrixElement';
 import { ElementData } from '../utilities/ExpressionClasses';
@@ -74,7 +75,7 @@ const MatrixColumn = ({
                     && editableOperatorNumber
                     ? editableOperatorNumber
                     : number
-            ).toString();
+            ).toTex();
         }, [editableOperatorNumber, isElementSelected]
     );
 
@@ -131,11 +132,20 @@ const MatrixColumn = ({
                                     textAlign: 'center',
                                 }}
                             >
-                                {formatElement({
-                                    number,
-                                    row,
-                                    column
-                                })}
+                            <MathView
+                                style={{
+                                    color: 'white',
+                                    flex: 1
+                                }}
+                                config={{ ex: 16 }}
+                                math={
+                                    formatElement({
+                                        number,
+                                        row,
+                                        column
+                                    })
+                                }
+                            />
                             </Text>
                         </View>
                     </TouchableOpacity>
