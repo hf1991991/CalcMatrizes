@@ -1,7 +1,5 @@
 # Calculadora de Matrizes
 
-Autor: Henrique Falconer
-
 <p align="center">
  <img align="center" src="https://user-images.githubusercontent.com/58156196/116633452-e413ec00-a92f-11eb-8e5c-4bf022fc8271.png" width="300">
 </p>
