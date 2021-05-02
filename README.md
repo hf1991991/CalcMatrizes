@@ -37,8 +37,7 @@ Obs.: Para conseguir a senha, só mandar uma mensagem pra mim pelo WhatsApp.
 - [Servidores da Apple em manutenção](https://github.com/fastlane/fastlane/issues/12683)
 - [Bundler::GemNotFound: Could not find CFPropertyList-3.0.0 in any of the sources](https://github.com/fastlane/fastlane/issues/15056)
 - [Certificado de distribuição não reconhecido pelo XCode](https://stackoverflow.com/questions/39568005/xcode-8-shows-error-that-provisioning-profile-doesnt-include-signing-certificat)
-- [Outro link para certificado de distribuição não reconhecido pelo XCode](https://help.pushwoosh.com/hc/en-us/articles/360000382743-Getting-the-Provisioning-profile-XXX-doesn-t-include-signing-certificate-iPhone-Distribution-XXX-from-the-XCode)![IMG_1981](https://user-images.githubusercontent.com/58156196/116633144-21c44500-a92f-11eb-9b14-1f845fe5dcfd.PNG)
-![IMG_1980](https://user-images.githubusercontent.com/58156196/116633146-22f57200-a92f-11eb-9783-54a0e5ee3758.PNG)![Icon](https://user-images.githubusercontent.com/58156196/116816440-4ccdb500-ab38-11eb-8a94-aa976db2d0f6.png)![Frame](https://user-images.githubusercontent.com/58156196/116816504-91595080-ab38-11eb-92ae-e5e6b96709f3.png)![Icon](https://user-images.githubusercontent.com/58156196/116816645-2f4d1b00-ab39-11eb-8ab7-d54388401b16.png)![Icon](https://user-images.githubusercontent.com/58156196/116816673-4d1a8000-ab39-11eb-8055-a92d1b5df00d.png)
+- [Outro link para certificado de distribuição não reconhecido pelo XCode](https://help.pushwoosh.com/hc/en-us/articles/360000382743-Getting-the-Provisioning-profile-XXX-doesn-t-include-signing-certificate-iPhone-Distribution-XXX-from-the-XCode)
 
 
 
