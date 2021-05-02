@@ -6,16 +6,10 @@ Autor: Henrique Falconer
  <img align="center" src="https://user-images.githubusercontent.com/58156196/116633452-e413ec00-a92f-11eb-8e5c-4bf022fc8271.png" width="300">
 </p>
 
-## Telas!
-
-<p align="center">
+<p align="center" float="left">
  <img align="center" src="https://user-images.githubusercontent.com/58156196/116632816-5d124400-a92e-11eb-9e4a-727e33e34f14.PNG" width="300" />
-</p>
-
-<p align="center">
  <img align="center" src="https://user-images.githubusercontent.com/58156196/116633741-b0859180-a930-11eb-920a-25ab747292da.PNG" width="300" />
 </p>
-
 
 <p align="center">
  <img align="center" src="https://user-images.githubusercontent.com/58156196/116633787-c85d1580-a930-11eb-87aa-e5db876527eb.PNG" height="300" />
